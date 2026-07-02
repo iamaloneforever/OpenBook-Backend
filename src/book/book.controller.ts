@@ -1,11 +1,14 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Logger } from "@nestjs/common";
 import { BookService } from "./book.service";
 
 @Controller("book")
 export class BookController {
-  constructor(private readonly bookService: BookService) { }
-  @Get()
-  async FindAll() {
-    return this.bookService.FindAll();
-  }
+	private readonly logger = new Logger(BookController.name);
+
+	constructor(private readonly bookService: BookService) { }
+	@Get()
+	async FindAll() {
+		this.logger.log("Fetching All Books");
+		return this.bookService.FindAll();
+	}
 }
