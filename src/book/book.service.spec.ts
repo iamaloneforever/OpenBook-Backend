@@ -1,96 +1,148 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { describe, beforeEach, it, expect, vi } from "vitest";
+import { Test, TestingModule } from '@nestjs/testing';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
+import { describe, beforeEach, it, expect, vi } from 'vitest';
 
-import { BookService } from "./book.service";
-import { PrismaService } from "../prisma/prisma.service";
-import { CreateBookDto } from "src/dtos/book/create-book-dto";
+import { Prisma } from '../generated/prisma/client';
 
-describe("BookService", () => {
-	let service: BookService;
-	let prisma: {
-		book: {
-			findMany: ReturnType<typeof vi.fn>;
-			findUnique: ReturnType<typeof vi.fn>;
-			create: ReturnType<typeof vi.fn>;
-		};
-	};
+import { BookService } from './book.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateBookDto } from '../dtos/book/create-book-dto';
 
-	beforeEach(async () => {
-		prisma = {
-			book: {
-				findMany: vi.fn(),
-				findUnique: vi.fn(),
-				create: vi.fn(),
-			},
-		};
+describe('BookService', () => {
+  let service: BookService;
 
-		const module: TestingModule = await Test.createTestingModule({
-			providers: [
-				BookService,
-				{
-					provide: PrismaService,
-					useValue: prisma,
-				},
-			],
-		}).compile();
+  let prisma: {
+    book: {
+      findMany: ReturnType<typeof vi.fn>;
+      findUnique: ReturnType<typeof vi.fn>;
+      create: ReturnType<typeof vi.fn>;
+    };
+  };
 
-		service = module.get(BookService);
-	});
+  beforeEach(async () => {
+    prisma = {
+      book: {
+        findMany: vi.fn(),
+        findUnique: vi.fn(),
+        create: vi.fn(),
+      },
+    };
 
-	it("should be defined", () => {
-		expect(service).toBeDefined();
-	});
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        BookService,
+        {
+          provide: PrismaService,
+          useValue: prisma,
+        },
+      ],
+    }).compile();
 
-	it("should return all books", async () => {
-		const books = [
-			{
-				id: "1",
-				title: "Clean Code",
-			},
-		];
+    service = module.get(BookService);
+  });
 
-		prisma.book.findMany.mockResolvedValue(books);
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 
-		const result = await service.findAll();
+  describe('findAll', () => {
+    it('should return all books', async () => {
+      const books = [
+        {
+          id: '1',
+          title: 'Clean Code',
+        },
+      ];
 
-		expect(result).toEqual(books);
-		expect(prisma.book.findMany).toHaveBeenCalledOnce();
-	});
+      prisma.book.findMany.mockResolvedValue(books);
 
-	it("should return one book", async () => {
-		const book = {
-			id: "1",
-			title: "Clean Code",
-		};
+      const result = await service.findAll();
 
-		prisma.book.findUnique.mockResolvedValue(book);
+      expect(result).toEqual(books);
 
-		const result = await service.findOne("1");
+      expect(prisma.book.findMany).toHaveBeenCalledWith({
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+    });
+  });
 
-		expect(result).toEqual(book);
-		expect(prisma.book.findUnique).toHaveBeenCalledWith({
-			where: { id: "1" },
-		});
-	});
+  describe('findOne', () => {
+    it('should return one book', async () => {
+      const book = {
+        id: '1',
+        title: 'Clean Code',
+      };
 
-	it("should create a book", async () => {
-		const dto: CreateBookDto = {
-			title: "Clean Code",
-			author: "Robert C. Martin",
-		};
+      prisma.book.findUnique.mockResolvedValue(book);
 
-		const createdBook = {
-			id: "1",
-			...dto,
-		};
+      const result = await service.findOne('1');
 
-		prisma.book.create.mockResolvedValue(createdBook);
+      expect(result).toEqual(book);
 
-		const result = await service.create(dto);
+      expect(prisma.book.findUnique).toHaveBeenCalledWith({
+        where: {
+          id: '1',
+        },
+      });
+    });
 
-		expect(result).toEqual(createdBook);
-		expect(prisma.book.create).toHaveBeenCalledWith({
-			data: dto,
-		});
-	});
+    it('should throw NotFoundException if book does not exist', async () => {
+      prisma.book.findUnique.mockResolvedValue(null);
+
+      await expect(service.findOne('1')).rejects.toThrow(NotFoundException);
+
+      expect(prisma.book.findUnique).toHaveBeenCalledWith({
+        where: {
+          id: '1',
+        },
+      });
+    });
+  });
+
+  describe('create', () => {
+    const dto: CreateBookDto = {
+      title: 'Clean Code',
+      author: 'Robert C. Martin',
+    };
+
+    it('should create a book', async () => {
+      const createdBook = {
+        id: '1',
+        ...dto,
+      };
+
+      prisma.book.create.mockResolvedValue(createdBook);
+
+      const result = await service.create(dto);
+
+      expect(result).toEqual(createdBook);
+
+      expect(prisma.book.create).toHaveBeenCalledWith({
+        data: dto,
+      });
+    });
+
+    it('should throw ConflictException when ISBN already exists', async () => {
+      const error = new Prisma.PrismaClientKnownRequestError('Duplicate key', {
+        code: 'P2002',
+        clientVersion: 'test',
+      });
+
+      prisma.book.create.mockRejectedValue(error);
+
+      await expect(service.create(dto)).rejects.toThrow(ConflictException);
+    });
+
+    it('should throw BadRequestException for unknown errors', async () => {
+      prisma.book.create.mockRejectedValue(new Error('Database crashed'));
+
+      await expect(service.create(dto)).rejects.toThrow(BadRequestException);
+    });
+  });
 });

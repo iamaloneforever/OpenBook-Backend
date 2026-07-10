@@ -2,9 +2,9 @@ import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 
 import type { Request, Response } from 'express';
 
-import { SignupDto } from 'src/dtos/auth/signup.dto';
+import { SignupDto } from '../dtos/auth/signup.dto';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from 'src/guards/Auth/local-auth.guard';
+import { LocalAuthGuard } from '../guards/Auth/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {

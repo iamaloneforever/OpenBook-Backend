@@ -10,7 +10,7 @@ import {
 import { BookService } from './book.service';
 import { CreateBookDto } from '../dtos/book/create-book-dto';
 import { BookIDParamDto } from '../dtos/shared/is-cuid.dto';
-import { JwtAuthGuard } from 'src/guards/Auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../guards/Auth/jwt-auth.guard';
 
 @Controller('book')
 export class BookController {
