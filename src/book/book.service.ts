@@ -7,7 +7,7 @@ import {
 } from "@nestjs/common";
 import { Prisma } from "../generated/prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
-import { CreateBookDto } from "src/dtos/create-book-dto";
+import { CreateBookDto } from "src/dtos/book/create-book-dto";
 
 @Injectable()
 export class BookService {

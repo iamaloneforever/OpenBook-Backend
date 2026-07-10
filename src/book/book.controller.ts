@@ -1,13 +1,22 @@
-import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { BookService } from './book.service';
-import { CreateBookDto } from '../dtos/create-book-dto';
-import { BookIDParamDto } from '../dtos/is-cuid.dto';
+import { CreateBookDto } from '../dtos/book/create-book-dto';
+import { BookIDParamDto } from '../dtos/shared/is-cuid.dto';
+import { JwtAuthGuard } from 'src/guards/Auth/jwt-auth.guard';
 
 @Controller('book')
 export class BookController {
   private readonly logger = new Logger(BookController.name);
-  constructor(private readonly bookService: BookService) { }
-
+  constructor(private readonly bookService: BookService) {}
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll() {
     this.logger.log('GET /book');

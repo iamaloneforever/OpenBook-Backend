@@ -46,6 +46,7 @@ export type BookMinAggregateOutputType = {
   coverUrl: string | null
   averageRating: number | null
   ratingsCount: number | null
+  ownerId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -60,6 +61,7 @@ export type BookMaxAggregateOutputType = {
   coverUrl: string | null
   averageRating: number | null
   ratingsCount: number | null
+  ownerId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -74,6 +76,7 @@ export type BookCountAggregateOutputType = {
   coverUrl: number
   averageRating: number
   ratingsCount: number
+  ownerId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -100,6 +103,7 @@ export type BookMinAggregateInputType = {
   coverUrl?: true
   averageRating?: true
   ratingsCount?: true
+  ownerId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -114,6 +118,7 @@ export type BookMaxAggregateInputType = {
   coverUrl?: true
   averageRating?: true
   ratingsCount?: true
+  ownerId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -128,6 +133,7 @@ export type BookCountAggregateInputType = {
   coverUrl?: true
   averageRating?: true
   ratingsCount?: true
+  ownerId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -229,6 +235,7 @@ export type BookGroupByOutputType = {
   coverUrl: string | null
   averageRating: number
   ratingsCount: number
+  ownerId: string | null
   createdAt: Date
   updatedAt: Date
   _count: BookCountAggregateOutputType | null
@@ -266,8 +273,10 @@ export type BookWhereInput = {
   coverUrl?: Prisma.StringNullableFilter<"Book"> | string | null
   averageRating?: Prisma.FloatFilter<"Book"> | number
   ratingsCount?: Prisma.IntFilter<"Book"> | number
+  ownerId?: Prisma.StringNullableFilter<"Book"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Book"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Book"> | Date | string
+  owner?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   ratings?: Prisma.RatingListRelationFilter
 }
 
@@ -281,8 +290,10 @@ export type BookOrderByWithRelationInput = {
   coverUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   averageRating?: Prisma.SortOrder
   ratingsCount?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  owner?: Prisma.UserOrderByWithRelationInput
   ratings?: Prisma.RatingOrderByRelationAggregateInput
 }
 
@@ -299,8 +310,10 @@ export type BookWhereUniqueInput = Prisma.AtLeast<{
   coverUrl?: Prisma.StringNullableFilter<"Book"> | string | null
   averageRating?: Prisma.FloatFilter<"Book"> | number
   ratingsCount?: Prisma.IntFilter<"Book"> | number
+  ownerId?: Prisma.StringNullableFilter<"Book"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Book"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Book"> | Date | string
+  owner?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   ratings?: Prisma.RatingListRelationFilter
 }, "id" | "isbn">
 
@@ -314,6 +327,7 @@ export type BookOrderByWithAggregationInput = {
   coverUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   averageRating?: Prisma.SortOrder
   ratingsCount?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.BookCountOrderByAggregateInput
@@ -336,6 +350,7 @@ export type BookScalarWhereWithAggregatesInput = {
   coverUrl?: Prisma.StringNullableWithAggregatesFilter<"Book"> | string | null
   averageRating?: Prisma.FloatWithAggregatesFilter<"Book"> | number
   ratingsCount?: Prisma.IntWithAggregatesFilter<"Book"> | number
+  ownerId?: Prisma.StringNullableWithAggregatesFilter<"Book"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Book"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Book"> | Date | string
 }
@@ -352,6 +367,7 @@ export type BookCreateInput = {
   ratingsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  owner?: Prisma.UserCreateNestedOneWithoutBooksInput
   ratings?: Prisma.RatingCreateNestedManyWithoutBookInput
 }
 
@@ -365,6 +381,7 @@ export type BookUncheckedCreateInput = {
   coverUrl?: string | null
   averageRating?: number
   ratingsCount?: number
+  ownerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutBookInput
@@ -382,6 +399,7 @@ export type BookUpdateInput = {
   ratingsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneWithoutBooksNestedInput
   ratings?: Prisma.RatingUpdateManyWithoutBookNestedInput
 }
 
@@ -395,6 +413,7 @@ export type BookUncheckedUpdateInput = {
   coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
   ratingsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutBookNestedInput
@@ -410,6 +429,7 @@ export type BookCreateManyInput = {
   coverUrl?: string | null
   averageRating?: number
   ratingsCount?: number
+  ownerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -438,8 +458,19 @@ export type BookUncheckedUpdateManyInput = {
   coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
   ratingsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type BookListRelationFilter = {
+  every?: Prisma.BookWhereInput
+  some?: Prisma.BookWhereInput
+  none?: Prisma.BookWhereInput
+}
+
+export type BookOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type BookCountOrderByAggregateInput = {
@@ -452,6 +483,7 @@ export type BookCountOrderByAggregateInput = {
   coverUrl?: Prisma.SortOrder
   averageRating?: Prisma.SortOrder
   ratingsCount?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -471,6 +503,7 @@ export type BookMaxOrderByAggregateInput = {
   coverUrl?: Prisma.SortOrder
   averageRating?: Prisma.SortOrder
   ratingsCount?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -485,6 +518,7 @@ export type BookMinOrderByAggregateInput = {
   coverUrl?: Prisma.SortOrder
   averageRating?: Prisma.SortOrder
   ratingsCount?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -499,12 +533,46 @@ export type BookScalarRelationFilter = {
   isNot?: Prisma.BookWhereInput
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
+export type BookCreateNestedManyWithoutOwnerInput = {
+  create?: Prisma.XOR<Prisma.BookCreateWithoutOwnerInput, Prisma.BookUncheckedCreateWithoutOwnerInput> | Prisma.BookCreateWithoutOwnerInput[] | Prisma.BookUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.BookCreateOrConnectWithoutOwnerInput | Prisma.BookCreateOrConnectWithoutOwnerInput[]
+  createMany?: Prisma.BookCreateManyOwnerInputEnvelope
+  connect?: Prisma.BookWhereUniqueInput | Prisma.BookWhereUniqueInput[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
+export type BookUncheckedCreateNestedManyWithoutOwnerInput = {
+  create?: Prisma.XOR<Prisma.BookCreateWithoutOwnerInput, Prisma.BookUncheckedCreateWithoutOwnerInput> | Prisma.BookCreateWithoutOwnerInput[] | Prisma.BookUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.BookCreateOrConnectWithoutOwnerInput | Prisma.BookCreateOrConnectWithoutOwnerInput[]
+  createMany?: Prisma.BookCreateManyOwnerInputEnvelope
+  connect?: Prisma.BookWhereUniqueInput | Prisma.BookWhereUniqueInput[]
+}
+
+export type BookUpdateManyWithoutOwnerNestedInput = {
+  create?: Prisma.XOR<Prisma.BookCreateWithoutOwnerInput, Prisma.BookUncheckedCreateWithoutOwnerInput> | Prisma.BookCreateWithoutOwnerInput[] | Prisma.BookUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.BookCreateOrConnectWithoutOwnerInput | Prisma.BookCreateOrConnectWithoutOwnerInput[]
+  upsert?: Prisma.BookUpsertWithWhereUniqueWithoutOwnerInput | Prisma.BookUpsertWithWhereUniqueWithoutOwnerInput[]
+  createMany?: Prisma.BookCreateManyOwnerInputEnvelope
+  set?: Prisma.BookWhereUniqueInput | Prisma.BookWhereUniqueInput[]
+  disconnect?: Prisma.BookWhereUniqueInput | Prisma.BookWhereUniqueInput[]
+  delete?: Prisma.BookWhereUniqueInput | Prisma.BookWhereUniqueInput[]
+  connect?: Prisma.BookWhereUniqueInput | Prisma.BookWhereUniqueInput[]
+  update?: Prisma.BookUpdateWithWhereUniqueWithoutOwnerInput | Prisma.BookUpdateWithWhereUniqueWithoutOwnerInput[]
+  updateMany?: Prisma.BookUpdateManyWithWhereWithoutOwnerInput | Prisma.BookUpdateManyWithWhereWithoutOwnerInput[]
+  deleteMany?: Prisma.BookScalarWhereInput | Prisma.BookScalarWhereInput[]
+}
+
+export type BookUncheckedUpdateManyWithoutOwnerNestedInput = {
+  create?: Prisma.XOR<Prisma.BookCreateWithoutOwnerInput, Prisma.BookUncheckedCreateWithoutOwnerInput> | Prisma.BookCreateWithoutOwnerInput[] | Prisma.BookUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.BookCreateOrConnectWithoutOwnerInput | Prisma.BookCreateOrConnectWithoutOwnerInput[]
+  upsert?: Prisma.BookUpsertWithWhereUniqueWithoutOwnerInput | Prisma.BookUpsertWithWhereUniqueWithoutOwnerInput[]
+  createMany?: Prisma.BookCreateManyOwnerInputEnvelope
+  set?: Prisma.BookWhereUniqueInput | Prisma.BookWhereUniqueInput[]
+  disconnect?: Prisma.BookWhereUniqueInput | Prisma.BookWhereUniqueInput[]
+  delete?: Prisma.BookWhereUniqueInput | Prisma.BookWhereUniqueInput[]
+  connect?: Prisma.BookWhereUniqueInput | Prisma.BookWhereUniqueInput[]
+  update?: Prisma.BookUpdateWithWhereUniqueWithoutOwnerInput | Prisma.BookUpdateWithWhereUniqueWithoutOwnerInput[]
+  updateMany?: Prisma.BookUpdateManyWithWhereWithoutOwnerInput | Prisma.BookUpdateManyWithWhereWithoutOwnerInput[]
+  deleteMany?: Prisma.BookScalarWhereInput | Prisma.BookScalarWhereInput[]
 }
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -527,10 +595,6 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type BookCreateNestedOneWithoutRatingsInput = {
   create?: Prisma.XOR<Prisma.BookCreateWithoutRatingsInput, Prisma.BookUncheckedCreateWithoutRatingsInput>
   connectOrCreate?: Prisma.BookCreateOrConnectWithoutRatingsInput
@@ -545,6 +609,80 @@ export type BookUpdateOneRequiredWithoutRatingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BookUpdateToOneWithWhereWithoutRatingsInput, Prisma.BookUpdateWithoutRatingsInput>, Prisma.BookUncheckedUpdateWithoutRatingsInput>
 }
 
+export type BookCreateWithoutOwnerInput = {
+  id?: string
+  title: string
+  description?: string | null
+  author: string
+  isbn?: string | null
+  publishedAt?: Date | string | null
+  coverUrl?: string | null
+  averageRating?: number
+  ratingsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ratings?: Prisma.RatingCreateNestedManyWithoutBookInput
+}
+
+export type BookUncheckedCreateWithoutOwnerInput = {
+  id?: string
+  title: string
+  description?: string | null
+  author: string
+  isbn?: string | null
+  publishedAt?: Date | string | null
+  coverUrl?: string | null
+  averageRating?: number
+  ratingsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutBookInput
+}
+
+export type BookCreateOrConnectWithoutOwnerInput = {
+  where: Prisma.BookWhereUniqueInput
+  create: Prisma.XOR<Prisma.BookCreateWithoutOwnerInput, Prisma.BookUncheckedCreateWithoutOwnerInput>
+}
+
+export type BookCreateManyOwnerInputEnvelope = {
+  data: Prisma.BookCreateManyOwnerInput | Prisma.BookCreateManyOwnerInput[]
+  skipDuplicates?: boolean
+}
+
+export type BookUpsertWithWhereUniqueWithoutOwnerInput = {
+  where: Prisma.BookWhereUniqueInput
+  update: Prisma.XOR<Prisma.BookUpdateWithoutOwnerInput, Prisma.BookUncheckedUpdateWithoutOwnerInput>
+  create: Prisma.XOR<Prisma.BookCreateWithoutOwnerInput, Prisma.BookUncheckedCreateWithoutOwnerInput>
+}
+
+export type BookUpdateWithWhereUniqueWithoutOwnerInput = {
+  where: Prisma.BookWhereUniqueInput
+  data: Prisma.XOR<Prisma.BookUpdateWithoutOwnerInput, Prisma.BookUncheckedUpdateWithoutOwnerInput>
+}
+
+export type BookUpdateManyWithWhereWithoutOwnerInput = {
+  where: Prisma.BookScalarWhereInput
+  data: Prisma.XOR<Prisma.BookUpdateManyMutationInput, Prisma.BookUncheckedUpdateManyWithoutOwnerInput>
+}
+
+export type BookScalarWhereInput = {
+  AND?: Prisma.BookScalarWhereInput | Prisma.BookScalarWhereInput[]
+  OR?: Prisma.BookScalarWhereInput[]
+  NOT?: Prisma.BookScalarWhereInput | Prisma.BookScalarWhereInput[]
+  id?: Prisma.StringFilter<"Book"> | string
+  title?: Prisma.StringFilter<"Book"> | string
+  description?: Prisma.StringNullableFilter<"Book"> | string | null
+  author?: Prisma.StringFilter<"Book"> | string
+  isbn?: Prisma.StringNullableFilter<"Book"> | string | null
+  publishedAt?: Prisma.DateTimeNullableFilter<"Book"> | Date | string | null
+  coverUrl?: Prisma.StringNullableFilter<"Book"> | string | null
+  averageRating?: Prisma.FloatFilter<"Book"> | number
+  ratingsCount?: Prisma.IntFilter<"Book"> | number
+  ownerId?: Prisma.StringNullableFilter<"Book"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Book"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Book"> | Date | string
+}
+
 export type BookCreateWithoutRatingsInput = {
   id?: string
   title: string
@@ -557,6 +695,7 @@ export type BookCreateWithoutRatingsInput = {
   ratingsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  owner?: Prisma.UserCreateNestedOneWithoutBooksInput
 }
 
 export type BookUncheckedCreateWithoutRatingsInput = {
@@ -569,6 +708,7 @@ export type BookUncheckedCreateWithoutRatingsInput = {
   coverUrl?: string | null
   averageRating?: number
   ratingsCount?: number
+  ownerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -601,9 +741,69 @@ export type BookUpdateWithoutRatingsInput = {
   ratingsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneWithoutBooksNestedInput
 }
 
 export type BookUncheckedUpdateWithoutRatingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  author?: Prisma.StringFieldUpdateOperationsInput | string
+  isbn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  ratingsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type BookCreateManyOwnerInput = {
+  id?: string
+  title: string
+  description?: string | null
+  author: string
+  isbn?: string | null
+  publishedAt?: Date | string | null
+  coverUrl?: string | null
+  averageRating?: number
+  ratingsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type BookUpdateWithoutOwnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  author?: Prisma.StringFieldUpdateOperationsInput | string
+  isbn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  ratingsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ratings?: Prisma.RatingUpdateManyWithoutBookNestedInput
+}
+
+export type BookUncheckedUpdateWithoutOwnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  author?: Prisma.StringFieldUpdateOperationsInput | string
+  isbn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  ratingsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutBookNestedInput
+}
+
+export type BookUncheckedUpdateManyWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -658,8 +858,10 @@ export type BookSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   coverUrl?: boolean
   averageRating?: boolean
   ratingsCount?: boolean
+  ownerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  owner?: boolean | Prisma.Book$ownerArgs<ExtArgs>
   ratings?: boolean | Prisma.Book$ratingsArgs<ExtArgs>
   _count?: boolean | Prisma.BookCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["book"]>
@@ -674,8 +876,10 @@ export type BookSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   coverUrl?: boolean
   averageRating?: boolean
   ratingsCount?: boolean
+  ownerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  owner?: boolean | Prisma.Book$ownerArgs<ExtArgs>
 }, ExtArgs["result"]["book"]>
 
 export type BookSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -688,8 +892,10 @@ export type BookSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   coverUrl?: boolean
   averageRating?: boolean
   ratingsCount?: boolean
+  ownerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  owner?: boolean | Prisma.Book$ownerArgs<ExtArgs>
 }, ExtArgs["result"]["book"]>
 
 export type BookSelectScalar = {
@@ -702,21 +908,28 @@ export type BookSelectScalar = {
   coverUrl?: boolean
   averageRating?: boolean
   ratingsCount?: boolean
+  ownerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BookOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "author" | "isbn" | "publishedAt" | "coverUrl" | "averageRating" | "ratingsCount" | "createdAt" | "updatedAt", ExtArgs["result"]["book"]>
+export type BookOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "author" | "isbn" | "publishedAt" | "coverUrl" | "averageRating" | "ratingsCount" | "ownerId" | "createdAt" | "updatedAt", ExtArgs["result"]["book"]>
 export type BookInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  owner?: boolean | Prisma.Book$ownerArgs<ExtArgs>
   ratings?: boolean | Prisma.Book$ratingsArgs<ExtArgs>
   _count?: boolean | Prisma.BookCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type BookIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type BookIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type BookIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  owner?: boolean | Prisma.Book$ownerArgs<ExtArgs>
+}
+export type BookIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  owner?: boolean | Prisma.Book$ownerArgs<ExtArgs>
+}
 
 export type $BookPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Book"
   objects: {
+    owner: Prisma.$UserPayload<ExtArgs> | null
     ratings: Prisma.$RatingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -729,6 +942,7 @@ export type $BookPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     coverUrl: string | null
     averageRating: number
     ratingsCount: number
+    ownerId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["book"]>
@@ -1125,6 +1339,7 @@ readonly fields: BookFieldRefs;
  */
 export interface Prisma__BookClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  owner<T extends Prisma.Book$ownerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Book$ownerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   ratings<T extends Prisma.Book$ratingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Book$ratingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RatingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1164,6 +1379,7 @@ export interface BookFieldRefs {
   readonly coverUrl: Prisma.FieldRef<"Book", 'String'>
   readonly averageRating: Prisma.FieldRef<"Book", 'Float'>
   readonly ratingsCount: Prisma.FieldRef<"Book", 'Int'>
+  readonly ownerId: Prisma.FieldRef<"Book", 'String'>
   readonly createdAt: Prisma.FieldRef<"Book", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Book", 'DateTime'>
 }
@@ -1420,6 +1636,10 @@ export type BookCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.BookCreateManyInput | Prisma.BookCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BookIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1490,6 +1710,10 @@ export type BookUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Books to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BookIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1556,6 +1780,25 @@ export type BookDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Books to delete.
    */
   limit?: number
+}
+
+/**
+ * Book.owner
+ */
+export type Book$ownerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

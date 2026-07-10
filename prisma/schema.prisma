@@ -13,6 +13,19 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
+  refreshToken String?
+
+  books Book[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
 model Book {
   id          String   @id @default(cuid())
   title       String
@@ -21,16 +34,20 @@ model Book {
   isbn        String?  @unique
 
   publishedAt DateTime?
-
   coverUrl    String?
 
-  averageRating Float   @default(0)
-  ratingsCount  Int     @default(0)
+  averageRating Float @default(0)
+  ratingsCount  Int   @default(0)
+
+  ownerId String?
+  owner   User? @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   ratings Rating[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
 }
 
 model Rating {
