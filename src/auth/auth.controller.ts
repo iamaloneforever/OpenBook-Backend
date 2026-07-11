@@ -4,11 +4,11 @@ import type { Request, Response } from 'express';
 
 import { SignupDto } from '../dtos/auth/signup.dto';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from '../guards/Auth/local-auth.guard';
+import { LocalAuthGuard } from '../guards/auth/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('signup')
   async signup(

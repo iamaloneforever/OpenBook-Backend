@@ -4,23 +4,26 @@ import {
 	Injectable,
 	Logger,
 	NotFoundException,
-} from "@nestjs/common";
-import { Prisma } from "../generated/prisma/client";
-import { PrismaService } from "../prisma/prisma.service";
-import { CreateBookDto } from "src/dtos/book/create-book-dto";
+} from '@nestjs/common';
+import { Prisma } from '../generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateBookDto } from 'src/dtos/book/create-book-dto';
 
 @Injectable()
 export class BookService {
 	private readonly logger = new Logger(BookService.name);
 
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(private readonly prisma: PrismaService) { }
 
-	async findAll() {
-		this.logger.log("Finding all books");
+	async findAll(userId: string) {
+		this.logger.log('Finding all books');
 
 		return this.prisma.book.findMany({
+			where: {
+				ownerId: userId,
+			},
 			orderBy: {
-				createdAt: "desc",
+				createdAt: 'desc',
 			},
 		});
 	}
@@ -33,30 +36,37 @@ export class BookService {
 		});
 
 		if (!book) {
-			throw new NotFoundException("Book not found");
+			throw new NotFoundException('Book not found');
 		}
 
 		return book;
 	}
 
-	async create(dto: CreateBookDto) {
-		this.logger.log("Creating a new book");
+	async create(dto: CreateBookDto, ownerId: string) {
+		this.logger.log('Creating a new book');
 
 		try {
 			return await this.prisma.book.create({
-				data: dto,
+				data: {
+					...dto,
+					owner: {
+						connect: {
+							id: ownerId,
+						},
+					},
+				},
 			});
 		} catch (error) {
-			this.logger.error("Failed to create book", error);
+			this.logger.error('Failed to create book', error);
 
 			if (
 				error instanceof Prisma.PrismaClientKnownRequestError &&
-				error.code === "P2002"
+				error.code === 'P2002'
 			) {
-				throw new ConflictException("A book with this ISBN already exists.");
+				throw new ConflictException('A book with this ISBN already exists.');
 			}
 
-			throw new BadRequestException("Failed to create book.");
+			throw new BadRequestException('Failed to create book.');
 		}
 	}
 }
