@@ -11,6 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -32,18 +33,20 @@ export class BookController {
   constructor(private readonly bookService: BookService) { }
 
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60)
   @Get()
-  async findAll(@CurrentUser() user: User, @Query() query: SearchBookDto) {
+  findAll(@CurrentUser() user: User, @Query() query: SearchBookDto) {
     this.logger.log('GET /book');
 
     return this.bookService.findAll(user.id, query);
   }
-
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60) // 60 ثانیه
   @Get(':id')
   findOne(@Param() params: BookIDParamDto) {
     return this.bookService.findOne(params.id);
   }
-
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
