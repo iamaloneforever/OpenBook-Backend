@@ -700,6 +700,7 @@ export type BookScalarFieldEnum = (typeof BookScalarFieldEnum)[keyof typeof Book
 export const RatingScalarFieldEnum = {
   id: 'id',
   value: 'value',
+  userId: 'userId',
   bookId: 'bookId',
   createdAt: 'createdAt'
 } as const

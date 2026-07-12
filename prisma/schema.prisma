@@ -14,16 +14,16 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(cuid())
-  username String @unique
+  id           String   @id @default(cuid())
+  username     String   @unique
   password String
   refreshToken String?
 
-  books Book[]
+  books   Book[]
+  ratings Rating[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 }
 
 model Book {
@@ -51,14 +51,17 @@ model Book {
 }
 
 model Rating {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  value     Int
+  value Int
 
-  bookId    String
-  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bookId String
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
-  @@index([bookId])
+  @@unique([userId, bookId])
 }
