@@ -1,11 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -14,24 +9,25 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  username     String   @unique
-  password String
+  id           String  @id @default(cuid())
+  username     String  @unique
+  password     String
   refreshToken String?
 
-  books   Book[]
-  ratings Rating[]
+  books     Book[]
+  ratings   Rating[]
+  readLists ReadList[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Book {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   title       String
   description String?
   author      String
-  isbn        String?  @unique
+  isbn        String? @unique
 
   publishedAt DateTime?
   coverUrl    String?
@@ -39,15 +35,46 @@ model Book {
   averageRating Float @default(0)
   ratingsCount  Int   @default(0)
 
-  ownerId String?
-  owner   User? @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
-  ratings Rating[]
+  ratings       Rating[]
+  readListBooks ReadListBook[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([ownerId])
+}
+
+model ReadList {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+
+  userId String
+  owner  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items ReadListBook[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, title])
+  @@index([userId])
+}
+
+model ReadListBook {
+  readListId String
+  bookId     String
+
+  readList ReadList @relation(fields: [readListId], references: [id], onDelete: Cascade)
+  book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  addedAt DateTime @default(now())
+
+  @@id([readListId, bookId])
+  @@index([bookId])
 }
 
 model Rating {
@@ -56,12 +83,13 @@ model Rating {
   value Int
 
   userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   bookId String
-  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
   @@unique([userId, bookId])
+  @@index([bookId])
 }

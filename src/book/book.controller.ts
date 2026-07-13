@@ -2,10 +2,12 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Logger,
   Param,
   Post,
+  Put,
   Query,
   UploadedFile,
   UseGuards,
@@ -25,6 +27,7 @@ import { RateBookDto } from 'src/dtos/book/rate-book.dto';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { SearchBookDto } from 'src/dtos/book/search-book.dto';
+import { UpdateBookDto } from 'src/dtos/book/update-book.dto';
 
 @Controller('book')
 export class BookController {
@@ -99,5 +102,19 @@ export class BookController {
     @CurrentUser() user: User,
   ) {
     return this.bookService.rateBook(id, user.id, dto.value);
+  }
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  deleteBook(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.bookService.deleteBook(id, user.id);
+  }
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  updateBook(
+    @Param('id') id: string,
+    @CurrentUser() user: User,
+    @Body() dto: UpdateBookDto,
+  ) {
+    return this.bookService.updateBook(id, user.id, dto);
   }
 }

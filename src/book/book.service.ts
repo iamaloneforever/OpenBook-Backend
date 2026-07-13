@@ -9,6 +9,7 @@ import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookDto } from 'src/dtos/book/create-book-dto';
 import { SearchBookDto } from 'src/dtos/book/search-book.dto';
+import { UpdateBookDto } from 'src/dtos/book/update-book.dto';
 
 @Injectable()
 export class BookService {
@@ -214,5 +215,88 @@ export class BookService {
 
 			return updatedBook;
 		});
+	}
+	async deleteBook(bookId: string, userId: string) {
+		this.logger.log(`Deleting book ${bookId} for user ${userId}`);
+
+		const book = await this.prisma.book.findFirst({
+			where: {
+				id: bookId,
+				ownerId: userId,
+			},
+		});
+
+		if (!book) {
+			this.logger.warn(
+				`Book ${bookId} not found or does not belong to user ${userId}`,
+			);
+
+			throw new NotFoundException('Book not found');
+		}
+
+		await this.prisma.book.delete({
+			where: {
+				id: bookId,
+			},
+		});
+
+		this.logger.log(`Book ${bookId} deleted successfully`);
+
+		return {
+			message: 'Book deleted successfully',
+		};
+	}
+	async updateBook(
+		bookId: string,
+		userId: string,
+		dto: UpdateBookDto,
+		coverUrl?: string,
+	) {
+		this.logger.log(`Updating book ${bookId} for user ${userId}`);
+
+		const book = await this.prisma.book.findFirst({
+			where: {
+				id: bookId,
+				ownerId: userId,
+			},
+		});
+
+		if (!book) {
+			this.logger.warn(
+				`Book ${bookId} not found or does not belong to user ${userId}`,
+			);
+
+			throw new NotFoundException('Book not found');
+		}
+
+		try {
+			const updatedBook = await this.prisma.book.update({
+				where: {
+					id: bookId,
+				},
+				data: {
+					...dto,
+					...(coverUrl && { coverUrl }),
+				},
+			});
+
+			this.logger.log(`Book ${bookId} updated successfully`);
+
+			return updatedBook;
+		} catch (error) {
+			this.logger.error(
+				`Failed to update book ${bookId}`,
+				error instanceof Error ? error.stack : String(error),
+			);
+
+			if (
+				error instanceof Prisma.PrismaClientKnownRequestError &&
+				error.code === 'P2002'
+			) {
+				throw new ConflictException('A book with this ISBN already exists.');
+			}
+
+			throw new BadRequestException('Failed to update book.');
+		}
 	}
 }

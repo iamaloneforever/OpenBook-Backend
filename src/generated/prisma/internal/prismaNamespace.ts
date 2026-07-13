@@ -386,6 +386,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Book: 'Book',
+  ReadList: 'ReadList',
+  ReadListBook: 'ReadListBook',
   Rating: 'Rating'
 } as const
 
@@ -402,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "book" | "rating"
+    modelProps: "user" | "book" | "readList" | "readListBook" | "rating"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -554,6 +556,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ReadList: {
+      payload: Prisma.$ReadListPayload<ExtArgs>
+      fields: Prisma.ReadListFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReadListFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReadListFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListPayload>
+        }
+        findFirst: {
+          args: Prisma.ReadListFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReadListFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListPayload>
+        }
+        findMany: {
+          args: Prisma.ReadListFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListPayload>[]
+        }
+        create: {
+          args: Prisma.ReadListCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListPayload>
+        }
+        createMany: {
+          args: Prisma.ReadListCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReadListCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListPayload>[]
+        }
+        delete: {
+          args: Prisma.ReadListDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListPayload>
+        }
+        update: {
+          args: Prisma.ReadListUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReadListDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReadListUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReadListUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReadListUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListPayload>
+        }
+        aggregate: {
+          args: Prisma.ReadListAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReadList>
+        }
+        groupBy: {
+          args: Prisma.ReadListGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadListGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReadListCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadListCountAggregateOutputType> | number
+        }
+      }
+    }
+    ReadListBook: {
+      payload: Prisma.$ReadListBookPayload<ExtArgs>
+      fields: Prisma.ReadListBookFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReadListBookFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListBookPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReadListBookFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListBookPayload>
+        }
+        findFirst: {
+          args: Prisma.ReadListBookFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListBookPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReadListBookFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListBookPayload>
+        }
+        findMany: {
+          args: Prisma.ReadListBookFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListBookPayload>[]
+        }
+        create: {
+          args: Prisma.ReadListBookCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListBookPayload>
+        }
+        createMany: {
+          args: Prisma.ReadListBookCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReadListBookCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListBookPayload>[]
+        }
+        delete: {
+          args: Prisma.ReadListBookDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListBookPayload>
+        }
+        update: {
+          args: Prisma.ReadListBookUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListBookPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReadListBookDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReadListBookUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReadListBookUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListBookPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReadListBookUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListBookPayload>
+        }
+        aggregate: {
+          args: Prisma.ReadListBookAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReadListBook>
+        }
+        groupBy: {
+          args: Prisma.ReadListBookGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadListBookGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReadListBookCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadListBookCountAggregateOutputType> | number
+        }
+      }
+    }
     Rating: {
       payload: Prisma.$RatingPayload<ExtArgs>
       fields: Prisma.RatingFieldRefs
@@ -695,6 +845,27 @@ export const BookScalarFieldEnum = {
 } as const
 
 export type BookScalarFieldEnum = (typeof BookScalarFieldEnum)[keyof typeof BookScalarFieldEnum]
+
+
+export const ReadListScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReadListScalarFieldEnum = (typeof ReadListScalarFieldEnum)[keyof typeof ReadListScalarFieldEnum]
+
+
+export const ReadListBookScalarFieldEnum = {
+  readListId: 'readListId',
+  bookId: 'bookId',
+  addedAt: 'addedAt'
+} as const
+
+export type ReadListBookScalarFieldEnum = (typeof ReadListBookScalarFieldEnum)[keyof typeof ReadListBookScalarFieldEnum]
 
 
 export const RatingScalarFieldEnum = {
@@ -905,6 +1076,8 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   book?: Prisma.BookOmit
+  readList?: Prisma.ReadListOmit
+  readListBook?: Prisma.ReadListBookOmit
   rating?: Prisma.RatingOmit
 }
 

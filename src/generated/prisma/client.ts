@@ -50,6 +50,16 @@ export type User = Prisma.UserModel
  */
 export type Book = Prisma.BookModel
 /**
+ * Model ReadList
+ * 
+ */
+export type ReadList = Prisma.ReadListModel
+/**
+ * Model ReadListBook
+ * 
+ */
+export type ReadListBook = Prisma.ReadListBookModel
+/**
  * Model Rating
  * 
  */
