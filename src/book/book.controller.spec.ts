@@ -171,7 +171,7 @@ describe('BookController', () => {
 
       service.deleteBook.mockResolvedValue(result);
 
-      const response = await controller.deleteBook('book-1', user as any);
+      const response = await controller.deleteBook('book-1');
 
       expect(service.deleteBook).toHaveBeenCalledWith('book-1');
       expect(response).toEqual(result);
@@ -191,11 +191,7 @@ describe('BookController', () => {
 
       service.updateBook.mockResolvedValue(result);
 
-      const response = await controller.updateBook(
-        'book-1',
-        user as any,
-        dto as any,
-      );
+      const response = await controller.updateBook('book-1', user as any);
 
       expect(service.updateBook).toHaveBeenCalledWith('book-1', dto);
 
