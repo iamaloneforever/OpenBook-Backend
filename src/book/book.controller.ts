@@ -73,17 +73,13 @@ export class BookController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, OwnerGuard)
   @Owner('book')
-  deleteBook(@Param('id') id: string, @CurrentUser() user: User) {
+  deleteBook(@Param('id') id: string) {
     return this.bookService.deleteBook(id);
   }
   @Put(':id')
   @UseGuards(JwtAuthGuard, OwnerGuard)
   @Owner('book')
-  updateBook(
-    @Param('id') id: string,
-    @CurrentUser() user: User,
-    @Body() dto: UpdateBookDto,
-  ) {
+  updateBook(@Param('id') id: string, @Body() dto: UpdateBookDto) {
     return this.bookService.updateBook(id, dto);
   }
 }
