@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JwtAuthGuard } from 'src/guards/auth/jwt-auth.guard';
-import { CurrentUser } from 'src/decorators/Current-user.decorator';
+import { JwtAuthGuard } from 'src/common/guards/auth/jwt-auth.guard';
+import { CurrentUser } from 'src/common/decorators/Current-user.decorator';
 import type { User } from 'src/generated/prisma/client';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 

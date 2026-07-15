@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -15,19 +14,18 @@ import {
 } from '@nestjs/common';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
-import { FileInterceptor } from '@nestjs/platform-express';
-
 import { BookService } from './book.service';
-import { CreateBookDto } from '../dtos/book/create-book-dto';
-import { BookIDParamDto } from '../dtos/shared/is-cuid.dto';
-import { JwtAuthGuard } from '../guards/auth/jwt-auth.guard';
-import { CurrentUser } from 'src/decorators/Current-user.decorator';
-import type { User } from 'src/generated/prisma/client';
-import { RateBookDto } from 'src/dtos/book/rate-book.dto';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { SearchBookDto } from 'src/dtos/book/search-book.dto';
-import { UpdateBookDto } from 'src/dtos/book/update-book.dto';
+import { CreateBookDto } from '../common/dtos/book/create-book-dto';
+import { BookIDParamDto } from '../common/dtos/shared/is-cuid.dto';
+import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
+import { CurrentUser } from '../common/decorators/Current-user.decorator';
+import type { User } from '../generated/prisma/client';
+import { RateBookDto } from '../common/dtos/book/rate-book.dto';
+import { SearchBookDto } from '../common/dtos/book/search-book.dto';
+import { UpdateBookDto } from '../common/dtos/book/update-book.dto';
+import { CoverUploadInterceptor } from '../common/config/multer.config';
+import { OwnerGuard } from '../common/guards/auth/owner.guard';
+import { Owner } from '../common/decorators/owner.decorator';
 
 @Controller('book')
 export class BookController {
@@ -44,52 +42,21 @@ export class BookController {
 
     return this.bookService.findAll(user.id, query);
   }
+  @UseGuards(JwtAuthGuard, OwnerGuard)
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(60) // 60 ثانیه
   @Get(':id')
+  @Owner('book')
   findOne(@Param() params: BookIDParamDto) {
     return this.bookService.findOne(params.id);
   }
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    FileInterceptor('cover', {
-      storage: diskStorage({
-        destination: './uploads/books/covers',
-
-        filename: (_, file, callback) => {
-          const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-
-          callback(null, uniqueName + extname(file.originalname));
-        },
-      }),
-
-      fileFilter: (_, file, callback) => {
-        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
-
-        const ext = extname(file.originalname).toLowerCase();
-
-        if (!allowedExtensions.includes(ext)) {
-          return callback(
-            new BadRequestException(
-              'Only jpg, jpeg, png and webp images are allowed',
-            ),
-            false,
-          );
-        }
-
-        callback(null, true);
-      },
-
-      limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB
-      },
-    }),
-  )
+  @UseInterceptors(CoverUploadInterceptor)
   create(
     @Body() dto: CreateBookDto,
     @CurrentUser() user: User,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.bookService.create(dto, user.id, file?.path);
   }
@@ -104,17 +71,19 @@ export class BookController {
     return this.bookService.rateBook(id, user.id, dto.value);
   }
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, OwnerGuard)
+  @Owner('book')
   deleteBook(@Param('id') id: string, @CurrentUser() user: User) {
-    return this.bookService.deleteBook(id, user.id);
+    return this.bookService.deleteBook(id);
   }
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, OwnerGuard)
+  @Owner('book')
   updateBook(
     @Param('id') id: string,
     @CurrentUser() user: User,
     @Body() dto: UpdateBookDto,
   ) {
-    return this.bookService.updateBook(id, user.id, dto);
+    return this.bookService.updateBook(id, dto);
   }
 }

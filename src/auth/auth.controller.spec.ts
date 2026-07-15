@@ -3,7 +3,7 @@ import { describe, beforeEach, it, expect, vi } from 'vitest';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { SignupDto } from 'src/dtos/auth/signup.dto';
+import { SignupDto } from 'src/common/dtos/auth/signup.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;

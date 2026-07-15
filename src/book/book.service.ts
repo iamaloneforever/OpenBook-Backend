@@ -5,11 +5,13 @@ import {
 	Logger,
 	NotFoundException,
 } from '@nestjs/common';
+
 import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateBookDto } from 'src/dtos/book/create-book-dto';
-import { SearchBookDto } from 'src/dtos/book/search-book.dto';
-import { UpdateBookDto } from 'src/dtos/book/update-book.dto';
+
+import { CreateBookDto } from '../common/dtos/book/create-book-dto';
+import { SearchBookDto } from '../common/dtos/book/search-book.dto';
+import { UpdateBookDto } from '../common/dtos/book/update-book.dto';
 
 @Injectable()
 export class BookService {
@@ -18,8 +20,7 @@ export class BookService {
 	constructor(private readonly prisma: PrismaService) { }
 
 	async findAll(userId: string, query: SearchBookDto) {
-		this.logger.log(`Finding books for user ${userId}`);
-		this.logger.debug(`Search query: ${JSON.stringify(query)}`);
+		this.logger.debug(`Finding books for user ${userId}`);
 
 		const {
 			q,
@@ -32,94 +33,119 @@ export class BookService {
 			limit = 10,
 		} = query;
 
-		const books = await this.prisma.book.findMany({
-			where: {
-				ownerId: userId,
+		const where: Prisma.BookWhereInput = {
+			ownerId: userId,
 
-				...(q && {
-					OR: [
-						{
-							title: {
-								contains: q,
-								mode: 'insensitive',
-							},
+			...(q && {
+				OR: [
+					{
+						title: {
+							contains: q,
+							mode: Prisma.QueryMode.insensitive,
 						},
-						{
-							description: {
-								contains: q,
-								mode: 'insensitive',
-							},
-						},
-						{
-							author: {
-								contains: q,
-								mode: 'insensitive',
-							},
-						},
-						{
-							isbn: {
-								contains: q,
-								mode: 'insensitive',
-							},
-						},
-					],
-				}),
-
-				...(author && {
-					author: {
-						contains: author,
-						mode: 'insensitive',
 					},
-				}),
-
-				...(minRating !== undefined || maxRating !== undefined
-					? {
-						averageRating: {
-							...(minRating !== undefined && { gte: minRating }),
-							...(maxRating !== undefined && { lte: maxRating }),
+					{
+						description: {
+							contains: q,
+							mode: Prisma.QueryMode.insensitive,
 						},
-					}
-					: {}),
+					},
+					{
+						author: {
+							contains: q,
+							mode: Prisma.QueryMode.insensitive,
+						},
+					},
+					{
+						isbn: {
+							contains: q,
+							mode: Prisma.QueryMode.insensitive,
+						},
+					},
+				],
+			}),
+
+			...(author && {
+				author: {
+					contains: author,
+					mode: Prisma.QueryMode.insensitive,
+				},
+			}),
+
+			...(minRating !== undefined || maxRating !== undefined
+				? {
+					averageRating: {
+						...(minRating !== undefined && {
+							gte: minRating,
+						}),
+
+						...(maxRating !== undefined && {
+							lte: maxRating,
+						}),
+					},
+				}
+				: {}),
+		};
+		const [books, total] = await this.prisma.$transaction([
+			this.prisma.book.findMany({
+				where,
+
+				orderBy: {
+					[sort]: order,
+				},
+
+				skip: (page - 1) * limit,
+
+				take: limit,
+			}),
+
+			this.prisma.book.count({
+				where,
+			}),
+		]);
+
+		return {
+			data: books,
+
+			meta: {
+				total,
+				page,
+				limit,
+				totalPages: Math.ceil(total / limit),
 			},
-
-			orderBy: {
-				[sort]: order,
-			},
-
-			skip: (page - 1) * limit,
-			take: limit,
-		});
-
-		this.logger.log(`Found ${books.length} books`);
-
-		return books;
+		};
 	}
 
 	async findOne(id: string) {
-		this.logger.log(`Finding book ${id}`);
-
 		const book = await this.prisma.book.findUnique({
-			where: { id },
+			where: {
+				id,
+			},
 		});
 
 		if (!book) {
-			this.logger.warn(`Book ${id} not found`);
 			throw new NotFoundException('Book not found');
 		}
-
-		this.logger.log(`Book ${id} found`);
 
 		return book;
 	}
 
-	async create(dto: CreateBookDto, ownerId: string, coverUrl?: string) {
-		this.logger.log(`Creating book "${dto.title}" for user ${ownerId}`);
+	async create(
+		dto: CreateBookDto,
+
+		ownerId: string,
+
+		coverUrl?: string,
+	) {
+		this.logger.log(`Creating book ${dto.title}`);
 
 		try {
-			const book = await this.prisma.book.create({
+			return await this.prisma.book.create({
 				data: {
 					...dto,
+
 					coverUrl,
+
 					owner: {
 						connect: {
 							id: ownerId,
@@ -127,176 +153,149 @@ export class BookService {
 					},
 				},
 			});
-
-			this.logger.log(`Book ${book.id} created successfully`);
-
-			return book;
 		} catch (error) {
-			this.logger.error(
-				`Failed to create book "${dto.title}"`,
-				error instanceof Error ? error.stack : String(error),
-			);
-
-			if (
-				error instanceof Prisma.PrismaClientKnownRequestError &&
-				error.code === 'P2002'
-			) {
-				throw new ConflictException('A book with this ISBN already exists.');
-			}
-
-			throw new BadRequestException('Failed to create book.');
+			this.handleError(error, 'Failed to create book');
 		}
 	}
 
-	async rateBook(bookId: string, userId: string, value: number) {
-		this.logger.log(`User ${userId} rated book ${bookId} with ${value} stars`);
+	async updateBook(
+		bookId: string,
 
+		dto: UpdateBookDto,
+
+		coverUrl?: string,
+	) {
+		try {
+			return await this.prisma.book.update({
+				where: {
+					id: bookId,
+				},
+
+				data: {
+					...dto,
+
+					...(coverUrl && {
+						coverUrl,
+					}),
+				},
+			});
+		} catch (error) {
+			this.handleError(error, 'Failed to update book');
+		}
+	}
+
+	async deleteBook(bookId: string) {
+		try {
+			await this.prisma.book.delete({
+				where: {
+					id: bookId,
+				},
+			});
+
+			return {
+				message: 'Book deleted successfully',
+			};
+		} catch (error) {
+			this.handleError(error, 'Failed to delete book');
+		}
+	}
+
+	async rateBook(
+		bookId: string,
+
+		userId: string,
+
+		value: number,
+	) {
 		return this.prisma.$transaction(async (tx) => {
 			const book = await tx.book.findUnique({
-				where: { id: bookId },
+				where: {
+					id: bookId,
+				},
 			});
 
 			if (!book) {
-				this.logger.warn(`Book ${bookId} not found`);
 				throw new NotFoundException('Book not found');
 			}
 
-			const existingRating = await tx.rating.findUnique({
+			const rating = await tx.rating.findUnique({
 				where: {
 					userId_bookId: {
 						userId,
+
 						bookId,
 					},
 				},
 			});
 
-			if (existingRating) {
-				this.logger.log(`Updating rating for book ${bookId}`);
-
+			if (rating) {
 				await tx.rating.update({
-					where: { id: existingRating.id },
-					data: { value },
+					where: {
+						id: rating.id,
+					},
+
+					data: {
+						value,
+					},
 				});
 			} else {
-				this.logger.log(`Creating rating for book ${bookId}`);
-
 				await tx.rating.create({
 					data: {
-						userId,
-						bookId,
 						value,
+
+						userId,
+
+						bookId,
 					},
 				});
 			}
 
 			const stats = await tx.rating.aggregate({
-				where: { bookId },
+				where: {
+					bookId,
+				},
+
 				_avg: {
 					value: true,
 				},
+
 				_count: {
 					value: true,
 				},
 			});
 
-			this.logger.debug(
-				`Average rating: ${stats._avg.value ?? 0}, Count: ${stats._count.value}`,
-			);
-
-			const updatedBook = await tx.book.update({
-				where: { id: bookId },
-				data: {
-					averageRating: stats._avg.value ?? 0,
-					ratingsCount: stats._count.value,
-				},
-			});
-
-			this.logger.log(`Book ${bookId} rating updated successfully`);
-
-			return updatedBook;
-		});
-	}
-	async deleteBook(bookId: string, userId: string) {
-		this.logger.log(`Deleting book ${bookId} for user ${userId}`);
-
-		const book = await this.prisma.book.findFirst({
-			where: {
-				id: bookId,
-				ownerId: userId,
-			},
-		});
-
-		if (!book) {
-			this.logger.warn(
-				`Book ${bookId} not found or does not belong to user ${userId}`,
-			);
-
-			throw new NotFoundException('Book not found');
-		}
-
-		await this.prisma.book.delete({
-			where: {
-				id: bookId,
-			},
-		});
-
-		this.logger.log(`Book ${bookId} deleted successfully`);
-
-		return {
-			message: 'Book deleted successfully',
-		};
-	}
-	async updateBook(
-		bookId: string,
-		userId: string,
-		dto: UpdateBookDto,
-		coverUrl?: string,
-	) {
-		this.logger.log(`Updating book ${bookId} for user ${userId}`);
-
-		const book = await this.prisma.book.findFirst({
-			where: {
-				id: bookId,
-				ownerId: userId,
-			},
-		});
-
-		if (!book) {
-			this.logger.warn(
-				`Book ${bookId} not found or does not belong to user ${userId}`,
-			);
-
-			throw new NotFoundException('Book not found');
-		}
-
-		try {
-			const updatedBook = await this.prisma.book.update({
+			return tx.book.update({
 				where: {
 					id: bookId,
 				},
+
 				data: {
-					...dto,
-					...(coverUrl && { coverUrl }),
+					averageRating: stats._avg.value ?? 0,
+
+					ratingsCount: stats._count.value,
 				},
 			});
+		});
+	}
 
-			this.logger.log(`Book ${bookId} updated successfully`);
+	private handleError(
+		error: unknown,
 
-			return updatedBook;
-		} catch (error) {
-			this.logger.error(
-				`Failed to update book ${bookId}`,
-				error instanceof Error ? error.stack : String(error),
-			);
+		message: string,
+	): never {
+		this.logger.error(
+			message,
 
-			if (
-				error instanceof Prisma.PrismaClientKnownRequestError &&
-				error.code === 'P2002'
-			) {
-				throw new ConflictException('A book with this ISBN already exists.');
-			}
+			error instanceof Error ? error.stack : String(error),
+		);
 
-			throw new BadRequestException('Failed to update book.');
+		if (
+			error instanceof Prisma.PrismaClientKnownRequestError &&
+			error.code === 'P2002'
+		) {
+			throw new ConflictException('ISBN already exists');
 		}
+
+		throw new BadRequestException(message);
 	}
 }

@@ -3,28 +3,53 @@ import { describe, beforeEach, it, expect, vi } from 'vitest';
 
 import { BookController } from './book.controller';
 import { BookService } from './book.service';
+import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
+import { OwnerGuard } from '../common/guards/auth/owner.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 describe('BookController', () => {
   let controller: BookController;
-  let service: BookService;
+
+  const service = {
+    findAll: vi.fn(),
+    findOne: vi.fn(),
+    create: vi.fn(),
+    rateBook: vi.fn(),
+    deleteBook: vi.fn(),
+    updateBook: vi.fn(),
+  };
+
+  const user = {
+    id: 'user-1',
+  };
 
   beforeEach(async () => {
+    vi.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BookController],
       providers: [
         {
           provide: BookService,
-          useValue: {
-            findAll: vi.fn(),
-            findOne: vi.fn(),
-            create: vi.fn(),
-          },
+          useValue: service,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({
+        canActivate: vi.fn().mockReturnValue(true),
+      })
+      .overrideGuard(OwnerGuard)
+      .useValue({
+        canActivate: vi.fn().mockReturnValue(true),
+      })
+      .overrideInterceptor(CacheInterceptor)
+      .useValue({
+        intercept: vi.fn((_, next) => next.handle()),
+      })
+      .compile();
 
     controller = module.get(BookController);
-    service = module.get(BookService);
   });
 
   it('should be defined', () => {
@@ -32,67 +57,149 @@ describe('BookController', () => {
   });
 
   describe('findAll', () => {
-    it('should return all books', async () => {
-      const books = [
-        {
-          id: '1',
-          title: 'Clean Code',
+    it('should call service.findAll with user id and query', async () => {
+      const query = {
+        page: 1,
+        limit: 10,
+      };
+
+      const result = {
+        data: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
         },
-        {
-          id: '2',
-          title: 'The Pragmatic Programmer',
-        },
-      ];
+      };
 
-      vi.mocked(service.findAll).mockResolvedValue(books as never);
+      service.findAll.mockResolvedValue(result);
 
-      const result = await controller.findAll();
+      const response = await controller.findAll(user as any, query as any);
 
-      expect(service.findAll).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(books);
+      expect(service.findAll).toHaveBeenCalledWith(user.id, query);
+      expect(response).toEqual(result);
     });
   });
 
   describe('findOne', () => {
-    it('should call bookService.findOne with correct id', async () => {
-      const id = 'cmra83gn5000072sbax0sqhg1';
-
-      vi.mocked(service.findOne).mockResolvedValue({
-        id,
+    it('should call service.findOne with book id', async () => {
+      const book = {
+        id: 'book-1',
         title: 'Clean Code',
-      } as never);
+      };
 
-      const result = await controller.findOne({ id });
+      service.findOne.mockResolvedValue(book);
 
-      expect(service.findOne).toHaveBeenCalledTimes(1);
-      expect(service.findOne).toHaveBeenCalledWith(id);
-
-      expect(result).toEqual({
-        id,
-        title: 'Clean Code',
+      const response = await controller.findOne({
+        id: 'book-1',
       });
+
+      expect(service.findOne).toHaveBeenCalledWith('book-1');
+      expect(response).toEqual(book);
     });
   });
 
   describe('create', () => {
-    it('should call bookService.create with dto', async () => {
+    const dto = {
+      title: 'Clean Code',
+      author: 'Robert C. Martin',
+    };
+
+    it('should create a book with cover', async () => {
+      const file = {
+        path: 'uploads/books/covers/cover.jpg',
+      } as Express.Multer.File;
+
+      const book = {
+        id: 'book-1',
+        ...dto,
+        coverUrl: file.path,
+      };
+
+      service.create.mockResolvedValue(book);
+
+      const response = await controller.create(dto as any, user as any, file);
+
+      expect(service.create).toHaveBeenCalledWith(dto, user.id, file.path);
+
+      expect(response).toEqual(book);
+    });
+
+    it('should create a book without cover', async () => {
+      service.create.mockResolvedValue(dto);
+
+      const response = await controller.create(
+        dto as any,
+        user as any,
+        undefined,
+      );
+
+      expect(service.create).toHaveBeenCalledWith(dto, user.id, undefined);
+
+      expect(response).toEqual(dto);
+    });
+  });
+
+  describe('rateBook', () => {
+    it('should call service.rateBook with book id, user id and rating value', async () => {
+      const result = {
+        id: 'book-1',
+        averageRating: 5,
+        ratingsCount: 1,
+      };
+
+      service.rateBook.mockResolvedValue(result);
+
+      const response = await controller.rateBook(
+        'book-1',
+        { value: 5 },
+        user as any,
+      );
+
+      expect(service.rateBook).toHaveBeenCalledWith('book-1', user.id, 5);
+
+      expect(response).toEqual(result);
+    });
+  });
+
+  describe('deleteBook', () => {
+    it('should call service.deleteBook with book id', async () => {
+      const result = {
+        message: 'Book deleted successfully',
+      };
+
+      service.deleteBook.mockResolvedValue(result);
+
+      const response = await controller.deleteBook('book-1', user as any);
+
+      expect(service.deleteBook).toHaveBeenCalledWith('book-1');
+      expect(response).toEqual(result);
+    });
+  });
+
+  describe('updateBook', () => {
+    it('should call service.updateBook with book id and dto', async () => {
       const dto = {
-        title: 'Clean Code',
+        title: 'Updated Clean Code',
       };
 
-      const createdBook = {
-        id: '1',
-        title: 'Clean Code',
+      const result = {
+        id: 'book-1',
+        ...dto,
       };
 
-      vi.mocked(service.create).mockResolvedValue(createdBook as never);
+      service.updateBook.mockResolvedValue(result);
 
-      const result = await controller.create(dto as any);
+      const response = await controller.updateBook(
+        'book-1',
+        user as any,
+        dto as any,
+      );
 
-      expect(service.create).toHaveBeenCalledTimes(1);
-      expect(service.create).toHaveBeenCalledWith(dto);
+      expect(service.updateBook).toHaveBeenCalledWith('book-1', dto);
 
-      expect(result).toEqual(createdBook);
+      expect(response).toEqual(result);
     });
   });
 });

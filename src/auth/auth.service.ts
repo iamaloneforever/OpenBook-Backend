@@ -7,14 +7,14 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { SignupDto } from 'src/dtos/auth/signup.dto';
+import { SignupDto } from 'src/common/dtos/auth/signup.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async signup(dto: SignupDto) {
     const { username, password } = dto;
