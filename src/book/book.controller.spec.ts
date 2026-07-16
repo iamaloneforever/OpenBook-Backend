@@ -191,7 +191,7 @@ describe('BookController', () => {
 
       service.updateBook.mockResolvedValue(result);
 
-      const response = await controller.updateBook('book-1', user as any);
+      const response = await controller.updateBook('book-1', dto);
 
       expect(service.updateBook).toHaveBeenCalledWith('book-1', dto);
 
