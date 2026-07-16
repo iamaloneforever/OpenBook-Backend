@@ -5,7 +5,8 @@ import {
   IsUrl,
   IsDateString,
   MaxLength,
-} from "class-validator";
+  IsBoolean,
+} from 'class-validator';
 
 export class CreateBookDto {
   @IsString()
@@ -31,4 +32,7 @@ export class CreateBookDto {
   @IsOptional()
   @IsUrl()
   coverUrl?: string;
+  @IsOptional()
+  @IsBoolean()
+  isdigital?: boolean;
 }

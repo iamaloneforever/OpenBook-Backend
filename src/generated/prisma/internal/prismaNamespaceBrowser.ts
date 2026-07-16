@@ -92,6 +92,7 @@ export const BookScalarFieldEnum = {
   description: 'description',
   author: 'author',
   isbn: 'isbn',
+  isdigital: 'isdigital',
   publishedAt: 'publishedAt',
   coverUrl: 'coverUrl',
   averageRating: 'averageRating',

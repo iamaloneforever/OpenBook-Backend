@@ -23,11 +23,12 @@ model User {
 }
 
 model Book {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
   description String?
   author      String
-  isbn        String? @unique
+  isbn        String?  @unique
+  isdigital   Boolean? @default(false)
 
   publishedAt DateTime?
   coverUrl    String?
