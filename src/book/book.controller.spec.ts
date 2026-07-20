@@ -75,7 +75,7 @@ describe('BookController', () => {
 
       service.findAll.mockResolvedValue(result);
 
-      const response = await controller.findAll(user as any, query as any);
+      const response = await controller.findAll(user as any, query);
 
       expect(service.findAll).toHaveBeenCalledWith(user.id, query);
       expect(response).toEqual(result);

@@ -4,6 +4,6 @@ import { ReadListService } from './read-list.service';
 
 @Module({
   controllers: [ReadListController],
-  providers: [ReadListService]
+  providers: [ReadListService],
 })
 export class ReadListModule {}

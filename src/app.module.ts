@@ -12,29 +12,29 @@ import { UserModule } from './user/user.module';
 import { ReadListModule } from './read-list/read-list.module';
 
 @Module({
-	imports: [
-		BookModule,
-		UserModule,
-		PrismaModule,
-		AuthModule,
-		ConfigModule.forRoot({
-			isGlobal: true,
-		}),
-		CacheModule.register({
-			isGlobal: true,
-			ttl: 60_000,
-		}),
-		ServeStaticModule.forRoot({
-			rootPath: join(process.cwd(), 'uploads'),
-			serveRoot: '/uploads',
-			serveStaticOptions: {
-				index: false,
-				fallthrough: false,
-			},
-		}),
-		ReadListModule,
-	],
-	controllers: [AppController],
-	providers: [AppService],
+  imports: [
+    BookModule,
+    UserModule,
+    PrismaModule,
+    AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 60_000,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+      serveStaticOptions: {
+        index: false,
+        fallthrough: false,
+      },
+    }),
+    ReadListModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

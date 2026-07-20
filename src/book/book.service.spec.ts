@@ -69,11 +69,11 @@ describe('BookService', () => {
       ],
     })
       .setLogger({
-        log: () => { },
-        error: () => { },
-        warn: () => { },
-        debug: () => { },
-        verbose: () => { },
+        log: () => {},
+        error: () => {},
+        warn: () => {},
+        debug: () => {},
+        verbose: () => {},
       })
       .compile();
 

@@ -1,4 +1,7 @@
 import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { CurrentUser } from '../common/decorators/Current-user.decorator';
+import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
+import type { User } from '../generated/prisma/client';
 
 import type { Request, Response } from 'express';
 
@@ -8,7 +11,7 @@ import { LocalAuthGuard } from '../common/guards/auth/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
   async signup(
@@ -19,7 +22,7 @@ export class AuthController {
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -45,7 +48,7 @@ export class AuthController {
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -65,7 +68,7 @@ export class AuthController {
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -75,7 +78,12 @@ export class AuthController {
     };
   }
   @Post('logout')
-  logout(@Res({ passthrough: true }) res: Response) {
+  @UseGuards(JwtAuthGuard)
+  async logout(
+    @CurrentUser() user: User,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    await this.authService.logout(user.id);
     res.clearCookie('refreshToken');
 
     return {

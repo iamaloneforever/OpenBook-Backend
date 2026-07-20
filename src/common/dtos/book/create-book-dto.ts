@@ -5,8 +5,13 @@ import {
   IsUrl,
   IsDateString,
   MaxLength,
-  IsBoolean,
+  IsEnum,
+  ValidateNested,
 } from 'class-validator';
+import { BookType } from 'src/generated/prisma/enums';
+import { DigitalBookDto } from './Digital-book.dto';
+import { Type } from 'class-transformer';
+import { PhysicalBookDto } from './Physical-book.dto';
 
 export class CreateBookDto {
   @IsString()
@@ -32,7 +37,17 @@ export class CreateBookDto {
   @IsOptional()
   @IsUrl()
   coverUrl?: string;
+
+  @IsEnum(BookType)
+  type: BookType;
+
   @IsOptional()
-  @IsBoolean()
-  isdigital?: boolean;
+  @ValidateNested()
+  @Type(() => DigitalBookDto)
+  digitalBook?: DigitalBookDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PhysicalBookDto)
+  physicalBook?: PhysicalBookDto;
 }

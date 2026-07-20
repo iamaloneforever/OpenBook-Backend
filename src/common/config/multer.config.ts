@@ -1,37 +1,58 @@
-import { BadRequestException } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+
 import { diskStorage } from 'multer';
+
 import { extname } from 'path';
 
-export const CoverUploadInterceptor = FileInterceptor('cover', {
-  storage: diskStorage({
-    destination: './uploads/books/covers',
+import { randomUUID } from 'crypto';
 
-    filename: (_, file, callback) => {
-      const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-
-      callback(null, uniqueName + extname(file.originalname));
+export const BookUploadInterceptor = FileFieldsInterceptor(
+  [
+    {
+      name: 'cover',
+      maxCount: 1,
     },
-  }),
+    {
+      name: 'file',
+      maxCount: 1,
+    },
+  ],
+  {
+    storage: diskStorage({
+      destination: (_, file, callback) => {
+        if (file.fieldname === 'cover') {
+          callback(null, './uploads/books/covers');
+        } else {
+          callback(null, './uploads/books/files');
+        }
+      },
 
-  fileFilter: (_, file, callback) => {
-    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
+      filename: (_, file, callback) => {
+        const filename = `${randomUUID()}${extname(file.originalname)}`;
 
-    const ext = extname(file.originalname).toLowerCase();
+        callback(null, filename);
+      },
+    }),
 
-    if (!allowedExtensions.includes(ext)) {
-      return callback(
-        new BadRequestException(
-          'Only jpg, jpeg, png and webp images are allowed.',
-        ),
-        false,
-      );
-    }
+    fileFilter: (_, file, callback) => {
+      const extension = extname(file.originalname).toLowerCase();
 
-    callback(null, true);
+      if (file.fieldname === 'file' && extension !== '.epub') {
+        return callback(new Error('Only EPUB files are allowed'), false);
+      }
+
+      if (
+        file.fieldname === 'cover' &&
+        !['.jpg', '.jpeg', '.png', '.webp'].includes(extension)
+      ) {
+        return callback(new Error('Invalid cover format'), false);
+      }
+
+      callback(null, true);
+    },
+
+    limits: {
+      fileSize: 50 * 1024 * 1024,
+    },
   },
-
-  limits: {
-    fileSize: 5 * 1024 * 1024,
-  },
-});
+);
