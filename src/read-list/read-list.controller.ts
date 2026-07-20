@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
@@ -21,16 +22,21 @@ import type { User } from 'src/generated/prisma/client';
 import { CreateReadListDto } from 'src/common/dtos/read-list/create-read-list.dto';
 import { UpdateReadListDto } from 'src/common/dtos/read-list/update-read-list.dto';
 import { AddBookToReadListDto } from 'src/common/dtos/read-list/add-book-to-read-list.dto';
+import { PaginationDto } from 'src/common/dtos/shared/pagination.dto';
 import { Owner } from 'src/common/decorators/owner.decorator';
 
 @Controller('read-list')
 @UseGuards(JwtAuthGuard)
 export class ReadListController {
-  constructor(private readonly readListService: ReadListService) { }
+  constructor(private readonly readListService: ReadListService) {}
 
   @Get()
-  getLists(@CurrentUser() user: User) {
-    return this.readListService.getLists(user.id);
+  getLists(@CurrentUser() user: User, @Query() query: PaginationDto) {
+    return this.readListService.getLists(
+      user.id,
+      query.page || 1,
+      query.limit || 10,
+    );
   }
 
   @Get(':id')

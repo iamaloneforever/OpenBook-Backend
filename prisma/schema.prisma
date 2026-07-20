@@ -8,6 +8,21 @@ datasource db {
   provider = "postgresql"
 }
 
+enum BookType {
+  DIGITAL
+  PHYSICAL
+}
+
+enum DigitalBookSource {
+  URL
+  FILE
+}
+
+enum PhysicalBookSource {
+  OWNED
+  RENTED
+}
+
 model User {
   id           String  @id @default(cuid())
   username     String  @unique
@@ -17,21 +32,25 @@ model User {
   books     Book[]
   ratings   Rating[]
   readLists ReadList[]
+  progress  BookProgress[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Book {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   title       String
   description String?
   author      String
-  isbn        String?  @unique
-  isdigital   Boolean? @default(false)
+  isbn        String? @unique
+
+  type BookType @default(PHYSICAL)
 
   publishedAt DateTime?
   coverUrl    String?
+  
+  totalPages  Int?
 
   averageRating Float @default(0)
   ratingsCount  Int   @default(0)
@@ -39,13 +58,46 @@ model Book {
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
+  digitalBook  DigitalBook?
+  physicalBook PhysicalBook?
+
   ratings       Rating[]
   readListBooks ReadListBook[]
+  progress      BookProgress[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([ownerId])
+}
+
+model DigitalBook {
+  id String @id @default(cuid())
+
+  bookId String @unique
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  source DigitalBookSource @default(URL)
+
+  url      String?
+  filePath String?
+  fileType String?
+  fileSize Int?
+}
+
+model PhysicalBook {
+  id String @id @default(cuid())
+
+  bookId String @unique
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  address    String
+  city       String
+  country    String
+  postalCode String?
+
+  borrowedBy String?
+  returnDate DateTime?
 }
 
 model ReadList {
@@ -93,4 +145,28 @@ model Rating {
 
   @@unique([userId, bookId])
   @@index([bookId])
+}
+
+model BookProgress {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  currentPage Int @default(0)
+  totalPages  Int @default(0)
+  
+  status      String @default("reading") // reading, completed, paused, dropped
+  progressPercentage Float @default(0)
+
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, bookId])
+  @@index([bookId])
+  @@index([userId])
 }

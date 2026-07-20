@@ -16,28 +16,46 @@ import { UpdateReadListDto } from '../common/dtos/read-list/update-read-list.dto
 export class ReadListService {
   private readonly logger = new Logger(ReadListService.name);
 
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-  async getLists(userId: string) {
+  async getLists(userId: string, page: number = 1, limit: number = 10) {
     this.logger.log(`Getting read lists for user ${userId}`);
 
-    return this.prisma.readList.findMany({
-      where: {
-        userId,
-      },
+    const [lists, total] = await this.prisma.$transaction([
+      this.prisma.readList.findMany({
+        where: {
+          userId,
+        },
 
-      include: {
-        _count: {
-          select: {
-            items: true,
+        include: {
+          _count: {
+            select: {
+              items: true,
+            },
           },
         },
-      },
 
-      orderBy: {
-        createdAt: 'desc',
+        orderBy: {
+          createdAt: 'desc',
+        },
+
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.readList.count({
+        where: { userId },
+      }),
+    ]);
+
+    return {
+      data: lists,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-    });
+    };
   }
 
   async getList(id: string) {
@@ -49,7 +67,16 @@ export class ReadListService {
       include: {
         items: {
           include: {
-            book: true,
+            book: {
+              include: {
+                _count: {
+                  select: {
+                    ratings: true,
+                    progress: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -59,7 +86,24 @@ export class ReadListService {
       throw new NotFoundException('Read list not found');
     }
 
-    return list;
+    // Calculate statistics
+    const books = list.items.map((item) => item.book);
+    const totalBooks = books.length;
+    const totalPages = books.reduce((sum, b) => sum + (b.totalPages || 0), 0);
+    const averageRating =
+      books.length > 0
+        ? books.reduce((sum, b) => sum + b.averageRating, 0) / books.length
+        : 0;
+
+    return {
+      ...list,
+      stats: {
+        totalBooks,
+        totalPages,
+        averageRating: Math.round(averageRating * 10) / 10,
+        totalRatings: books.reduce((sum, b) => sum + b.ratingsCount, 0),
+      },
+    };
   }
 
   async createList(userId: string, dto: CreateReadListDto) {
