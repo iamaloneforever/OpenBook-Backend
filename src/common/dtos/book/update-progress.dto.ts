@@ -1,4 +1,5 @@
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsInt, IsOptional, Min, IsEnum } from 'class-validator';
+import { ReadStatus } from 'src/common/enums/read-status.enum';
 
 export class UpdateProgressDto {
   @IsInt()
@@ -11,6 +12,8 @@ export class UpdateProgressDto {
   totalPages?: number;
 
   @IsOptional()
-  @IsString()
-  status?: 'reading' | 'completed' | 'paused' | 'dropped';
+  @IsEnum(ReadStatus, {
+    message: 'status must be one of reading|completed|paused|dropped',
+  })
+  status?: ReadStatus;
 }

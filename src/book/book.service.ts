@@ -11,13 +11,17 @@ import {
   DigitalBookSource,
   Prisma,
   BookProgress,
+  BookReadingStatus,
 } from '../generated/prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { ReadStatus } from 'src/common/enums/read-status.enum';
 
 import { CreateBookDto } from '../common/dtos/book/create-book-dto';
 import { SearchBookDto } from '../common/dtos/book/search-book.dto';
 import { UpdateBookDto } from '../common/dtos/book/update-book.dto';
+import { SetTagsDto } from '../common/dtos/book/set-tags.dto';
+import { FindByTagsDto } from '../common/dtos/book/find-by-tags.dto';
 
 @Injectable()
 export class BookService {
@@ -612,7 +616,7 @@ export class BookService {
         currentPage: number;
         totalPages: number;
         progressPercentage: number;
-        status: string;
+        status: ReadStatus | string;
       }
   > {
     const progress = await this.prisma.bookProgress.findUnique({
@@ -637,8 +641,13 @@ export class BookService {
   async setProgress(
     bookId: string,
     userId: string,
-    data: { currentPage: number; totalPages?: number; status?: string },
+    data: { currentPage: number; totalPages?: number; status?: ReadStatus },
   ) {
+    // validate status explicitly (extra guard in addition to DTO validation)
+    if (data.status && !Object.values(ReadStatus).includes(data.status)) {
+      throw new BadRequestException('Invalid status value');
+    }
+
     return this.prisma.$transaction(async (tx) => {
       const book = await tx.book.findUnique({
         where: { id: bookId },
@@ -670,8 +679,8 @@ export class BookService {
             currentPage: data.currentPage,
             totalPages: data.totalPages || existingProgress.totalPages,
             progressPercentage,
-            status: data.status || existingProgress.status,
-            completedAt: data.status === 'completed' ? new Date() : null,
+            status: (data.status as unknown as BookReadingStatus) || existingProgress.status || BookReadingStatus.READING,
+            completedAt: (data.status || existingProgress.status) === ReadStatus.COMPLETED ? new Date() : null,
             updatedAt: new Date(),
           },
         });
@@ -683,7 +692,7 @@ export class BookService {
             currentPage: data.currentPage,
             totalPages,
             progressPercentage,
-            status: data.status || 'reading',
+            status: (data.status as unknown as BookReadingStatus) || BookReadingStatus.READING,
           },
         });
       }
@@ -751,6 +760,11 @@ export class BookService {
       include: {
         digitalBook: true,
         physicalBook: true,
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
         _count: {
           select: {
             ratings: true,
@@ -779,6 +793,7 @@ export class BookService {
 
     return {
       ...book,
+      tags: book.tags.map((bt) => bt.tag.name),
       progress,
       stats: {
         totalReaders: book._count.progress,
@@ -786,5 +801,259 @@ export class BookService {
         averageRating: book.averageRating,
       },
     };
+  }
+
+  // --------------------------------------------------------------------------
+  // SET TAGS
+  // --------------------------------------------------------------------------
+
+  async setTags(bookId: string, dto: SetTagsDto) {
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        const book = await tx.book.findUnique({
+          where: { id: bookId },
+        });
+
+        if (!book) {
+          throw new NotFoundException('Book not found');
+        }
+
+        // Get or create tags
+        const tags = await Promise.all(
+          dto.tags.map((tagName) =>
+            tx.tag.upsert({
+              where: { name: tagName.toLowerCase().trim() },
+              update: {},
+              create: { name: tagName.toLowerCase().trim() },
+            }),
+          ),
+        );
+
+        // Remove all existing tags for this book
+        await tx.bookTag.deleteMany({
+          where: { bookId },
+        });
+
+        // Add new tags
+        await tx.bookTag.createMany({
+          data: tags.map((tag) => ({
+            bookId,
+            tagId: tag.id,
+          })),
+        });
+
+        return tx.book.findUnique({
+          where: { id: bookId },
+          include: {
+            tags: {
+              include: {
+                tag: true,
+              },
+            },
+          },
+        });
+      });
+    } catch (error) {
+      this.handleError(error, 'Failed to set tags');
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // ADD TAGS
+  // --------------------------------------------------------------------------
+
+  async addTags(bookId: string, dto: SetTagsDto) {
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        const book = await tx.book.findUnique({
+          where: { id: bookId },
+        });
+
+        if (!book) {
+          throw new NotFoundException('Book not found');
+        }
+
+        // Get existing tags
+        const existingTags = await tx.bookTag.findMany({
+          where: { bookId },
+          include: { tag: true },
+        });
+
+        const existingTagNames = new Set(
+          existingTags.map((bt) => bt.tag.name.toLowerCase()),
+        );
+
+        // Get or create new tags and filter out duplicates
+        const tagsToAdd = await Promise.all(
+          dto.tags
+            .map((tagName) => tagName.toLowerCase().trim())
+            .filter((tagName) => !existingTagNames.has(tagName))
+            .map((tagName) =>
+              tx.tag.upsert({
+                where: { name: tagName },
+                update: {},
+                create: { name: tagName },
+              }),
+            ),
+        );
+
+        // Add new tags
+        if (tagsToAdd.length > 0) {
+          await tx.bookTag.createMany({
+            data: tagsToAdd.map((tag) => ({
+              bookId,
+              tagId: tag.id,
+            })),
+          });
+        }
+
+        return tx.book.findUnique({
+          where: { id: bookId },
+          include: {
+            tags: {
+              include: {
+                tag: true,
+              },
+            },
+          },
+        });
+      });
+    } catch (error) {
+      this.handleError(error, 'Failed to add tags');
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // REMOVE TAGS
+  // --------------------------------------------------------------------------
+
+  async removeTags(bookId: string, dto: SetTagsDto) {
+    try {
+      const book = await this.prisma.book.findUnique({
+        where: { id: bookId },
+      });
+
+      if (!book) {
+        throw new NotFoundException('Book not found');
+      }
+
+      const tagsToRemove = dto.tags.map((t) => t.toLowerCase().trim());
+
+      await this.prisma.bookTag.deleteMany({
+        where: {
+          bookId,
+          tag: {
+            name: {
+              in: tagsToRemove,
+            },
+          },
+        },
+      });
+
+      return this.prisma.book.findUnique({
+        where: { id: bookId },
+        include: {
+          tags: {
+            include: {
+              tag: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      this.handleError(error, 'Failed to remove tags');
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // FIND BY TAGS
+  // --------------------------------------------------------------------------
+
+  async findByTags(userId: string, dto: FindByTagsDto) {
+    try {
+      const {
+        tags,
+        page = 1,
+        limit = 10,
+      } = dto;
+
+      const tagsLower = tags.map((t) => t.toLowerCase().trim());
+
+      const [books, total] = await this.prisma.$transaction([
+        this.prisma.book.findMany({
+          where: {
+            ownerId: userId,
+            tags: {
+              some: {
+                tag: {
+                  name: {
+                    in: tagsLower,
+                  },
+                },
+              },
+            },
+          },
+          include: {
+            digitalBook: true,
+            physicalBook: true,
+            tags: {
+              include: {
+                tag: true,
+              },
+            },
+          },
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        this.prisma.book.count({
+          where: {
+            ownerId: userId,
+            tags: {
+              some: {
+                tag: {
+                  name: {
+                    in: tagsLower,
+                  },
+                },
+              },
+            },
+          },
+        }),
+      ]);
+
+      return {
+        data: books.map((book) => ({
+          ...book,
+          tags: book.tags.map((bt) => bt.tag.name),
+        })),
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    } catch (error) {
+      this.handleError(error, 'Failed to find books by tags');
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // GET ALL TAGS
+  // --------------------------------------------------------------------------
+
+  async getAllTags() {
+    return this.prisma.tag.findMany({
+      orderBy: {
+        name: 'asc',
+      },
+      include: {
+        _count: {
+          select: {
+            books: true,
+          },
+        },
+      },
+    });
   }
 }

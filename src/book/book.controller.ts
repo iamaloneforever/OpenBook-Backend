@@ -22,6 +22,8 @@ import { UpdateBookDto } from '../common/dtos/book/update-book.dto';
 import { SearchBookDto } from '../common/dtos/book/search-book.dto';
 import { RateBookDto } from '../common/dtos/book/rate-book.dto';
 import { UpdateProgressDto } from '../common/dtos/book/update-progress.dto';
+import { SetTagsDto } from '../common/dtos/book/set-tags.dto';
+import { FindByTagsDto } from '../common/dtos/book/find-by-tags.dto';
 import { TopBooksQueryDto } from '../common/dtos/shared/pagination.dto';
 
 import { BookIDParamDto } from '../common/dtos/shared/is-cuid.dto';
@@ -228,5 +230,66 @@ export class BookController {
 
       epub,
     );
+  }
+
+  // --------------------------------------------------------------------------
+  // SET TAGS
+  // --------------------------------------------------------------------------
+
+  @Post(':id/tags')
+  @UseGuards(JwtAuthGuard, OwnerGuard)
+  @Owner('book')
+  setTags(@Param('id') id: string, @Body() dto: SetTagsDto) {
+    this.logger.log(`POST /book/${id}/tags`);
+    return this.bookService.setTags(id, dto);
+  }
+
+  // --------------------------------------------------------------------------
+  // ADD TAGS
+  // --------------------------------------------------------------------------
+
+  @Put(':id/tags/add')
+  @UseGuards(JwtAuthGuard, OwnerGuard)
+  @Owner('book')
+  addTags(@Param('id') id: string, @Body() dto: SetTagsDto) {
+    this.logger.log(`PUT /book/${id}/tags/add`);
+    return this.bookService.addTags(id, dto);
+  }
+
+  // --------------------------------------------------------------------------
+  // REMOVE TAGS
+  // --------------------------------------------------------------------------
+
+  @Delete(':id/tags')
+  @UseGuards(JwtAuthGuard, OwnerGuard)
+  @Owner('book')
+  removeTags(@Param('id') id: string, @Body() dto: SetTagsDto) {
+    this.logger.log(`DELETE /book/${id}/tags`);
+    return this.bookService.removeTags(id, dto);
+  }
+
+  // --------------------------------------------------------------------------
+  // FIND BY TAGS
+  // --------------------------------------------------------------------------
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60)
+  @Get('tags/search')
+  findByTags(@CurrentUser() user: User, @Query() query: FindByTagsDto) {
+    this.logger.log('GET /book/tags/search');
+    return this.bookService.findByTags(user.id, query);
+  }
+
+  // --------------------------------------------------------------------------
+  // GET ALL TAGS
+  // --------------------------------------------------------------------------
+
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300)
+  @Get('tags/all')
+  getAllTags() {
+    this.logger.log('GET /book/tags/all');
+    return this.bookService.getAllTags();
   }
 }
