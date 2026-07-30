@@ -6,21 +6,27 @@ import { BookService } from './book.service';
 import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
 import { OwnerGuard } from '../common/guards/auth/owner.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { User } from 'src/generated/prisma/client';
 
 describe('BookController', () => {
   let controller: BookController;
 
   const service = {
     findAll: vi.fn(),
-    findOne: vi.fn(),
+    findOneWithProgress: vi.fn(),
     create: vi.fn(),
     rateBook: vi.fn(),
     deleteBook: vi.fn(),
     updateBook: vi.fn(),
   };
 
-  const user = {
-    id: 'user-1',
+  const user: User = {
+    id: '1',
+    username: 'amir',
+    password: 'hashed-password',
+    refreshToken: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   beforeEach(async () => {
@@ -75,7 +81,7 @@ describe('BookController', () => {
 
       service.findAll.mockResolvedValue(result);
 
-      const response = await controller.findAll(user as any, query);
+      const response = await controller.findAll(user, query);
 
       expect(service.findAll).toHaveBeenCalledWith(user.id, query);
       expect(response).toEqual(result);
@@ -83,19 +89,21 @@ describe('BookController', () => {
   });
 
   describe('findOne', () => {
-    it('should call service.findOne with book id', async () => {
+    it('should call service.findOneWithProgress with book id', async () => {
       const book = {
         id: 'book-1',
         title: 'Clean Code',
       };
 
-      service.findOne.mockResolvedValue(book);
+      service.findOneWithProgress.mockResolvedValue(book);
 
-      const response = await controller.findOne({
-        id: 'book-1',
-      });
+      const response = await controller.findOne({ id: 'book-1' } as any, user);
 
-      expect(service.findOne).toHaveBeenCalledWith('book-1');
+      expect(service.findOneWithProgress).toHaveBeenCalledWith(
+        'book-1',
+        user.id,
+      );
+
       expect(response).toEqual(book);
     });
   });
@@ -107,21 +115,21 @@ describe('BookController', () => {
     };
 
     it('should create a book with cover', async () => {
-      const file = {
-        path: 'uploads/books/covers/cover.jpg',
-      } as Express.Multer.File;
-
       const book = {
         id: 'book-1',
         ...dto,
-        coverUrl: file.path,
       };
 
       service.create.mockResolvedValue(book);
 
-      const response = await controller.create(dto as any, user as any, file);
+      const response = await controller.create(dto as any, user, undefined);
 
-      expect(service.create).toHaveBeenCalledWith(dto, user.id, file.path);
+      expect(service.create).toHaveBeenCalledWith(
+        dto,
+        user.id,
+        undefined,
+        undefined,
+      );
 
       expect(response).toEqual(book);
     });
@@ -129,13 +137,14 @@ describe('BookController', () => {
     it('should create a book without cover', async () => {
       service.create.mockResolvedValue(dto);
 
-      const response = await controller.create(
-        dto as any,
-        user as any,
+      const response = await controller.create(dto as any, user, undefined);
+
+      expect(service.create).toHaveBeenCalledWith(
+        dto,
+        user.id,
+        undefined,
         undefined,
       );
-
-      expect(service.create).toHaveBeenCalledWith(dto, user.id, undefined);
 
       expect(response).toEqual(dto);
     });
@@ -151,11 +160,7 @@ describe('BookController', () => {
 
       service.rateBook.mockResolvedValue(result);
 
-      const response = await controller.rateBook(
-        'book-1',
-        { value: 5 },
-        user as any,
-      );
+      const response = await controller.rateBook('book-1', { value: 5 }, user);
 
       expect(service.rateBook).toHaveBeenCalledWith('book-1', user.id, 5);
 
@@ -191,9 +196,14 @@ describe('BookController', () => {
 
       service.updateBook.mockResolvedValue(result);
 
-      const response = await controller.updateBook('book-1', dto);
+      const response = await controller.updateBook('book-1', dto, undefined);
 
-      expect(service.updateBook).toHaveBeenCalledWith('book-1', dto);
+      expect(service.updateBook).toHaveBeenCalledWith(
+        'book-1',
+        dto,
+        undefined,
+        undefined,
+      );
 
       expect(response).toEqual(result);
     });

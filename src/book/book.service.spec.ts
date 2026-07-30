@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Prisma } from '../generated/prisma/client';
+import { BookType, Prisma } from '../generated/prisma/client';
 
 import { BookService } from './book.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -14,10 +14,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookDto } from '../common/dtos/book/create-book-dto';
 import { SearchBookDto } from '../common/dtos/book/search-book.dto';
 import { UpdateBookDto } from '../common/dtos/book/update-book.dto';
+import { ReadingStatsService } from '../reading-stats/reading-stats.service';
 
 describe('BookService', () => {
   let service: BookService;
-
+  const readingStatsService = {
+    getProgress: vi.fn(),
+    updateProgress: vi.fn(),
+  };
   let prisma: {
     book: {
       findMany: ReturnType<typeof vi.fn>;
@@ -66,14 +70,18 @@ describe('BookService', () => {
           provide: PrismaService,
           useValue: prisma,
         },
+        {
+          provide: ReadingStatsService,
+          useValue: ReadingStatsService,
+        },
       ],
     })
       .setLogger({
-        log: () => {},
-        error: () => {},
-        warn: () => {},
-        debug: () => {},
-        verbose: () => {},
+        log: () => { },
+        error: () => { },
+        warn: () => { },
+        debug: () => { },
+        verbose: () => { },
       })
       .compile();
 
@@ -195,6 +203,10 @@ describe('BookService', () => {
         where: {
           id: 'book-1',
         },
+        include: {
+          digitalBook: true,
+          physicalBook: true,
+        },
       });
     });
 
@@ -215,8 +227,14 @@ describe('BookService', () => {
     const dto: CreateBookDto = {
       title: 'Clean Code',
       author: 'Robert C. Martin',
+      type: BookType.PHYSICAL,
+      physicalBook: {
+        address: 'he',
+        postalCode: '1',
+        city: '1',
+        country: 'germany',
+      },
     };
-
     it('should create a book', async () => {
       const createdBook = {
         id: 'book-1',
@@ -229,16 +247,23 @@ describe('BookService', () => {
       const result = await service.create(dto, 'user-1');
 
       expect(result).toEqual(createdBook);
-
       expect(prisma.book.create).toHaveBeenCalledWith({
         data: {
           ...dto,
           coverUrl: undefined,
+          publishedAt: undefined,
           owner: {
             connect: {
               id: 'user-1',
             },
           },
+          physicalBook: {
+            create: dto.physicalBook,
+          },
+        },
+        include: {
+          digitalBook: true,
+          physicalBook: true,
         },
       });
     });
@@ -259,12 +284,25 @@ describe('BookService', () => {
       expect(prisma.book.create).toHaveBeenCalledWith({
         data: {
           ...dto,
+
           coverUrl: '/uploads/cover.jpg',
+
+          publishedAt: undefined,
+
+          physicalBook: {
+            create: dto.physicalBook,
+          },
+
           owner: {
             connect: {
               id: 'user-1',
             },
           },
+        },
+
+        include: {
+          digitalBook: true,
+          physicalBook: true,
         },
       });
     });
@@ -300,30 +338,64 @@ describe('BookService', () => {
       title: 'Clean Code Updated',
     };
 
+    let tx: any;
+
+    beforeEach(() => {
+      tx = {
+        book: {
+          findUnique: vi.fn().mockResolvedValue({
+            id: 'book-1',
+            type: BookType.PHYSICAL,
+            physicalBook: {},
+            digitalBook: null,
+          }),
+
+          update: vi.fn(),
+        },
+
+        physicalBook: {
+          update: vi.fn(),
+        },
+
+        digitalBook: {
+          update: vi.fn(),
+        },
+      };
+
+      prisma.$transaction.mockImplementation(async (callback) => callback(tx));
+    });
+
     it('should update a book', async () => {
       const updatedBook = {
         id: 'book-1',
         ...dto,
       };
 
-      prisma.book.update.mockResolvedValue(updatedBook);
+      tx.book.update.mockResolvedValue(updatedBook);
 
       const result = await service.updateBook('book-1', dto);
 
       expect(result).toEqual(updatedBook);
 
-      expect(prisma.book.update).toHaveBeenCalledWith({
+      expect(tx.book.update).toHaveBeenCalledWith({
         where: {
           id: 'book-1',
         },
+
         data: {
           ...dto,
+          publishedAt: undefined,
+        },
+
+        include: {
+          digitalBook: true,
+          physicalBook: true,
         },
       });
     });
 
     it('should update the cover URL', async () => {
-      prisma.book.update.mockResolvedValue({
+      tx.book.update.mockResolvedValue({
         id: 'book-1',
         ...dto,
         coverUrl: '/uploads/new-cover.jpg',
@@ -331,13 +403,20 @@ describe('BookService', () => {
 
       await service.updateBook('book-1', dto, '/uploads/new-cover.jpg');
 
-      expect(prisma.book.update).toHaveBeenCalledWith({
+      expect(tx.book.update).toHaveBeenCalledWith({
         where: {
           id: 'book-1',
         },
+
         data: {
           ...dto,
+          publishedAt: undefined,
           coverUrl: '/uploads/new-cover.jpg',
+        },
+
+        include: {
+          digitalBook: true,
+          physicalBook: true,
         },
       });
     });
@@ -348,7 +427,7 @@ describe('BookService', () => {
         clientVersion: 'test',
       });
 
-      prisma.book.update.mockRejectedValue(error);
+      tx.book.update.mockRejectedValue(error);
 
       await expect(service.updateBook('book-1', dto)).rejects.toThrow(
         ConflictException,
@@ -356,14 +435,13 @@ describe('BookService', () => {
     });
 
     it('should throw BadRequestException for unknown errors', async () => {
-      prisma.book.update.mockRejectedValue(new Error('Database crashed'));
+      tx.book.update.mockRejectedValue(new Error('Database crashed'));
 
       await expect(service.updateBook('book-1', dto)).rejects.toThrow(
         BadRequestException,
       );
     });
   });
-
   // ---------------------------------------------------------------------------
   // deleteBook
   // ---------------------------------------------------------------------------

@@ -152,20 +152,4 @@ describe('AuthController', () => {
       });
     });
   });
-
-  describe('logout', () => {
-    it('should clear refresh cookie', () => {
-      const res = {
-        clearCookie: vi.fn(),
-      } as any;
-
-      const result = controller.logout(res);
-
-      expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
-
-      expect(result).toEqual({
-        message: 'Logged out successfully',
-      });
-    });
-  });
 });

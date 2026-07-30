@@ -11,7 +11,7 @@ import { LocalAuthGuard } from '../common/guards/auth/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('signup')
   async signup(

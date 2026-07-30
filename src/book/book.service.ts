@@ -16,6 +16,7 @@ import {
 
 import { PrismaService } from '../prisma/prisma.service';
 import { ReadStatus } from 'src/common/enums/read-status.enum';
+import { ReadingStatsService } from '../reading-stats/reading-stats.service';
 
 import { CreateBookDto } from '../common/dtos/book/create-book-dto';
 import { SearchBookDto } from '../common/dtos/book/search-book.dto';
@@ -27,7 +28,10 @@ import { FindByTagsDto } from '../common/dtos/book/find-by-tags.dto';
 export class BookService {
   private readonly logger = new Logger(BookService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly readingStatsService: ReadingStatsService,
+  ) {}
 
   // --------------------------------------------------------------------------
   // FIND ALL
@@ -643,12 +647,11 @@ export class BookService {
     userId: string,
     data: { currentPage: number; totalPages?: number; status?: ReadStatus },
   ) {
-    // validate status explicitly (extra guard in addition to DTO validation)
     if (data.status && !Object.values(ReadStatus).includes(data.status)) {
       throw new BadRequestException('Invalid status value');
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       const book = await tx.book.findUnique({
         where: { id: bookId },
       });
@@ -679,8 +682,14 @@ export class BookService {
             currentPage: data.currentPage,
             totalPages: data.totalPages || existingProgress.totalPages,
             progressPercentage,
-            status: (data.status as unknown as BookReadingStatus) || existingProgress.status || BookReadingStatus.READING,
-            completedAt: (data.status || existingProgress.status) === ReadStatus.COMPLETED ? new Date() : null,
+            status:
+              (data.status as unknown as BookReadingStatus) ||
+              existingProgress.status ||
+              BookReadingStatus.READING,
+            completedAt:
+              (data.status || existingProgress.status) === ReadStatus.COMPLETED
+                ? new Date()
+                : null,
             updatedAt: new Date(),
           },
         });
@@ -692,11 +701,23 @@ export class BookService {
             currentPage: data.currentPage,
             totalPages,
             progressPercentage,
-            status: (data.status as unknown as BookReadingStatus) || BookReadingStatus.READING,
+            status:
+              (data.status as unknown as BookReadingStatus) ||
+              BookReadingStatus.READING,
           },
         });
       }
     });
+
+    const newStatus =
+      (data.status as unknown as BookReadingStatus) ||
+      BookReadingStatus.READING;
+    if (newStatus === BookReadingStatus.COMPLETED) {
+      await this.readingStatsService.updateStatsOnCompletion(userId, bookId);
+      await this.readingStatsService.updateStreak(userId);
+    }
+
+    return result;
   }
 
   // --------------------------------------------------------------------------
@@ -971,11 +992,7 @@ export class BookService {
 
   async findByTags(userId: string, dto: FindByTagsDto) {
     try {
-      const {
-        tags,
-        page = 1,
-        limit = 10,
-      } = dto;
+      const { tags, page = 1, limit = 10 } = dto;
 
       const tagsLower = tags.map((t) => t.toLowerCase().trim());
 

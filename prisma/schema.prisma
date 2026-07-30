@@ -36,10 +36,11 @@ model User {
   password     String
   refreshToken String?
 
-  books     Book[]
-  ratings   Rating[]
-  readLists ReadList[]
-  progress  BookProgress[]
+  books        Book[]
+  ratings      Rating[]
+  readLists    ReadList[]
+  progress     BookProgress[]
+  readingStats ReadingStats?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -50,7 +51,7 @@ model Book {
   title       String
   description String?
   author      String
-  isbn        String? @unique
+  isbn        String?
 
   type BookType @default(PHYSICAL)
 
@@ -198,4 +199,23 @@ model BookTag {
 
   @@id([bookId, tagId])
   @@index([tagId])
+}
+
+model ReadingStats {
+  id String @id @default(cuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  totalBooksCompleted Int   @default(0)
+  totalPagesRead      Int   @default(0)
+  totalReadingTime    Int   @default(0)
+  averageRating       Float @default(0)
+
+  currentStreak Int       @default(0)
+  longestStreak Int       @default(0)
+  lastReadDate  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

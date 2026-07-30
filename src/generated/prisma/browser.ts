@@ -67,3 +67,8 @@ export type Tag = Prisma.TagModel
  * 
  */
 export type BookTag = Prisma.BookTagModel
+/**
+ * Model ReadingStats
+ * 
+ */
+export type ReadingStats = Prisma.ReadingStatsModel

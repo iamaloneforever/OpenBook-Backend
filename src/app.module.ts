@@ -10,6 +10,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { UserModule } from './user/user.module';
 import { ReadListModule } from './read-list/read-list.module';
+import { ReadingStatsModule } from './reading-stats/reading-stats.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ReadListModule } from './read-list/read-list.module';
       },
     }),
     ReadListModule,
+    ReadingStatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

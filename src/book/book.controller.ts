@@ -42,7 +42,7 @@ import { BookUploadInterceptor } from '../common/config/multer.config';
 export class BookController {
   private readonly logger = new Logger(BookController.name);
 
-  constructor(private readonly bookService: BookService) {}
+  constructor(private readonly bookService: BookService) { }
 
   // --------------------------------------------------------------------------
   // GET ALL BOOKS
@@ -134,15 +134,15 @@ export class BookController {
     user: User,
 
     @UploadedFiles()
-    files: {
+    files?: {
       cover?: Express.Multer.File[];
 
       file?: Express.Multer.File[];
     },
   ) {
-    const cover = files.cover?.[0];
+    const cover = files?.cover?.[0];
 
-    const epub = files.file?.[0];
+    const epub = files?.file?.[0];
 
     return this.bookService.create(
       dto,
@@ -211,15 +211,15 @@ export class BookController {
     @Body() dto: UpdateBookDto,
 
     @UploadedFiles()
-    files: {
+    files?: {
       cover?: Express.Multer.File[];
 
       file?: Express.Multer.File[];
     },
   ) {
-    const cover = files.cover?.[0];
+    const cover = files?.cover?.[0];
 
-    const epub = files.file?.[0];
+    const epub = files?.file?.[0];
 
     return this.bookService.updateBook(
       id,

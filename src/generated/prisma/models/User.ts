@@ -194,6 +194,7 @@ export type UserWhereInput = {
   ratings?: Prisma.RatingListRelationFilter
   readLists?: Prisma.ReadListListRelationFilter
   progress?: Prisma.BookProgressListRelationFilter
+  readingStats?: Prisma.XOR<Prisma.ReadingStatsNullableScalarRelationFilter, Prisma.ReadingStatsWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -207,6 +208,7 @@ export type UserOrderByWithRelationInput = {
   ratings?: Prisma.RatingOrderByRelationAggregateInput
   readLists?: Prisma.ReadListOrderByRelationAggregateInput
   progress?: Prisma.BookProgressOrderByRelationAggregateInput
+  readingStats?: Prisma.ReadingStatsOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -223,6 +225,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   ratings?: Prisma.RatingListRelationFilter
   readLists?: Prisma.ReadListListRelationFilter
   progress?: Prisma.BookProgressListRelationFilter
+  readingStats?: Prisma.XOR<Prisma.ReadingStatsNullableScalarRelationFilter, Prisma.ReadingStatsWhereInput> | null
 }, "id" | "username">
 
 export type UserOrderByWithAggregationInput = {
@@ -260,6 +263,7 @@ export type UserCreateInput = {
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
   progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -273,6 +277,7 @@ export type UserUncheckedCreateInput = {
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
   progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -286,6 +291,7 @@ export type UserUpdateInput = {
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
   progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -299,6 +305,7 @@ export type UserUncheckedUpdateInput = {
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
   progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -428,6 +435,20 @@ export type UserUpdateOneRequiredWithoutProgressNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProgressInput, Prisma.UserUpdateWithoutProgressInput>, Prisma.UserUncheckedUpdateWithoutProgressInput>
 }
 
+export type UserCreateNestedOneWithoutReadingStatsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReadingStatsInput, Prisma.UserUncheckedCreateWithoutReadingStatsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReadingStatsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutReadingStatsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReadingStatsInput, Prisma.UserUncheckedCreateWithoutReadingStatsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReadingStatsInput
+  upsert?: Prisma.UserUpsertWithoutReadingStatsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReadingStatsInput, Prisma.UserUpdateWithoutReadingStatsInput>, Prisma.UserUncheckedUpdateWithoutReadingStatsInput>
+}
+
 export type UserCreateWithoutBooksInput = {
   id?: string
   username: string
@@ -438,6 +459,7 @@ export type UserCreateWithoutBooksInput = {
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
   progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBooksInput = {
@@ -450,6 +472,7 @@ export type UserUncheckedCreateWithoutBooksInput = {
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
   progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBooksInput = {
@@ -478,6 +501,7 @@ export type UserUpdateWithoutBooksInput = {
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
   progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBooksInput = {
@@ -490,6 +514,7 @@ export type UserUncheckedUpdateWithoutBooksInput = {
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
   progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReadListsInput = {
@@ -502,6 +527,7 @@ export type UserCreateWithoutReadListsInput = {
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
   progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReadListsInput = {
@@ -514,6 +540,7 @@ export type UserUncheckedCreateWithoutReadListsInput = {
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
   progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReadListsInput = {
@@ -542,6 +569,7 @@ export type UserUpdateWithoutReadListsInput = {
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
   progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReadListsInput = {
@@ -554,6 +582,7 @@ export type UserUncheckedUpdateWithoutReadListsInput = {
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
   progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRatingsInput = {
@@ -566,6 +595,7 @@ export type UserCreateWithoutRatingsInput = {
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
   readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
   progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRatingsInput = {
@@ -578,6 +608,7 @@ export type UserUncheckedCreateWithoutRatingsInput = {
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
   readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
   progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRatingsInput = {
@@ -606,6 +637,7 @@ export type UserUpdateWithoutRatingsInput = {
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
   readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
   progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRatingsInput = {
@@ -618,6 +650,7 @@ export type UserUncheckedUpdateWithoutRatingsInput = {
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
   readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
   progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProgressInput = {
@@ -630,6 +663,7 @@ export type UserCreateWithoutProgressInput = {
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProgressInput = {
@@ -642,6 +676,7 @@ export type UserUncheckedCreateWithoutProgressInput = {
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProgressInput = {
@@ -670,6 +705,7 @@ export type UserUpdateWithoutProgressInput = {
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProgressInput = {
@@ -682,6 +718,75 @@ export type UserUncheckedUpdateWithoutProgressInput = {
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutReadingStatsInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutReadingStatsInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutReadingStatsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReadingStatsInput, Prisma.UserUncheckedCreateWithoutReadingStatsInput>
+}
+
+export type UserUpsertWithoutReadingStatsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReadingStatsInput, Prisma.UserUncheckedUpdateWithoutReadingStatsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReadingStatsInput, Prisma.UserUncheckedCreateWithoutReadingStatsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReadingStatsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReadingStatsInput, Prisma.UserUncheckedUpdateWithoutReadingStatsInput>
+}
+
+export type UserUpdateWithoutReadingStatsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReadingStatsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -753,6 +858,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   ratings?: boolean | Prisma.User$ratingsArgs<ExtArgs>
   readLists?: boolean | Prisma.User$readListsArgs<ExtArgs>
   progress?: boolean | Prisma.User$progressArgs<ExtArgs>
+  readingStats?: boolean | Prisma.User$readingStatsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -789,6 +895,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   ratings?: boolean | Prisma.User$ratingsArgs<ExtArgs>
   readLists?: boolean | Prisma.User$readListsArgs<ExtArgs>
   progress?: boolean | Prisma.User$progressArgs<ExtArgs>
+  readingStats?: boolean | Prisma.User$readingStatsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -801,6 +908,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     ratings: Prisma.$RatingPayload<ExtArgs>[]
     readLists: Prisma.$ReadListPayload<ExtArgs>[]
     progress: Prisma.$BookProgressPayload<ExtArgs>[]
+    readingStats: Prisma.$ReadingStatsPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1207,6 +1315,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   ratings<T extends Prisma.User$ratingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ratingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RatingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   readLists<T extends Prisma.User$readListsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$readListsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReadListPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   progress<T extends Prisma.User$progressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$progressArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  readingStats<T extends Prisma.User$readingStatsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$readingStatsArgs<ExtArgs>>): Prisma.Prisma__ReadingStatsClient<runtime.Types.Result.GetResult<Prisma.$ReadingStatsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1728,6 +1837,25 @@ export type User$progressArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.BookProgressScalarFieldEnum | Prisma.BookProgressScalarFieldEnum[]
+}
+
+/**
+ * User.readingStats
+ */
+export type User$readingStatsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReadingStats
+   */
+  select?: Prisma.ReadingStatsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReadingStats
+   */
+  omit?: Prisma.ReadingStatsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReadingStatsInclude<ExtArgs> | null
+  where?: Prisma.ReadingStatsWhereInput
 }
 
 /**

@@ -60,7 +60,8 @@ export const ModelName = {
   Rating: 'Rating',
   BookProgress: 'BookProgress',
   Tag: 'Tag',
-  BookTag: 'BookTag'
+  BookTag: 'BookTag',
+  ReadingStats: 'ReadingStats'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -201,6 +202,23 @@ export const BookTagScalarFieldEnum = {
 } as const
 
 export type BookTagScalarFieldEnum = (typeof BookTagScalarFieldEnum)[keyof typeof BookTagScalarFieldEnum]
+
+
+export const ReadingStatsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  totalBooksCompleted: 'totalBooksCompleted',
+  totalPagesRead: 'totalPagesRead',
+  totalReadingTime: 'totalReadingTime',
+  averageRating: 'averageRating',
+  currentStreak: 'currentStreak',
+  longestStreak: 'longestStreak',
+  lastReadDate: 'lastReadDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReadingStatsScalarFieldEnum = (typeof ReadingStatsScalarFieldEnum)[keyof typeof ReadingStatsScalarFieldEnum]
 
 
 export const SortOrder = {

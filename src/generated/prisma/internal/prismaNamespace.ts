@@ -393,7 +393,8 @@ export const ModelName = {
   Rating: 'Rating',
   BookProgress: 'BookProgress',
   Tag: 'Tag',
-  BookTag: 'BookTag'
+  BookTag: 'BookTag',
+  ReadingStats: 'ReadingStats'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "book" | "digitalBook" | "physicalBook" | "readList" | "readListBook" | "rating" | "bookProgress" | "tag" | "bookTag"
+    modelProps: "user" | "book" | "digitalBook" | "physicalBook" | "readList" | "readListBook" | "rating" | "bookProgress" | "tag" | "bookTag" | "readingStats"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1153,6 +1154,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ReadingStats: {
+      payload: Prisma.$ReadingStatsPayload<ExtArgs>
+      fields: Prisma.ReadingStatsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReadingStatsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadingStatsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReadingStatsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadingStatsPayload>
+        }
+        findFirst: {
+          args: Prisma.ReadingStatsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadingStatsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReadingStatsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadingStatsPayload>
+        }
+        findMany: {
+          args: Prisma.ReadingStatsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadingStatsPayload>[]
+        }
+        create: {
+          args: Prisma.ReadingStatsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadingStatsPayload>
+        }
+        createMany: {
+          args: Prisma.ReadingStatsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReadingStatsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadingStatsPayload>[]
+        }
+        delete: {
+          args: Prisma.ReadingStatsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadingStatsPayload>
+        }
+        update: {
+          args: Prisma.ReadingStatsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadingStatsPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReadingStatsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReadingStatsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReadingStatsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadingStatsPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReadingStatsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadingStatsPayload>
+        }
+        aggregate: {
+          args: Prisma.ReadingStatsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReadingStats>
+        }
+        groupBy: {
+          args: Prisma.ReadingStatsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadingStatsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReadingStatsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadingStatsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1314,6 +1389,23 @@ export const BookTagScalarFieldEnum = {
 } as const
 
 export type BookTagScalarFieldEnum = (typeof BookTagScalarFieldEnum)[keyof typeof BookTagScalarFieldEnum]
+
+
+export const ReadingStatsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  totalBooksCompleted: 'totalBooksCompleted',
+  totalPagesRead: 'totalPagesRead',
+  totalReadingTime: 'totalReadingTime',
+  averageRating: 'averageRating',
+  currentStreak: 'currentStreak',
+  longestStreak: 'longestStreak',
+  lastReadDate: 'lastReadDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReadingStatsScalarFieldEnum = (typeof ReadingStatsScalarFieldEnum)[keyof typeof ReadingStatsScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1563,6 +1655,7 @@ export type GlobalOmitConfig = {
   bookProgress?: Prisma.BookProgressOmit
   tag?: Prisma.TagOmit
   bookTag?: Prisma.BookTagOmit
+  readingStats?: Prisma.ReadingStatsOmit
 }
 
 /* Types for Logging */
