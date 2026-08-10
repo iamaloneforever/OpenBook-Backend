@@ -8,14 +8,12 @@ import { AuthModule } from './auth/auth.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { UserModule } from './user/user.module';
 import { ReadListModule } from './read-list/read-list.module';
-import { ReadingStatsModule } from './reading-stats/reading-stats.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
     BookModule,
-    UserModule,
     PrismaModule,
     AuthModule,
     ConfigModule.forRoot({
@@ -34,9 +32,9 @@ import { ReadingStatsModule } from './reading-stats/reading-stats.module';
       },
     }),
     ReadListModule,
-    ReadingStatsModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

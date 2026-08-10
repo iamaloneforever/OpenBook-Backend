@@ -14,14 +14,42 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookDto } from '../common/dtos/book/create-book-dto';
 import { SearchBookDto } from '../common/dtos/book/search-book.dto';
 import { UpdateBookDto } from '../common/dtos/book/update-book.dto';
-import { ReadingStatsService } from '../reading-stats/reading-stats.service';
+import { UserService } from '../user/user.service';
+
+type BookTx = {
+  book: {
+    findUnique: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+  };
+  physicalBook: {
+    update: ReturnType<typeof vi.fn>;
+  };
+  digitalBook: {
+    update: ReturnType<typeof vi.fn>;
+  };
+};
+
+type RatingTx = {
+  book: {
+    findUnique: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+  };
+  rating: {
+    findUnique: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    aggregate: ReturnType<typeof vi.fn>;
+  };
+};
+
+// Runs the transaction callback passed by the service against a fake `tx`
+const runTransaction =
+  <T>(tx: T) =>
+  (callback: (tx: T) => Promise<unknown>) =>
+    callback(tx) as unknown;
 
 describe('BookService', () => {
   let service: BookService;
-  const readingStatsService = {
-    getProgress: vi.fn(),
-    updateProgress: vi.fn(),
-  };
   let prisma: {
     book: {
       findMany: ReturnType<typeof vi.fn>;
@@ -71,17 +99,20 @@ describe('BookService', () => {
           useValue: prisma,
         },
         {
-          provide: ReadingStatsService,
-          useValue: ReadingStatsService,
+          provide: UserService,
+          useValue: {
+            updateStatsOnCompletion: vi.fn(),
+            updateStreak: vi.fn(),
+          },
         },
       ],
     })
       .setLogger({
-        log: () => { },
-        error: () => { },
-        warn: () => { },
-        debug: () => { },
-        verbose: () => { },
+        log: () => {},
+        error: () => {},
+        warn: () => {},
+        debug: () => {},
+        verbose: () => {},
       })
       .compile();
 
@@ -338,7 +369,7 @@ describe('BookService', () => {
       title: 'Clean Code Updated',
     };
 
-    let tx: any;
+    let tx: BookTx;
 
     beforeEach(() => {
       tx = {
@@ -362,7 +393,7 @@ describe('BookService', () => {
         },
       };
 
-      prisma.$transaction.mockImplementation(async (callback) => callback(tx));
+      prisma.$transaction.mockImplementation(runTransaction(tx));
     });
 
     it('should update a book', async () => {
@@ -486,7 +517,7 @@ describe('BookService', () => {
         ratingsCount: 1,
       };
 
-      const tx = {
+      const tx: RatingTx = {
         book: {
           findUnique: vi.fn().mockResolvedValue({
             id: 'book-1',
@@ -517,7 +548,7 @@ describe('BookService', () => {
         },
       };
 
-      prisma.$transaction.mockImplementation(async (callback) => callback(tx));
+      prisma.$transaction.mockImplementation(runTransaction(tx));
 
       const result = await service.rateBook('book-1', 'user-1', 5);
 
@@ -533,7 +564,7 @@ describe('BookService', () => {
     });
 
     it('should update an existing rating', async () => {
-      const tx = {
+      const tx: RatingTx = {
         book: {
           findUnique: vi.fn().mockResolvedValue({
             id: 'book-1',
@@ -571,7 +602,7 @@ describe('BookService', () => {
         },
       };
 
-      prisma.$transaction.mockImplementation(async (callback) => callback(tx));
+      prisma.$transaction.mockImplementation(runTransaction(tx));
 
       await service.rateBook('book-1', 'user-1', 5);
 
@@ -589,9 +620,10 @@ describe('BookService', () => {
     });
 
     it('should throw NotFoundException if book does not exist', async () => {
-      const tx = {
+      const tx: RatingTx = {
         book: {
           findUnique: vi.fn().mockResolvedValue(null),
+          update: vi.fn(),
         },
 
         rating: {
@@ -602,7 +634,7 @@ describe('BookService', () => {
         },
       };
 
-      prisma.$transaction.mockImplementation(async (callback) => callback(tx));
+      prisma.$transaction.mockImplementation(runTransaction(tx));
 
       await expect(service.rateBook('book-1', 'user-1', 5)).rejects.toThrow(
         NotFoundException,

@@ -50,7 +50,7 @@ export class BookController {
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(60)
+  @CacheTTL(6000)
   @Get()
   findAll(
     @CurrentUser() user: User,
@@ -71,7 +71,7 @@ export class BookController {
   // --------------------------------------------------------------------------
 
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(300)
+  @CacheTTL(3000)
   @Get('top/trending')
   getTopBooks(@Query() query: TopBooksQueryDto) {
     this.logger.log('GET /book/top/trending');
@@ -89,7 +89,7 @@ export class BookController {
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(60)
+  @CacheTTL(6000)
   @Get(':id')
   @Owner('book')
   findOne(@Param() params: BookIDParamDto, @CurrentUser() user: User) {
@@ -274,7 +274,7 @@ export class BookController {
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(60)
+  @CacheTTL(6000)
   @Get('tags/search')
   findByTags(@CurrentUser() user: User, @Query() query: FindByTagsDto) {
     this.logger.log('GET /book/tags/search');
@@ -286,7 +286,7 @@ export class BookController {
   // --------------------------------------------------------------------------
 
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(300)
+  @CacheTTL(3000)
   @Get('tags/all')
   getAllTags() {
     this.logger.log('GET /book/tags/all');

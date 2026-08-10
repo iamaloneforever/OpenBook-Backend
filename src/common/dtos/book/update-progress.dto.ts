@@ -1,7 +1,8 @@
 import { IsInt, IsOptional, Min, IsEnum } from 'class-validator';
-import { ReadStatus } from 'src/common/enums/read-status.enum';
+import { BookReadingStatus } from 'src/generated/prisma/enums';
 
 export class UpdateProgressDto {
+  @IsOptional()
   @IsInt()
   @Min(0)
   currentPage: number;
@@ -12,8 +13,8 @@ export class UpdateProgressDto {
   totalPages?: number;
 
   @IsOptional()
-  @IsEnum(ReadStatus, {
-    message: 'status must be one of reading|completed|paused|dropped',
+  @IsEnum(BookReadingStatus, {
+    message: 'status must be one of READING|COMPLETED|PAUSED|DROPPED',
   })
-  status?: ReadStatus;
+  status?: BookReadingStatus;
 }

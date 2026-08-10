@@ -4,51 +4,81 @@ import {
   ValidationPipe,
   NotFoundException,
 } from '@nestjs/common';
+import type { ExecutionContext } from '@nestjs/common';
+import type { Request } from 'express';
 import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppModule } from '../src/app.module';
 import { BookService } from '../src/book/book.service';
+import { JwtAuthGuard } from '../src/common/guards/auth/jwt-auth.guard';
+import { OwnerGuard } from '../src/common/guards/auth/owner.guard';
 
 describe('BookController (e2e)', () => {
   let app: INestApplication;
 
+  const userId = 'c123456789012345678901230';
   const bookId = 'c123456789012345678901234';
   const missingBookId = 'c999999999999999999999999';
 
   const bookServiceMock = {
     findAll: vi.fn(),
-    findOne: vi.fn(),
+    findOneWithProgress: vi.fn(),
     create: vi.fn(),
   };
 
   beforeEach(async () => {
     vi.resetAllMocks();
 
-    bookServiceMock.findAll.mockResolvedValue([
-      {
-        id: bookId,
-        title: 'Clean Code',
-        author: 'Robert C. Martin',
+    bookServiceMock.findAll.mockResolvedValue({
+      data: [
+        {
+          id: bookId,
+          title: 'Clean Code',
+          author: 'Robert C. Martin',
+        },
+      ],
+      meta: {
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
       },
-    ]);
+    });
 
-    bookServiceMock.findOne.mockResolvedValue({
+    bookServiceMock.findOneWithProgress.mockResolvedValue({
       id: bookId,
       title: 'Clean Code',
       author: 'Robert C. Martin',
     });
 
-    bookServiceMock.create.mockImplementation(async (dto) => ({
-      id: bookId,
-      ...dto,
-    }));
+    bookServiceMock.create.mockImplementation(
+      (dto: Record<string, unknown>) => ({
+        id: bookId,
+        ...dto,
+      }),
+    );
 
     const module = await Test.createTestingModule({
       imports: [AppModule],
     })
       .overrideProvider(BookService)
       .useValue(bookServiceMock)
+      .overrideGuard(JwtAuthGuard)
+      .useValue({
+        canActivate: (context: ExecutionContext) => {
+          const request = context.switchToHttp().getRequest<Request>();
+          request.user = {
+            id: userId,
+            username: 'test',
+          };
+          return true;
+        },
+      })
+      .overrideGuard(OwnerGuard)
+      .useValue({
+        canActivate: () => true,
+      })
       .compile();
 
     app = module.createNestApplication();
@@ -71,13 +101,13 @@ describe('BookController (e2e)', () => {
     it('should return all books', async () => {
       const res = await request(app.getHttpServer()).get('/book').expect(200);
 
-      expect(res.body).toEqual([
-        {
-          id: bookId,
-          title: 'Clean Code',
-          author: 'Robert C. Martin',
-        },
-      ]);
+      const body = res.body as { data: Array<Record<string, unknown>> };
+
+      expect(body.data[0]).toEqual({
+        id: bookId,
+        title: 'Clean Code',
+        author: 'Robert C. Martin',
+      });
 
       expect(bookServiceMock.findAll).toHaveBeenCalledOnce();
     });
@@ -95,26 +125,32 @@ describe('BookController (e2e)', () => {
         author: 'Robert C. Martin',
       });
 
-      expect(bookServiceMock.findOne).toHaveBeenCalledWith(bookId);
-      expect(bookServiceMock.findOne).toHaveBeenCalledOnce();
+      expect(bookServiceMock.findOneWithProgress).toHaveBeenCalledWith(
+        bookId,
+        userId,
+      );
+      expect(bookServiceMock.findOneWithProgress).toHaveBeenCalledOnce();
     });
 
     it('should return 404 when book does not exist', async () => {
-      bookServiceMock.findOne.mockRejectedValueOnce(
+      bookServiceMock.findOneWithProgress.mockRejectedValueOnce(
         new NotFoundException('Book not found'),
       );
       await request(app.getHttpServer())
         .get(`/book/${missingBookId}`)
         .expect(404);
 
-      expect(bookServiceMock.findOne).toHaveBeenCalledWith(missingBookId);
-      expect(bookServiceMock.findOne).toHaveBeenCalledOnce();
+      expect(bookServiceMock.findOneWithProgress).toHaveBeenCalledWith(
+        missingBookId,
+        userId,
+      );
+      expect(bookServiceMock.findOneWithProgress).toHaveBeenCalledOnce();
     });
 
     it('should return 400 for an invalid CUID', async () => {
       await request(app.getHttpServer()).get('/book/1').expect(400);
 
-      expect(bookServiceMock.findOne).not.toHaveBeenCalled();
+      expect(bookServiceMock.findOneWithProgress).not.toHaveBeenCalled();
     });
   });
 
@@ -123,6 +159,12 @@ describe('BookController (e2e)', () => {
       const dto = {
         title: 'The Pragmatic Programmer',
         author: 'Andrew Hunt',
+        type: 'PHYSICAL',
+        physicalBook: {
+          address: 'Main Street 1',
+          city: 'Berlin',
+          country: 'Germany',
+        },
       };
 
       const res = await request(app.getHttpServer())
@@ -135,7 +177,12 @@ describe('BookController (e2e)', () => {
         ...dto,
       });
 
-      expect(bookServiceMock.create).toHaveBeenCalledWith(dto);
+      expect(bookServiceMock.create).toHaveBeenCalledWith(
+        dto,
+        userId,
+        undefined,
+        undefined,
+      );
       expect(bookServiceMock.create).toHaveBeenCalledOnce();
     });
 

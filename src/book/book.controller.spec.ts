@@ -1,12 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, beforeEach, it, expect, vi } from 'vitest';
 
+import type { CallHandler, ExecutionContext } from '@nestjs/common';
+
 import { BookController } from './book.controller';
 import { BookService } from './book.service';
 import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
 import { OwnerGuard } from '../common/guards/auth/owner.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import { User } from 'src/generated/prisma/client';
+import { User, BookType } from 'src/generated/prisma/client';
+import { CreateBookDto } from '../common/dtos/book/create-book-dto';
 
 describe('BookController', () => {
   let controller: BookController;
@@ -51,7 +54,7 @@ describe('BookController', () => {
       })
       .overrideInterceptor(CacheInterceptor)
       .useValue({
-        intercept: vi.fn((_, next) => next.handle()),
+        intercept: (_: ExecutionContext, next: CallHandler) => next.handle(),
       })
       .compile();
 
@@ -97,7 +100,7 @@ describe('BookController', () => {
 
       service.findOneWithProgress.mockResolvedValue(book);
 
-      const response = await controller.findOne({ id: 'book-1' } as any, user);
+      const response = await controller.findOne({ id: 'book-1' }, user);
 
       expect(service.findOneWithProgress).toHaveBeenCalledWith(
         'book-1',
@@ -109,9 +112,15 @@ describe('BookController', () => {
   });
 
   describe('create', () => {
-    const dto = {
+    const dto: CreateBookDto = {
       title: 'Clean Code',
       author: 'Robert C. Martin',
+      type: BookType.PHYSICAL,
+      physicalBook: {
+        address: 'Main Street 1',
+        city: 'Berlin',
+        country: 'Germany',
+      },
     };
 
     it('should create a book with cover', async () => {
@@ -122,7 +131,7 @@ describe('BookController', () => {
 
       service.create.mockResolvedValue(book);
 
-      const response = await controller.create(dto as any, user, undefined);
+      const response = await controller.create(dto, user, undefined);
 
       expect(service.create).toHaveBeenCalledWith(
         dto,
@@ -137,7 +146,7 @@ describe('BookController', () => {
     it('should create a book without cover', async () => {
       service.create.mockResolvedValue(dto);
 
-      const response = await controller.create(dto as any, user, undefined);
+      const response = await controller.create(dto, user, undefined);
 
       expect(service.create).toHaveBeenCalledWith(
         dto,

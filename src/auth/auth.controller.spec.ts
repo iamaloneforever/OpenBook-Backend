@@ -1,13 +1,20 @@
 import { Test } from '@nestjs/testing';
 import { describe, beforeEach, it, expect, vi } from 'vitest';
 
+import type { Request, Response } from 'express';
+
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SignupDto } from 'src/common/dtos/auth/signup.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;
-  let service: AuthService;
+
+  const service = {
+    signup: vi.fn(),
+    generateTokens: vi.fn(),
+    refresh: vi.fn(),
+  };
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -15,17 +22,12 @@ describe('AuthController', () => {
       providers: [
         {
           provide: AuthService,
-          useValue: {
-            signup: vi.fn(),
-            generateTokens: vi.fn(),
-            refresh: vi.fn(),
-          },
+          useValue: service,
         },
       ],
     }).compile();
 
     controller = module.get(AuthController);
-    service = module.get(AuthService);
   });
 
   describe('signup', () => {
@@ -35,9 +37,8 @@ describe('AuthController', () => {
         password: '123456',
       };
 
-      const res = {
-        cookie: vi.fn(),
-      } as any;
+      const cookie = vi.fn();
+      const res = { cookie } as unknown as Response;
 
       const user = {
         id: '1',
@@ -45,7 +46,7 @@ describe('AuthController', () => {
         createdAt: new Date(),
       };
 
-      vi.mocked(service.signup).mockResolvedValue({
+      service.signup.mockResolvedValue({
         user,
         tokens: {
           accessToken: 'access',
@@ -57,7 +58,7 @@ describe('AuthController', () => {
 
       expect(service.signup).toHaveBeenCalledWith(dto);
 
-      expect(res.cookie).toHaveBeenCalledWith(
+      expect(cookie).toHaveBeenCalledWith(
         'refreshToken',
         'refresh',
         expect.objectContaining({
@@ -83,13 +84,12 @@ describe('AuthController', () => {
           id: '1',
           username: 'john',
         },
-      } as any;
+      } as unknown as Request;
 
-      const res = {
-        cookie: vi.fn(),
-      } as any;
+      const cookie = vi.fn();
+      const res = { cookie } as unknown as Response;
 
-      vi.mocked(service.generateTokens).mockResolvedValue({
+      service.generateTokens.mockResolvedValue({
         accessToken: 'access',
         refreshToken: 'refresh',
       });
@@ -98,7 +98,7 @@ describe('AuthController', () => {
 
       expect(service.generateTokens).toHaveBeenCalledWith('1', 'john');
 
-      expect(res.cookie).toHaveBeenCalledWith(
+      expect(cookie).toHaveBeenCalledWith(
         'refreshToken',
         'refresh',
         expect.objectContaining({
@@ -121,13 +121,12 @@ describe('AuthController', () => {
         cookies: {
           refreshToken: 'old-refresh-token',
         },
-      } as any;
+      } as unknown as Request;
 
-      const res = {
-        cookie: vi.fn(),
-      } as any;
+      const cookie = vi.fn();
+      const res = { cookie } as unknown as Response;
 
-      vi.mocked(service.refresh).mockResolvedValue({
+      service.refresh.mockResolvedValue({
         accessToken: 'new-access-token',
         refreshToken: 'new-refresh-token',
       });
@@ -136,7 +135,7 @@ describe('AuthController', () => {
 
       expect(service.refresh).toHaveBeenCalledWith('old-refresh-token');
 
-      expect(res.cookie).toHaveBeenCalledWith(
+      expect(cookie).toHaveBeenCalledWith(
         'refreshToken',
         'new-refresh-token',
         expect.objectContaining({

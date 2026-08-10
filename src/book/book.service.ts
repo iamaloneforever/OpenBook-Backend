@@ -15,8 +15,7 @@ import {
 } from '../generated/prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { ReadStatus } from 'src/common/enums/read-status.enum';
-import { ReadingStatsService } from '../reading-stats/reading-stats.service';
+import { UserService } from '../user/user.service';
 
 import { CreateBookDto } from '../common/dtos/book/create-book-dto';
 import { SearchBookDto } from '../common/dtos/book/search-book.dto';
@@ -30,8 +29,8 @@ export class BookService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly readingStatsService: ReadingStatsService,
-  ) {}
+    private readonly readingStatsService: UserService,
+  ) { }
 
   // --------------------------------------------------------------------------
   // FIND ALL
@@ -95,16 +94,16 @@ export class BookService {
 
       ...(minRating !== undefined || maxRating !== undefined
         ? {
-            averageRating: {
-              ...(minRating !== undefined && {
-                gte: minRating,
-              }),
+          averageRating: {
+            ...(minRating !== undefined && {
+              gte: minRating,
+            }),
 
-              ...(maxRating !== undefined && {
-                lte: maxRating,
-              }),
-            },
-          }
+            ...(maxRating !== undefined && {
+              lte: maxRating,
+            }),
+          },
+        }
         : {}),
     };
 
@@ -207,15 +206,15 @@ export class BookService {
 
           ...(dto.type === BookType.DIGITAL
             ? {
-                digitalBook: {
-                  create: digitalBookData!,
-                },
-              }
+              digitalBook: {
+                create: digitalBookData!,
+              },
+            }
             : {
-                physicalBook: {
-                  create: physicalBook!,
-                },
-              }),
+              physicalBook: {
+                create: physicalBook!,
+              },
+            }),
         },
 
         include: {
@@ -617,11 +616,11 @@ export class BookService {
   ): Promise<
     | BookProgress
     | {
-        currentPage: number;
-        totalPages: number;
-        progressPercentage: number;
-        status: ReadStatus | string;
-      }
+      currentPage: number;
+      totalPages: number;
+      progressPercentage: number;
+      status: BookReadingStatus | string;
+    }
   > {
     const progress = await this.prisma.bookProgress.findUnique({
       where: {
@@ -645,13 +644,15 @@ export class BookService {
   async setProgress(
     bookId: string,
     userId: string,
-    data: { currentPage: number; totalPages?: number; status?: ReadStatus },
+    data: {
+      currentPage: number;
+      totalPages?: number;
+      status?: BookReadingStatus;
+    },
   ) {
-    if (data.status && !Object.values(ReadStatus).includes(data.status)) {
-      throw new BadRequestException('Invalid status value');
-    }
+    let justCompleted = false;
 
-    const result = await this.prisma.$transaction(async (tx) => {
+    const progress = await this.prisma.$transaction(async (tx) => {
       const book = await tx.book.findUnique({
         where: { id: bookId },
       });
@@ -659,10 +660,6 @@ export class BookService {
       if (!book) {
         throw new NotFoundException('Book not found');
       }
-
-      const totalPages = data.totalPages || book.totalPages || 0;
-      const progressPercentage =
-        totalPages > 0 ? Math.round((data.currentPage / totalPages) * 100) : 0;
 
       const existingProgress = await tx.bookProgress.findUnique({
         where: {
@@ -673,54 +670,86 @@ export class BookService {
         },
       });
 
-      if (existingProgress) {
-        return tx.bookProgress.update({
-          where: {
-            id: existingProgress.id,
-          },
-          data: {
-            currentPage: data.currentPage,
-            totalPages: data.totalPages || existingProgress.totalPages,
-            progressPercentage,
-            status:
-              (data.status as unknown as BookReadingStatus) ||
-              existingProgress.status ||
-              BookReadingStatus.READING,
-            completedAt:
-              (data.status || existingProgress.status) === ReadStatus.COMPLETED
-                ? new Date()
-                : null,
-            updatedAt: new Date(),
-          },
-        });
-      } else {
-        return tx.bookProgress.create({
-          data: {
+      const wasCompleted =
+        existingProgress?.status === BookReadingStatus.COMPLETED;
+
+      const totalPages =
+        data.totalPages ?? existingProgress?.totalPages ?? book.totalPages;
+
+      if (!totalPages || totalPages <= 0) {
+        throw new BadRequestException('Book total pages is invalid.');
+      }
+
+      if (data.currentPage < 0) {
+        throw new BadRequestException('Current page cannot be less than 0.');
+      }
+
+      if (data.currentPage > totalPages) {
+        throw new BadRequestException(
+          `Current page cannot be greater than total pages (${totalPages}).`,
+        );
+      }
+
+      let currentPage = data.currentPage;
+
+      let status =
+        data.status ?? existingProgress?.status ?? BookReadingStatus.READING;
+
+      // اگر قبلاً کتاب کامل شده باشد، همیشه وضعیت COMPLETED باقی می‌ماند
+      if (wasCompleted) {
+        status = BookReadingStatus.COMPLETED;
+        currentPage = totalPages;
+      }
+
+      // اگر الان برای اولین بار کامل شد
+      if (!wasCompleted) {
+        if (
+          status === BookReadingStatus.COMPLETED ||
+          currentPage >= totalPages
+        ) {
+          currentPage = totalPages;
+          status = BookReadingStatus.COMPLETED;
+          justCompleted = true;
+        }
+      }
+
+      const payload = {
+        currentPage,
+        totalPages,
+        progressPercentage: Math.round((currentPage / totalPages) * 100),
+        status,
+        completedAt:
+          status === BookReadingStatus.COMPLETED
+            ? (existingProgress?.completedAt ?? new Date())
+            : null,
+        updatedAt: new Date(),
+      };
+
+      return tx.bookProgress.upsert({
+        where: {
+          userId_bookId: {
             userId,
             bookId,
-            currentPage: data.currentPage,
-            totalPages,
-            progressPercentage,
-            status:
-              (data.status as unknown as BookReadingStatus) ||
-              BookReadingStatus.READING,
           },
-        });
-      }
+        },
+        update: payload,
+        create: {
+          userId,
+          bookId,
+          ...payload,
+        },
+      });
     });
 
-    const newStatus =
-      (data.status as unknown as BookReadingStatus) ||
-      BookReadingStatus.READING;
-    if (newStatus === BookReadingStatus.COMPLETED) {
-      await this.readingStatsService.updateStatsOnCompletion(userId, bookId);
-      await this.readingStatsService.updateStreak(userId);
+    // Streak updates on every read (consecutive days of reading), while the
+    // completion stats only need to be recomputed when a book is completed.
+    await this.readingStatsService.updateStreak(userId);
+    if (justCompleted) {
+      await this.readingStatsService.updateStatsOnCompletion(userId);
     }
 
-    return result;
-  }
-
-  // --------------------------------------------------------------------------
+    return progress;
+  } // --------------------------------------------------------------------------
   // TOP BOOKS
   // --------------------------------------------------------------------------
 
@@ -802,11 +831,11 @@ export class BookService {
     let progress:
       | BookProgress
       | {
-          currentPage: number;
-          totalPages: number;
-          progressPercentage: number;
-          status: string;
-        }
+        currentPage: number;
+        totalPages: number;
+        progressPercentage: number;
+        status: string;
+      }
       | null = null;
     if (userId) {
       progress = await this.getProgress(id, userId);
