@@ -15,6 +15,7 @@ describe('User controller tests', () => {
     getSummary: vi.fn(),
     getMonthlyStats: vi.fn(),
     getStreak: vi.fn(),
+    getReadListStats: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -192,6 +193,37 @@ describe('User controller tests', () => {
 
       expect(result).toEqual(mockStreak);
       expect(service.getStreak).toHaveBeenCalledWith(userId);
+    });
+  });
+
+  describe('getReadListStats', () => {
+    it('should return read list stats for user', async () => {
+      const userId = 'user-1';
+      const mockReadListStats = {
+        totalReadLists: 2,
+        totalBooks: 4,
+        averageBooksPerList: 2,
+        readLists: [
+          {
+            id: 'list-1',
+            title: 'Favorites',
+            description: 'My top picks',
+            bookCount: 3,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      };
+
+      service.getReadListStats.mockResolvedValue(mockReadListStats);
+
+      const result = await controller.getReadListStats({
+        id: userId,
+        username: 'test',
+      } as User);
+
+      expect(result).toEqual(mockReadListStats);
+      expect(service.getReadListStats).toHaveBeenCalledWith(userId);
     });
   });
 });

@@ -6,7 +6,7 @@ import { BookReadingStatus } from '../generated/prisma/client';
 export class UserService {
   private readonly logger = new Logger(UserService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getStats(userId: string) {
     this.logger.debug(`Getting stats for user ${userId}`);
@@ -27,9 +27,10 @@ export class UserService {
   async getDashboard(userId: string) {
     this.logger.debug(`Getting dashboard for user ${userId}`);
 
-    const [stats, bookStats] = await Promise.all([
+    const [stats, bookStats, readstats] = await Promise.all([
       this.getStats(userId),
       this.getBookStats(userId),
+      this.getReadListStats(userId),
     ]);
 
     return {
@@ -37,6 +38,7 @@ export class UserService {
       summary: this.computeSummary(bookStats),
       monthlyStats: this.buildMonthlyStats(bookStats.books),
       bookStats,
+      readlist: readstats,
     };
   }
 
@@ -176,6 +178,53 @@ export class UserService {
       completionRate,
       byStatus,
       books,
+    };
+  }
+  /**
+   * Stats about the user's read lists: total lists, total books shelved
+   * across all lists and a per-list breakdown with book counts.
+   */
+  async getReadListStats(userId: string) {
+    this.logger.debug(`Getting read list stats for user ${userId}`);
+
+    const readLists = await this.prisma.readList.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        _count: {
+          select: {
+            items: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const totalReadLists = readLists.length;
+    const totalBooks = readLists.reduce(
+      (sum, list) => sum + list._count.items,
+      0,
+    );
+    const averageBooksPerList =
+      totalReadLists > 0
+        ? Math.round((totalBooks / totalReadLists) * 10) / 10
+        : 0;
+
+    return {
+      totalReadLists,
+      totalBooks,
+      averageBooksPerList,
+      readLists: readLists.map((list) => ({
+        id: list.id,
+        title: list.title,
+        description: list.description,
+        bookCount: list._count.items,
+        createdAt: list.createdAt,
+        updatedAt: list.updatedAt,
+      })),
     };
   }
 

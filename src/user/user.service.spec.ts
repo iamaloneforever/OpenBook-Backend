@@ -23,6 +23,9 @@ describe('UserService', () => {
     book: {
       count: vi.fn(),
     },
+    readList: {
+      findMany: vi.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -144,6 +147,7 @@ describe('UserService', () => {
 
       mockPrismaService.readingStats.findUnique.mockResolvedValue(mockStats);
       mockPrismaService.book.count.mockResolvedValue(1);
+      mockPrismaService.readList.findMany.mockResolvedValue([]);
       mockPrismaService.bookProgress.findMany.mockResolvedValue([
         buildProgress({ completedAt, updatedAt: completedAt }),
         buildProgress({
@@ -355,6 +359,83 @@ describe('UserService', () => {
           [BookReadingStatus.DROPPED]: 0,
         },
         books: [],
+      });
+    });
+  });
+
+  describe('getReadListStats', () => {
+    it('should return totals and a per-list breakdown', async () => {
+      const createdAt = new Date('2026-01-01');
+      const updatedAt = new Date('2026-02-01');
+
+      mockPrismaService.readList.findMany.mockResolvedValue([
+        {
+          id: 'list-1',
+          title: 'Favorites',
+          description: 'My top picks',
+          createdAt,
+          updatedAt,
+          _count: { items: 3 },
+        },
+        {
+          id: 'list-2',
+          title: 'To Read',
+          description: null,
+          createdAt,
+          updatedAt,
+          _count: { items: 1 },
+        },
+      ]);
+
+      const result = await service.getReadListStats(userId);
+
+      expect(mockPrismaService.readList.findMany).toHaveBeenCalledWith({
+        where: { userId },
+        include: {
+          _count: {
+            select: {
+              items: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      expect(result).toEqual({
+        totalReadLists: 2,
+        totalBooks: 4,
+        averageBooksPerList: 2,
+        readLists: [
+          {
+            id: 'list-1',
+            title: 'Favorites',
+            description: 'My top picks',
+            bookCount: 3,
+            createdAt,
+            updatedAt,
+          },
+          {
+            id: 'list-2',
+            title: 'To Read',
+            description: null,
+            bookCount: 1,
+            createdAt,
+            updatedAt,
+          },
+        ],
+      });
+    });
+
+    it('should return zeroed stats when the user has no read lists', async () => {
+      mockPrismaService.readList.findMany.mockResolvedValue([]);
+
+      const result = await service.getReadListStats(userId);
+
+      expect(result).toEqual({
+        totalReadLists: 0,
+        totalBooks: 0,
+        averageBooksPerList: 0,
+        readLists: [],
       });
     });
   });

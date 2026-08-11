@@ -39,13 +39,22 @@ export class UserController {
   // INDIVIDUAL STAT ENDPOINTS
   // --------------------------------------------------------------------------
 
-  @Get('book_stats')
+  @Get('book-stats')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(3000)
   async getBookStats(@CurrentUser() user: User) {
     this.logger.debug(`Getting book stats for user ${user.id}`);
     return this.userService.getBookStats(user.id);
+  }
+
+  @Get('read-list-stats')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3000)
+  async getReadListStats(@CurrentUser() user: User) {
+    this.logger.debug(`Getting read list stats for user ${user.id}`);
+    return this.userService.getReadListStats(user.id);
   }
 
   @Get('summary')
