@@ -1,4 +1,4 @@
-# 📖 OpenBook
+# 📖 OpenBook - Backend
 
 <p align="center">
   <img src="https://img.shields.io/badge/Node-22.x-green?logo=nodedotjs" alt="Node Version" />
