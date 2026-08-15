@@ -6,16 +6,22 @@ pipeline {
         }
     }
 
+    parameters {
+        choice(
+            name: 'RETRY_COUNT',
+            choices: ['1', '2', '3', '5'],
+            description: 'Number of retry attempts for npm ci'
+        )
+    }
+
     environment {
         CI = 'true'
 
-        // Jenkins metadata
         BRANCH_REQUESTED = "${env.CHANGE_BRANCH ?: env.BRANCH_NAME ?: 'unknown'}"
         COMMIT_SHA       = "${env.GIT_COMMIT ?: 'unknown'}"
         PR_NUMBER        = "${env.CHANGE_ID ?: 'none'}"
         PR_TARGET        = "${env.CHANGE_TARGET ?: 'none'}"
 
-        // Build metadata
         BUILD_ID         = "${env.BUILD_ID}"
         BUILD_NUMBER     = "${env.BUILD_NUMBER}"
         BUILD_URL        = "${env.BUILD_URL}"
@@ -34,21 +40,37 @@ pipeline {
                     echo "========================================"
                     echo "Job:             $JOB_NAME"
                     echo "Build:           #$BUILD_NUMBER"
-                    echo "Build URL:       $BUILD_URL"
                     echo "Branch:          $BRANCH_REQUESTED"
                     echo "PR Number:       $PR_NUMBER"
                     echo "PR Target:       $PR_TARGET"
                     echo "Commit:          $COMMIT_SHA"
-                    echo "Node:            $NODE_NAME"
-                    echo "Workspace:       $WORKSPACE_DIR"
+                    echo "Retry Count:     $RETRY_COUNT"
                     echo "========================================"
+                '''
+            }
+        }
+
+        stage('Network Check') {
+            steps {
+                sh '''
+                    node --version
+                    npm --version
+                    npm config get registry
+                    npm ping
                 '''
             }
         }
 
         stage('Install') {
             steps {
-                sh 'npm ci'
+                retry(params.RETRY_COUNT.toInteger()) {
+                    sh '''
+                        npm config set fetch-retries 5
+                        npm config set fetch-retry-mintimeout 20000
+                        npm config set fetch-retry-maxtimeout 120000
+                        npm ci
+                    '''
+                }
             }
         }
 
@@ -95,6 +117,8 @@ Build:     #${env.BUILD_NUMBER}
 Branch:    ${env.BRANCH_REQUESTED}
 Commit:    ${env.COMMIT_SHA}
 PR:        ${env.PR_NUMBER}
+Target:    ${env.PR_TARGET}
+Retries:   ${params.RETRY_COUNT}
 Status:    ${currentBuild.currentResult}
 URL:       ${env.BUILD_URL}
 ========================================
