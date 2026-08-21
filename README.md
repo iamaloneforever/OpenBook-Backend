@@ -27,6 +27,7 @@
 - 🗄️ **PostgreSQL + Prisma** — Robust database with type-safe ORM
 - 🔒 **Self‑Hosted** — Your data stays on your server
 - 🐳 **Docker Ready** — Easy deployment with Docker Compose
+-  **Jenkins Support** — Easy deployment with jenkins CI
 
 ---
 
