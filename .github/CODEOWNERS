@@ -1,1 +1,5 @@
+# Default owner for the entire repository
 * @iamaloneforever
+
+# Protect the CODEOWNERS configuration itself
+/.github/CODEOWNERS @iamaloneforever
