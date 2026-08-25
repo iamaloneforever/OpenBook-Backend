@@ -11,7 +11,7 @@ import { LocalAuthGuard } from '../common/guards/auth/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
   async signup(
@@ -62,7 +62,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken: string = req.cookies.refreshToken as string;
 
     const tokens = await this.authService.refresh(refreshToken);
 

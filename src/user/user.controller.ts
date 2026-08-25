@@ -15,7 +15,7 @@ import type { User } from '../generated/prisma/client';
 export class UserController {
   private readonly logger = new Logger(UserService.name);
 
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Get()
   @UseGuards(JwtAuthGuard)

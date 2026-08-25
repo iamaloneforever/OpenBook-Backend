@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import type { ExecutionContext } from '@nestjs/common';
 import type { Request } from 'express';
+import type { Server } from 'http';
 import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -16,6 +17,7 @@ import { OwnerGuard } from '../src/common/guards/auth/owner.guard';
 
 describe('BookController (e2e)', () => {
   let app: INestApplication;
+  let server: Server;
 
   const userId = 'c123456789012345678901230';
   const bookId = 'c123456789012345678901234';
@@ -91,6 +93,7 @@ describe('BookController (e2e)', () => {
     );
 
     await app.init();
+    server = app.getHttpServer() as Server;
   });
 
   afterEach(async () => {
@@ -99,7 +102,7 @@ describe('BookController (e2e)', () => {
 
   describe('GET /book', () => {
     it('should return all books', async () => {
-      const res = await request(app.getHttpServer()).get('/book').expect(200);
+      const res = await request(server).get('/book').expect(200);
 
       const body = res.body as { data: Array<Record<string, unknown>> };
 
@@ -115,9 +118,7 @@ describe('BookController (e2e)', () => {
 
   describe('GET /book/:id', () => {
     it('should return a book', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/book/${bookId}`)
-        .expect(200);
+      const res = await request(server).get(`/book/${bookId}`).expect(200);
 
       expect(res.body).toEqual({
         id: bookId,
@@ -136,9 +137,7 @@ describe('BookController (e2e)', () => {
       bookServiceMock.findOneWithProgress.mockRejectedValueOnce(
         new NotFoundException('Book not found'),
       );
-      await request(app.getHttpServer())
-        .get(`/book/${missingBookId}`)
-        .expect(404);
+      await request(server).get(`/book/${missingBookId}`).expect(404);
 
       expect(bookServiceMock.findOneWithProgress).toHaveBeenCalledWith(
         missingBookId,
@@ -148,7 +147,7 @@ describe('BookController (e2e)', () => {
     });
 
     it('should return 400 for an invalid CUID', async () => {
-      await request(app.getHttpServer()).get('/book/1').expect(400);
+      await request(server).get('/book/1').expect(400);
 
       expect(bookServiceMock.findOneWithProgress).not.toHaveBeenCalled();
     });
@@ -167,10 +166,7 @@ describe('BookController (e2e)', () => {
         },
       };
 
-      const res = await request(app.getHttpServer())
-        .post('/book')
-        .send(dto)
-        .expect(201);
+      const res = await request(server).post('/book').send(dto).expect(201);
 
       expect(res.body).toEqual({
         id: bookId,
@@ -187,7 +183,7 @@ describe('BookController (e2e)', () => {
     });
 
     it('should reject an invalid body', async () => {
-      await request(app.getHttpServer()).post('/book').send({}).expect(400);
+      await request(server).post('/book').send({}).expect(400);
 
       expect(bookServiceMock.create).not.toHaveBeenCalled();
     });

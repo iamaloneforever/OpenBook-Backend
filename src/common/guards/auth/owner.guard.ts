@@ -28,10 +28,14 @@ export class OwnerGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<{
+      user: { id: string };
+      params: Record<string, string>;
+      resource: unknown;
+    }>();
 
-    const user = request.user;
-    const id = request.params[metadata.param];
+    const { user, params } = request;
+    const id = params[metadata.param];
 
     const config = OWNER_CONFIG[metadata.resource];
 

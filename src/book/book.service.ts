@@ -30,7 +30,7 @@ export class BookService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly readingStatsService: UserService,
-  ) { }
+  ) {}
 
   // --------------------------------------------------------------------------
   // FIND ALL
@@ -94,16 +94,16 @@ export class BookService {
 
       ...(minRating !== undefined || maxRating !== undefined
         ? {
-          averageRating: {
-            ...(minRating !== undefined && {
-              gte: minRating,
-            }),
+            averageRating: {
+              ...(minRating !== undefined && {
+                gte: minRating,
+              }),
 
-            ...(maxRating !== undefined && {
-              lte: maxRating,
-            }),
-          },
-        }
+              ...(maxRating !== undefined && {
+                lte: maxRating,
+              }),
+            },
+          }
         : {}),
     };
 
@@ -206,15 +206,15 @@ export class BookService {
 
           ...(dto.type === BookType.DIGITAL
             ? {
-              digitalBook: {
-                create: digitalBookData!,
-              },
-            }
+                digitalBook: {
+                  create: digitalBookData!,
+                },
+              }
             : {
-              physicalBook: {
-                create: physicalBook!,
-              },
-            }),
+                physicalBook: {
+                  create: physicalBook!,
+                },
+              }),
         },
 
         include: {
@@ -616,11 +616,11 @@ export class BookService {
   ): Promise<
     | BookProgress
     | {
-      currentPage: number;
-      totalPages: number;
-      progressPercentage: number;
-      status: BookReadingStatus | string;
-    }
+        currentPage: number;
+        totalPages: number;
+        progressPercentage: number;
+        status: BookReadingStatus;
+      }
   > {
     const progress = await this.prisma.bookProgress.findUnique({
       where: {
@@ -831,11 +831,11 @@ export class BookService {
     let progress:
       | BookProgress
       | {
-        currentPage: number;
-        totalPages: number;
-        progressPercentage: number;
-        status: string;
-      }
+          currentPage: number;
+          totalPages: number;
+          progressPercentage: number;
+          status: BookReadingStatus;
+        }
       | null = null;
     if (userId) {
       progress = await this.getProgress(id, userId);

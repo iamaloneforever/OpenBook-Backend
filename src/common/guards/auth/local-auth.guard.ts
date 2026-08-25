@@ -5,24 +5,30 @@ import {
 } from '@nestjs/common';
 
 import { AuthGuard } from '@nestjs/passport';
+import type { User } from '../../../generated/prisma/client';
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
-  handleRequest(err: any, user: any, info: any) {
+  handleRequest(err: unknown, user: User | false, info: unknown) {
     console.log('Guard error:', err);
     console.log('User:', user);
     console.log('Info:', info);
 
     if (err) {
-      throw err;
+      throw err as Error;
     }
 
     if (!user) {
-      if (info?.message === 'Missing credentials') {
+      const message =
+        info && typeof info === 'object' && 'message' in info
+          ? (info as { message?: string }).message
+          : undefined;
+
+      if (message === 'Missing credentials') {
         throw new BadRequestException('Username and password are required');
       }
 
-      throw new UnauthorizedException(info?.message ?? 'Unauthorized');
+      throw new UnauthorizedException(message ?? 'Unauthorized');
     }
 
     return user;

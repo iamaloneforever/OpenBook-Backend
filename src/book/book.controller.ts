@@ -42,7 +42,7 @@ import { BookUploadInterceptor } from '../common/config/multer.config';
 export class BookController {
   private readonly logger = new Logger(BookController.name);
 
-  constructor(private readonly bookService: BookService) { }
+  constructor(private readonly bookService: BookService) {}
 
   // --------------------------------------------------------------------------
   // GET ALL BOOKS

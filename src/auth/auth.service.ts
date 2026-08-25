@@ -9,6 +9,11 @@ import * as argon2 from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignupDto } from 'src/common/dtos/auth/signup.dto';
 
+interface JwtPayload {
+  sub: string;
+  username: string;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -145,9 +150,9 @@ export class AuthService {
     };
   }
 
-  private verifyRefreshToken(token: string) {
+  private verifyRefreshToken(token: string): JwtPayload {
     try {
-      return this.jwtService.verify(token, {
+      return this.jwtService.verify<JwtPayload>(token, {
         secret: process.env.JWT_REFRESH_SECRET,
       });
     } catch {
