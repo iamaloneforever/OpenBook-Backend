@@ -636,7 +636,7 @@ export class BookService {
         currentPage: 0,
         totalPages: 0,
         progressPercentage: 0,
-        status: 'reading',
+        status: BookReadingStatus.READING,
       }
     );
   }

@@ -3,13 +3,19 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import type { ExecutionContext } from '@nestjs/common';
 
 import { AuthGuard } from '@nestjs/passport';
-import type { User } from '../../../generated/prisma/client';
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
-  handleRequest(err: unknown, user: User | false, info: unknown) {
+  handleRequest<TUser = any>(
+    err: unknown,
+    user: TUser | false,
+    info: unknown,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _context: ExecutionContext,
+  ): TUser {
     console.log('Guard error:', err);
     console.log('User:', user);
     console.log('Info:', info);
