@@ -28,7 +28,10 @@ function createInMemoryPrisma() {
   const progressStore: Array<Record<string, unknown>> = [];
   let statsStore: StatsRow | null = null;
 
-  const bookStore: Record<string, { id: string; title: string; totalPages: number }> = {
+  const bookStore: Record<
+    string,
+    { id: string; title: string; totalPages: number }
+  > = {
     'book-1': { id: 'book-1', title: 'Clean Code', totalPages: 300 },
     'book-2': { id: 'book-2', title: 'Pragmatic Programmer', totalPages: 200 },
   };
@@ -38,13 +41,13 @@ function createInMemoryPrisma() {
 
   const tx = {
     book: {
-      findUnique: vi.fn(async ({ where }: { where: { id: string } }) =>
+      findUnique: vi.fn(({ where }: { where: { id: string } }) =>
         bookStore[where.id] ? { ...bookStore[where.id] } : null,
       ),
     },
     bookProgress: {
       findUnique: vi.fn(
-        async ({
+        ({
           where,
         }: {
           where: { userId_bookId: { userId: string; bookId: string } };
@@ -59,40 +62,49 @@ function createInMemoryPrisma() {
           return row ? { ...row } : null;
         },
       ),
-      upsert: vi.fn(async (args: any) => {
-        const { where, update, create } = args;
-        const idx = findProgressIndex(
-          where.userId_bookId.userId,
-          where.userId_bookId.bookId,
-        );
-        if (idx >= 0) {
-          progressStore[idx] = { ...progressStore[idx], ...update };
-          return { ...progressStore[idx] };
-        }
-        progressStore.push({ ...create });
-        return { ...create };
-      }),
+      upsert: vi.fn(
+        (args: {
+          where: { userId_bookId: { userId: string; bookId: string } };
+          update: Record<string, unknown>;
+          create: Record<string, unknown>;
+        }) => {
+          const { where, update, create } = args;
+          const idx = findProgressIndex(
+            where.userId_bookId.userId,
+            where.userId_bookId.bookId,
+          );
+          if (idx >= 0) {
+            progressStore[idx] = { ...progressStore[idx], ...update };
+            return { ...progressStore[idx] };
+          }
+          progressStore.push({ ...create });
+          return { ...create };
+        },
+      ),
     },
   };
 
   const prisma = {
-    $transaction: vi.fn(async (arg: any) =>
-      typeof arg === 'function' ? arg(tx) : arg,
+    $transaction: vi.fn(
+      (arg: ((tx: typeof tx) => Promise<unknown>) | unknown[]) =>
+        typeof arg === 'function'
+          ? (arg as (t: typeof tx) => Promise<unknown>)(tx)
+          : arg,
     ),
     book: tx.book,
     bookProgress: {
       ...tx.bookProgress,
       // Only `updateStatsOnCompletion` calls findMany on bookProgress, so the
       // call count below doubles as "how many times completion stats ran".
-      findMany: vi.fn(async ({ where }: { where: Record<string, string> }) =>
+      findMany: vi.fn(({ where }: { where: Record<string, string> }) =>
         progressStore
           .filter((p) => p.userId === where.userId && p.status === where.status)
           .map((p) => ({ ...p, book: { ratings: [] } })),
       ),
     },
     readingStats: {
-      findUnique: vi.fn(async () => (statsStore ? { ...statsStore } : null)),
-      create: vi.fn(async ({ data }: { data: { userId: string } }) => {
+      findUnique: vi.fn(() => (statsStore ? { ...statsStore } : null)),
+      create: vi.fn(({ data }: { data: { userId: string } }) => {
         if (!statsStore) {
           statsStore = {
             userId: data.userId,
@@ -109,27 +121,32 @@ function createInMemoryPrisma() {
         }
         return { ...statsStore };
       }),
-      upsert: vi.fn(async (args: any) => {
-        const { update, create } = args;
-        if (!statsStore) {
-          statsStore = {
-            userId: create.userId,
-            totalBooksCompleted: 0,
-            totalPagesRead: 0,
-            totalReadingTime: 0,
-            averageRating: 0,
-            currentStreak: 0,
-            longestStreak: 0,
-            lastReadDate: null,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            ...create,
-          };
-        } else {
-          statsStore = { ...statsStore, ...update };
-        }
-        return { ...statsStore };
-      }),
+      upsert: vi.fn(
+        (args: {
+          update: Partial<StatsRow>;
+          create: Partial<StatsRow> & { userId: string };
+        }) => {
+          const { update, create } = args;
+          if (!statsStore) {
+            statsStore = {
+              userId: create.userId,
+              totalBooksCompleted: 0,
+              totalPagesRead: 0,
+              totalReadingTime: 0,
+              averageRating: 0,
+              currentStreak: 0,
+              longestStreak: 0,
+              lastReadDate: null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              ...create,
+            };
+          } else {
+            statsStore = { ...statsStore, ...update };
+          }
+          return { ...statsStore };
+        },
+      ),
     },
   };
 

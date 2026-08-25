@@ -6,7 +6,7 @@ import { BookReadingStatus } from '../generated/prisma/client';
 export class UserService {
   private readonly logger = new Logger(UserService.name);
 
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async getStats(userId: string) {
     this.logger.debug(`Getting stats for user ${userId}`);

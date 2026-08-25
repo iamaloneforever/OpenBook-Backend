@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { Test } from '@nestjs/testing';
+import type { Server } from 'http';
 import request from 'supertest';
 import {
   afterAll,
@@ -30,7 +31,7 @@ const hasDatabase = !!process.env.DATABASE_URL;
 describe.skipIf(!hasDatabase)('Reading streak (e2e, real database)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let server: any;
+  let server: Server;
   let dbUnreachable = false;
 
   const createdUsernames: string[] = [];
@@ -57,7 +58,7 @@ describe.skipIf(!hasDatabase)('Reading streak (e2e, real database)', () => {
     );
     await app.init();
 
-    server = app.getHttpServer();
+    server = app.getHttpServer() as Server;
     prisma = app.get(PrismaService);
 
     // Sweep leftovers from previously killed runs (older than 10 minutes, so
@@ -117,9 +118,14 @@ describe.skipIf(!hasDatabase)('Reading streak (e2e, real database)', () => {
       .send({ username, password })
       .expect(201);
 
+    const body = res.body as {
+      user: { id: string };
+      accessToken: string;
+    };
+
     return {
-      userId: res.body.user.id as string,
-      token: res.body.accessToken as string,
+      userId: body.user.id,
+      token: body.accessToken,
     };
   };
 
@@ -138,7 +144,11 @@ describe.skipIf(!hasDatabase)('Reading streak (e2e, real database)', () => {
           country: 'Germany',
         },
       })
-      .expect(201);
+      .expect(201)
+      .then((res) => ({
+        ...res,
+        body: res.body as { id: string },
+      }));
 
   const setProgress = (bookId: string, token: string, body: object) =>
     request(server)
@@ -147,13 +157,20 @@ describe.skipIf(!hasDatabase)('Reading streak (e2e, real database)', () => {
       .send(body)
       .expect(201);
 
+  interface UserStats {
+    currentStreak: number;
+    longestStreak: number;
+    totalBooksCompleted: number;
+    totalPagesRead: number;
+  }
+
   /** Reads the user's stats through the real HTTP endpoint (uncached). */
-  const readStats = async (token: string) => {
+  const readStats = async (token: string): Promise<UserStats> => {
     const res = await request(server)
       .get('/user')
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
-    return res.body;
+    return res.body as UserStats;
   };
 
   /**
