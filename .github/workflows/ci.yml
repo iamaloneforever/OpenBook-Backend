@@ -1,0 +1,250 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+  NODE_VERSION: "20"
+  RETRY_COUNT: "3"
+
+jobs:
+  info:
+    name: CI Information
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print CI build information
+        run: |
+          echo "========================================"
+          echo "           CI BUILD INFORMATION"
+          echo "========================================"
+          echo "Workflow:        ${{ github.workflow }}"
+          echo "Run:             #${{ github.run_number }}"
+          echo "Branch:          ${{ github.head_ref || github.ref_name }}"
+          echo "PR Number:       ${{ github.event.pull_request.number || 'none' }}"
+          echo "PR Target:       ${{ github.event.pull_request.base.ref || 'none' }}"
+          echo "Commit:          ${{ github.sha }}"
+          echo "Actor:           ${{ github.actor }}"
+          echo "Event:           ${{ github.event_name }}"
+          echo "Retry Count:     ${{ env.RETRY_COUNT }}"
+          echo "========================================"
+
+  install:
+    name: Install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Network check
+        run: |
+          node --version
+          npm --version
+          npm config get registry
+
+      - name: Install dependencies
+        run: |
+          npm config set fetch-retries 5
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
+
+          for i in $(seq 1 "$RETRY_COUNT"); do
+            echo "Attempt $i of $RETRY_COUNT..."
+            if npm ci --loglevel verbose; then
+              echo "Install succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Attempt $i failed."
+            sleep 5
+          done
+
+          echo "All $RETRY_COUNT attempts failed."
+          exit 1
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Cache node_modules
+        uses: actions/cache/save@v4
+        with:
+          path: node_modules
+          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+  lint:
+    name: Lint
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Lint
+        run: npm run lint
+
+  typecheck:
+    name: Type Check
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Type check
+        run: npm run typecheck
+
+  test-unit:
+    name: Unit Tests
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Run unit tests
+        run: npm run test
+
+  test-e2e:
+    name: E2E Tests
+    needs: install
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: openbook_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://test:test@localhost:5432/openbook_test
+      JWT_ACCESS_SECRET: ci-test-access-secret
+      JWT_REFRESH_SECRET: ci-test-refresh-secret
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Run Prisma migrations
+        run: npx prisma migrate deploy
+
+      - name: Run e2e tests
+        run: npm run test:e2e
+
+  build:
+    name: Build
+    needs: [lint, typecheck, test-unit, test-e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Build
+        run: npm run build
+
+  summary:
+    name: CI Summary
+    needs: [lint, typecheck, test-unit, test-e2e, build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report status
+        run: |
+          echo "========================================"
+          echo "           CI FINISHED"
+          echo "========================================"
+          echo "Workflow:    ${{ github.workflow }}"
+          echo "Run:         #${{ github.run_number }}"
+          echo "Branch:      ${{ github.head_ref || github.ref_name }}"
+          echo "Commit:      ${{ github.sha }}"
+          echo "PR:          ${{ github.event.pull_request.number || 'none' }}"
+          echo "Target:      ${{ github.event.pull_request.base.ref || 'none' }}"
+          echo "Event:       ${{ github.event_name }}"
+          echo "URL:         ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "========================================"
+
+          if [ "${{ contains(needs.*.result, 'failure') }}" = "true" ]; then
+            echo "❌ CI failed — PR should not be merged."
+            exit 1
+          elif [ "${{ contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+            echo "🛑 CI build was cancelled."
+            exit 1
+          else
+            echo "✅ All checks passed — PR can be merged."
+          fi

@@ -39,7 +39,13 @@ function createInMemoryPrisma() {
   const findProgressIndex = (userId: string, bookId: string) =>
     progressStore.findIndex((p) => p.userId === userId && p.bookId === bookId);
 
-  const tx = {
+  const tx: {
+    book: { findUnique: ReturnType<typeof vi.fn> };
+    bookProgress: {
+      findUnique: ReturnType<typeof vi.fn>;
+      upsert: ReturnType<typeof vi.fn>;
+    };
+  } = {
     book: {
       findUnique: vi.fn(({ where }: { where: { id: string } }) =>
         bookStore[where.id] ? { ...bookStore[where.id] } : null,
@@ -86,10 +92,8 @@ function createInMemoryPrisma() {
 
   const prisma = {
     $transaction: vi.fn(
-      (arg: ((tx: typeof tx) => Promise<unknown>) | unknown[]) =>
-        typeof arg === 'function'
-          ? (arg as (t: typeof tx) => Promise<unknown>)(tx)
-          : arg,
+      (arg: ((txArg: typeof tx) => Promise<unknown>) | unknown[]) =>
+        typeof arg === 'function' ? arg(tx) : arg,
     ),
     book: tx.book,
     bookProgress: {
@@ -129,7 +133,6 @@ function createInMemoryPrisma() {
           const { update, create } = args;
           if (!statsStore) {
             statsStore = {
-              userId: create.userId,
               totalBooksCompleted: 0,
               totalPagesRead: 0,
               totalReadingTime: 0,
