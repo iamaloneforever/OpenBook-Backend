@@ -31,7 +31,7 @@ export const BookUploadInterceptor = FileFieldsInterceptor(
 
         fs.mkdir(uploadDir, { recursive: true }, (err) => {
           if (err) {
-            return callback(err, null);
+            return callback(err, '');
           }
 
           callback(null, uploadDir);
