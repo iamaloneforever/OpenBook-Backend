@@ -29,9 +29,13 @@ export const BookUploadInterceptor = FileFieldsInterceptor(
           file.fieldname === 'cover' ? 'covers' : 'files',
         );
 
-        fs.mkdirSync(uploadDir, { recursive: true });
+        fs.mkdir(uploadDir, { recursive: true }, (err) => {
+          if (err) {
+            return callback(err, null);
+          }
 
-        callback(null, uploadDir);
+          callback(null, uploadDir);
+        });
       },
 
       filename: (_, file, callback) => {
