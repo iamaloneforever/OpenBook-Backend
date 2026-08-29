@@ -6,6 +6,9 @@ import { extname } from 'path';
 
 import { randomUUID } from 'crypto';
 
+import * as fs from 'fs';
+import * as path from 'path';
+
 export const BookUploadInterceptor = FileFieldsInterceptor(
   [
     {
@@ -20,11 +23,15 @@ export const BookUploadInterceptor = FileFieldsInterceptor(
   {
     storage: diskStorage({
       destination: (_, file, callback) => {
-        if (file.fieldname === 'cover') {
-          callback(null, './uploads/books/covers');
-        } else {
-          callback(null, './uploads/books/files');
-        }
+        const uploadDir = path.resolve(
+          process.cwd(),
+          './uploads/books',
+          file.fieldname === 'cover' ? 'covers' : 'files',
+        );
+
+        fs.mkdirSync(uploadDir, { recursive: true });
+
+        callback(null, uploadDir);
       },
 
       filename: (_, file, callback) => {
