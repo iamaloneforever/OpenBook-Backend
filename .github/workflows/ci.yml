@@ -218,9 +218,29 @@ jobs:
       - name: Build
         run: npm run build
 
+  docker-test:
+    name: Docker Test
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t nest-test .
+
+      - name: Run tests in Docker
+        run: docker run --rm nest-test sh -c "npm run test && npm run test:e2e"
+
+      - name: Run lint in Docker
+        run: docker run --rm nest-test npm run lint
+
+      - name: Run typecheck in Docker
+        run: docker run --rm nest-test npm run typecheck
+
   summary:
     name: CI Summary
-    needs: [lint, typecheck, test-unit, test-e2e, build]
+    needs: [lint, typecheck, test-unit, test-e2e, build, docker-test]
     if: always()
     runs-on: ubuntu-latest
     steps:
