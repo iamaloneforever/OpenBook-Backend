@@ -11,8 +11,8 @@ concurrency:
 
 env:
   CI: true
-  NODE_VERSION: "20"
-  RETRY_COUNT: "3"
+  NODE_VERSION: '20'
+  RETRY_COUNT: '3'
 
 jobs:
   info:
@@ -222,6 +222,9 @@ jobs:
     name: Docker Test
     needs: install
     runs-on: ubuntu-latest
+    env:
+      JWT_ACCESS_SECRET: ci-test-access-secret
+      JWT_REFRESH_SECRET: ci-test-refresh-secret
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -230,7 +233,11 @@ jobs:
         run: docker build --target test -t nest-test .
 
       - name: Run tests in Docker
-        run: docker run --rm nest-test
+        run: |
+          docker run --rm \
+            -e JWT_ACCESS_SECRET \
+            -e JWT_REFRESH_SECRET \
+            nest-test
 
       - name: Run lint in Docker
         run: docker run --rm nest-test npm run lint
