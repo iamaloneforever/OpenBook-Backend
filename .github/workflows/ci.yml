@@ -11,8 +11,8 @@ concurrency:
 
 env:
   CI: true
-  NODE_VERSION: "20"
-  RETRY_COUNT: "3"
+  NODE_VERSION: '20'
+  RETRY_COUNT: '3'
 
 jobs:
   info:
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -88,7 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -111,7 +111,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -134,7 +134,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -175,7 +175,7 @@ jobs:
       JWT_REFRESH_SECRET: ci-test-refresh-secret
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -201,7 +201,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -218,9 +218,36 @@ jobs:
       - name: Build
         run: npm run build
 
+  docker-test:
+    name: Docker Test
+    needs: install
+    runs-on: ubuntu-latest
+    env:
+      JWT_ACCESS_SECRET: ci-test-access-secret
+      JWT_REFRESH_SECRET: ci-test-refresh-secret
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Build Docker test image
+        run: docker build --target test -t nest-test .
+
+      - name: Run tests in Docker
+        run: |
+          docker run --rm \
+            -e JWT_ACCESS_SECRET \
+            -e JWT_REFRESH_SECRET \
+            nest-test
+
+      - name: Run lint in Docker
+        run: docker run --rm nest-test npm run lint
+
+      - name: Run typecheck in Docker
+        run: docker run --rm nest-test npm run typecheck
+
   summary:
     name: CI Summary
-    needs: [lint, typecheck, test-unit, test-e2e, build]
+    needs: [lint, typecheck, test-unit, test-e2e, build, docker-test]
     if: always()
     runs-on: ubuntu-latest
     steps:
