@@ -8,6 +8,15 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
+FROM base AS test
+ENV NODE_ENV=test
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npx prisma generate
+EXPOSE 5000
+CMD ["sh", "-c", "npm run test && npm run test:e2e"]
+
 FROM base AS production
 ENV NODE_ENV=production
 COPY --from=builder /app/dist ./dist
@@ -15,5 +24,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 RUN npx prisma generate
+RUN chown -R node:node /app
 EXPOSE 5000
+USER node
 CMD ["node", "dist/main.js"]
