@@ -3,11 +3,17 @@
     "id": "f32b4a8f-6ca1-483f-ad89-c6b9f423ccf7"
   },
   "entities": {
-    "environments": [],
+    "environments": [
+      "environments/local.postman_environment.json"
+    ],
     "flows": [],
-    "globals": [],
+    "globals": [
+      "../globals/workspace.postman_globals.json"
+    ],
     "mocks": [],
     "specs": [],
-    "collections": []
+    "collections": [
+      "openbook-api.postman_collection.json"
+    ]
   }
 }

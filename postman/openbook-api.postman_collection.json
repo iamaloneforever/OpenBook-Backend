@@ -1,0 +1,1260 @@
+{
+  "info": {
+    "name": "OpenBook API",
+    "description": "Full API test suite for the OpenBook NestJS backend.\n\nRun Auth > Signup twice to populate accessToken/userId and otherAccessToken/otherUserId, then run any folder.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup User A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 created', function() { pm.expect(pm.response.code).to.equal(201); });",
+                  "pm.test('returns user and token', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('user');",
+                  "  pm.expect(body.user).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('accessToken');",
+                  "  pm.environment.set('accessToken', body.accessToken);",
+                  "  pm.environment.set('userId', body.user.id);",
+                  "  pm.environment.set('username', body.user.username);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"testuser_a_{{$timestamp}}\",\"password\":\"password123\"}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/signup", "host": ["{{baseUrl}}"], "path": ["auth", "signup"] }
+          }
+        },
+        {
+          "name": "Signup User B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 created', function() { pm.expect(pm.response.code).to.equal(201); });",
+                  "pm.test('returns user and token', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('user');",
+                  "  pm.expect(body.user).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('accessToken');",
+                  "  pm.environment.set('otherAccessToken', body.accessToken);",
+                  "  pm.environment.set('otherUserId', body.user.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"testuser_b_{{$timestamp}}\",\"password\":\"password123\"}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/signup", "host": ["{{baseUrl}}"], "path": ["auth", "signup"] }
+          }
+        },
+        {
+          "name": "Login User A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 ok', function() { pm.expect(pm.response.code).to.equal(201); });",
+                  "pm.test('returns accessToken', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('accessToken');",
+                  "  pm.environment.set('accessToken', body.accessToken);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"{{username}}\",\"password\":\"password123\"}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Logout User A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 ok', function() { pm.expect(pm.response.code).to.equal(201); });",
+                  "pm.test('message confirms logout', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.message).to.include('Logged out');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/auth/logout", "host": ["{{baseUrl}}"], "path": ["auth", "logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile (Public)",
+      "item": [
+        {
+          "name": "Get Public Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('profile shape', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('username');",
+                  "  pm.expect(body).to.have.property('createdAt');",
+                  "  pm.expect(body).to.have.property('booksVisible');",
+                  "  pm.expect(body).to.have.property('readListsVisible');",
+                  "  pm.expect(body).to.have.property('bookCount');",
+                  "  pm.expect(body).to.have.property('readListCount');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/profile/{{userId}}", "host": ["{{baseUrl}}"], "path": ["profile", "{{userId}}"] }
+          }
+        },
+        {
+          "name": "Get Profile Books (visible)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('returns paginated list', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('data');",
+                  "  pm.expect(body).to.have.property('meta');",
+                  "  pm.expect(body.meta).to.have.property('total');",
+                  "  pm.expect(body.meta).to.have.property('page');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/profile/{{userId}}/books?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["profile", "{{userId}}", "books"], "query": [
+              { "key": "page", "value": "1" },
+              { "key": "limit", "value": "10" }
+            ] }
+          }
+        },
+        {
+          "name": "Get Profile Books (403 hidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok when other user has default visible settings', function() { pm.expect(pm.response.code).to.equal(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/profile/{{otherUserId}}/books", "host": ["{{baseUrl}}"], "path": ["profile", "{{otherUserId}}", "books"] }
+          }
+        },
+        {
+          "name": "Get Profile Read Lists (visible)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('returns paginated list', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('data');",
+                  "  pm.expect(body).to.have.property('meta');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/profile/{{userId}}/read-lists?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["profile", "{{userId}}", "read-lists"], "query": [
+              { "key": "page", "value": "1" },
+              { "key": "limit", "value": "10" }
+            ] }
+          }
+        },
+        {
+          "name": "Get Profile Read Lists (403 hidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok when other user has default visible settings', function() { pm.expect(pm.response.code).to.equal(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/profile/{{otherUserId}}/read-lists", "host": ["{{baseUrl}}"], "path": ["profile", "{{otherUserId}}", "read-lists"] }
+          }
+        },
+        {
+          "name": "Get Profile (404 unknown user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('404 or 400 for invalid id', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/profile/c00000000000000000000000", "host": ["{{baseUrl}}"], "path": ["profile", "c00000000000000000000000"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Privacy Settings",
+      "item": [
+        {
+          "name": "Get Privacy Settings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('defaults are true', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.showBooks).to.be.true;",
+                  "  pm.expect(body.showReadlists).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/settings/privacy", "host": ["{{baseUrl}}"], "path": ["user", "settings", "privacy"] }
+          }
+        },
+        {
+          "name": "Hide Books",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('showBooks is false', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.showBooks).to.be.false;",
+                  "  pm.expect(body.showReadlists).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"showBooks\":false}"
+            },
+            "url": { "raw": "{{baseUrl}}/user/settings/privacy", "host": ["{{baseUrl}}"], "path": ["user", "settings", "privacy"] }
+          }
+        },
+        {
+          "name": "Hide Read Lists",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('showReadlists is false', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.showReadlists).to.be.false;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"showReadlists\":false}"
+            },
+            "url": { "raw": "{{baseUrl}}/user/settings/privacy", "host": ["{{baseUrl}}"], "path": ["user", "settings", "privacy"] }
+          }
+        },
+        {
+          "name": "Re-enable Books",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('showBooks restored', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.showBooks).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"showBooks\":true}"
+            },
+            "url": { "raw": "{{baseUrl}}/user/settings/privacy", "host": ["{{baseUrl}}"], "path": ["user", "settings", "privacy"] }
+          }
+        },
+        {
+          "name": "Re-enable Read Lists",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('all defaults restored', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.showBooks).to.be.true;",
+                  "  pm.expect(body.showReadlists).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"showReadlists\":true}"
+            },
+            "url": { "raw": "{{baseUrl}}/user/settings/privacy", "host": ["{{baseUrl}}"], "path": ["user", "settings", "privacy"] }
+          }
+        },
+        {
+          "name": "Privacy - 401 without token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('401 unauthorized', function() { pm.expect(pm.response.code).to.equal(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{baseUrl}}/user/settings/privacy", "host": ["{{baseUrl}}"], "path": ["user", "settings", "privacy"] }
+          }
+        },
+        {
+          "name": "Privacy - invalid body rejected",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('400 bad request', function() { pm.expect(pm.response.code).to.equal(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"showBooks\":\"not-a-bool\"}"
+            },
+            "url": { "raw": "{{baseUrl}}/user/settings/privacy", "host": ["{{baseUrl}}"], "path": ["user", "settings", "privacy"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Stats",
+      "item": [
+        {
+          "name": "Get Stats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('stats shape', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('totalBooksCompleted');",
+                  "  pm.expect(body).to.have.property('currentStreak');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user", "host": ["{{baseUrl}}"], "path": ["user"] }
+          }
+        },
+        {
+          "name": "Get Dashboard",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('dashboard shape', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('stats');",
+                  "  pm.expect(body).to.have.property('summary');",
+                  "  pm.expect(body).to.have.property('monthlyStats');",
+                  "  pm.expect(body).to.have.property('bookStats');",
+                  "  pm.expect(body).to.have.property('readlist');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/dashboard", "host": ["{{baseUrl}}"], "path": ["user", "dashboard"] }
+          }
+        },
+        {
+          "name": "Get Book Stats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('shape', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('totalBooks');",
+                  "  pm.expect(body).to.have.property('byStatus');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/book-stats", "host": ["{{baseUrl}}"], "path": ["user", "book-stats"] }
+          }
+        },
+        {
+          "name": "Get Read List Stats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('shape', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('totalReadLists');",
+                  "  pm.expect(body).to.have.property('readLists');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/read-list-stats", "host": ["{{baseUrl}}"], "path": ["user", "read-list-stats"] }
+          }
+        },
+        {
+          "name": "Get Summary",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('shape', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('completedBooks');",
+                  "  pm.expect(body).to.have.property('currentlyReading');",
+                  "  pm.expect(body).to.have.property('totalPages');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/summary", "host": ["{{baseUrl}}"], "path": ["user", "summary"] }
+          }
+        },
+        {
+          "name": "Get Monthly Stats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('object returned', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/monthly-stats", "host": ["{{baseUrl}}"], "path": ["user", "monthly-stats"] }
+          }
+        },
+        {
+          "name": "Get Streak",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('shape', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('currentStreak');",
+                  "  pm.expect(body).to.have.property('longestStreak');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/streak", "host": ["{{baseUrl}}"], "path": ["user", "streak"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Books",
+      "item": [
+        {
+          "name": "Create Book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 created', function() { pm.expect(pm.response.code).to.equal(201); });",
+                  "pm.test('returns book with id', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('title');",
+                  "  pm.environment.set('bookId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Clean Code\",\"author\":\"Robert C. Martin\",\"type\":\"PHYSICAL\",\"physicalBook\":{\"address\":\"123 Main St\",\"city\":\"Berlin\",\"country\":\"Germany\"}}"
+            },
+            "url": { "raw": "{{baseUrl}}/book", "host": ["{{baseUrl}}"], "path": ["book"] }
+          }
+        },
+        {
+          "name": "Get All Books",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('paginated list', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('data');",
+                  "  pm.expect(body).to.have.property('meta');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/book?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["book"], "query": [
+              { "key": "page", "value": "1" },
+              { "key": "limit", "value": "10" }
+            ] }
+          }
+        },
+        {
+          "name": "Get Book by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('has book fields', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('title');",
+                  "  pm.expect(body).to.have.property('tags');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/book/{{bookId}}", "host": ["{{baseUrl}}"], "path": ["book", "{{bookId}}"] }
+          }
+        },
+        {
+          "name": "Get Book 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('404 or 400 for invalid id', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/book/c00000000000000000000000", "host": ["{{baseUrl}}"], "path": ["book", "c00000000000000000000000"] }
+          }
+        },
+        {
+          "name": "Update Book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('title updated', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.title).to.equal('Clean Code (Updated)');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Clean Code (Updated)\"}"
+            },
+            "url": { "raw": "{{baseUrl}}/book/{{bookId}}", "host": ["{{baseUrl}}"], "path": ["book", "{{bookId}}"] }
+          }
+        },
+        {
+          "name": "Rate Book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 ok', function() { pm.expect(pm.response.code).to.equal(201); });",
+                  "pm.test('rating applied', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.ratingsCount).to.be.above(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"value\":5}"
+            },
+            "url": { "raw": "{{baseUrl}}/book/{{bookId}}/rate", "host": ["{{baseUrl}}"], "path": ["book", "{{bookId}}", "rate"] }
+          }
+        },
+        {
+          "name": "Set Tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 ok', function() { pm.expect(pm.response.code).to.equal(201); });",
+                  "pm.test('tags set', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.tags).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tags\":[\"programming\",\"clean-code\"]}"
+            },
+            "url": { "raw": "{{baseUrl}}/book/{{bookId}}/tags", "host": ["{{baseUrl}}"], "path": ["book", "{{bookId}}", "tags"] }
+          }
+        },
+        {
+          "name": "Add Tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('tags present', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.tags).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tags\":[\"best-practices\"]}"
+            },
+            "url": { "raw": "{{baseUrl}}/book/{{bookId}}/tags/add", "host": ["{{baseUrl}}"], "path": ["book", "{{bookId}}", "tags", "add"] }
+          }
+        },
+        {
+          "name": "Remove Tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('tags array', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.tags).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tags\":[\"best-practices\"]}"
+            },
+            "url": { "raw": "{{baseUrl}}/book/{{bookId}}/tags", "host": ["{{baseUrl}}"], "path": ["book", "{{bookId}}", "tags"] }
+          }
+        },
+        {
+          "name": "Get All Tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('returns array', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/book/tags/all", "host": ["{{baseUrl}}"], "path": ["book", "tags", "all"] }
+          }
+        },
+        {
+          "name": "Find Books By Tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('paginated list', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('data');",
+                  "  pm.expect(body).to.have.property('meta');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/book/tags/search?tags=programming&tags=clean-code", "host": ["{{baseUrl}}"], "path": ["book", "tags", "search"], "query": [
+              { "key": "tags", "value": "programming" },
+              { "key": "tags", "value": "clean-code" }
+            ] }
+          }
+        },
+        {
+          "name": "Get Book Progress",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('defaults', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('currentPage');",
+                  "  pm.expect(body).to.have.property('status');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/book/{{bookId}}/progress", "host": ["{{baseUrl}}"], "path": ["book", "{{bookId}}", "progress"] }
+          }
+        },
+        {
+          "name": "Set Book Progress",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 created', function() { pm.expect(pm.response.code).to.equal(201); });",
+                  "pm.test('progress set', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.currentPage).to.equal(50);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"currentPage\":50,\"totalPages\":300}"
+            },
+            "url": { "raw": "{{baseUrl}}/book/{{bookId}}/progress", "host": ["{{baseUrl}}"], "path": ["book", "{{bookId}}", "progress"] }
+          }
+        },
+        {
+          "name": "Get Top Trending Books",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('paginated', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('data');",
+                  "  pm.expect(body).to.have.property('meta');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/book/top/trending?page=1&limit=10&sort=rating", "host": ["{{baseUrl}}"], "path": ["book", "top", "trending"], "query": [
+              { "key": "page", "value": "1" },
+              { "key": "limit", "value": "10" },
+              { "key": "sort", "value": "rating" }
+            ] }
+          }
+        },
+        {
+          "name": "Create Book - 400 invalid body",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('400 bad request', function() { pm.expect(pm.response.code).to.equal(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": { "raw": "{{baseUrl}}/book", "host": ["{{baseUrl}}"], "path": ["book"] }
+          }
+        },
+        {
+          "name": "Delete Book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('message', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.message).to.include('deleted');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/book/{{bookId}}", "host": ["{{baseUrl}}"], "path": ["book", "{{bookId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Read Lists",
+      "item": [
+        {
+          "name": "Create Read List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 created', function() { pm.expect(pm.response.code).to.equal(201); });",
+                  "pm.test('returns list with id', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('title');",
+                  "  pm.environment.set('readListId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Favorites\",\"description\":\"My top picks\"}"
+            },
+            "url": { "raw": "{{baseUrl}}/read-list", "host": ["{{baseUrl}}"], "path": ["read-list"] }
+          }
+        },
+        {
+          "name": "Get All Read Lists",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('paginated list', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('data');",
+                  "  pm.expect(body).to.have.property('meta');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/read-list?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["read-list"], "query": [
+              { "key": "page", "value": "1" },
+              { "key": "limit", "value": "10" }
+            ] }
+          }
+        },
+        {
+          "name": "Get Read List by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('has list fields', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('title');",
+                  "  pm.expect(body).to.have.property('stats');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/read-list/{{readListId}}", "host": ["{{baseUrl}}"], "path": ["read-list", "{{readListId}}"] }
+          }
+        },
+        {
+          "name": "Update Read List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('title updated', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.title).to.equal('Updated Favorites');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Updated Favorites\"}"
+            },
+            "url": { "raw": "{{baseUrl}}/read-list/{{readListId}}", "host": ["{{baseUrl}}"], "path": ["read-list", "{{readListId}}"] }
+          }
+        },
+        {
+          "name": "Create Book for Read Lists",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 created', function() { pm.expect(pm.response.code).to.equal(201); });",
+                  "pm.test('returns book with id', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.environment.set('readListBookId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Read List Test Book\",\"author\":\"Test Author\",\"type\":\"PHYSICAL\",\"physicalBook\":{\"address\":\"456 Test St\",\"city\":\"Munich\",\"country\":\"Germany\"}}"
+            },
+            "url": { "raw": "{{baseUrl}}/book", "host": ["{{baseUrl}}"], "path": ["book"] }
+          }
+        },
+        {
+          "name": "Add Book to Read List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 created', function() { pm.expect(pm.response.code).to.equal(201); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"bookId\":\"{{readListBookId}}\"}"
+            },
+            "url": { "raw": "{{baseUrl}}/read-list/{{readListId}}/books", "host": ["{{baseUrl}}"], "path": ["read-list", "{{readListId}}", "books"] }
+          }
+        },
+        {
+          "name": "Remove Book from Read List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok or 404 if not in list', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/read-list/{{readListId}}/books/{{readListBookId}}", "host": ["{{baseUrl}}"], "path": ["read-list", "{{readListId}}", "books", "{{readListBookId}}"] }
+          }
+        },
+        {
+          "name": "Delete Read List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ok', function() { pm.expect(pm.response.code).to.equal(200); });",
+                  "pm.test('message', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.message).to.include('deleted');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/read-list/{{readListId}}", "host": ["{{baseUrl}}"], "path": ["read-list", "{{readListId}}"] }
+          }
+        },
+        {
+          "name": "Create Read List - 400 invalid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('400 bad request', function() { pm.expect(pm.response.code).to.equal(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": { "raw": "{{baseUrl}}/read-list", "host": ["{{baseUrl}}"], "path": ["read-list"] }
+          }
+        }
+      ]
+    }
+  ]
+}
