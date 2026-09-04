@@ -26,6 +26,10 @@ describe('UserService', () => {
     readList: {
       findMany: vi.fn(),
     },
+    user: {
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -632,6 +636,61 @@ describe('UserService', () => {
           longestStreak: 10,
           lastReadDate: expect.any(Date) as unknown,
         },
+      });
+    });
+  });
+
+  describe('getPrivacySettings', () => {
+    it('should return privacy settings for user', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        showBooks: true,
+        showReadlists: false,
+      });
+
+      const result = await service.getPrivacySettings(userId);
+
+      expect(result).toEqual({
+        showBooks: true,
+        showReadlists: false,
+      });
+    });
+  });
+
+  describe('updatePrivacySettings', () => {
+    it('should update privacy settings', async () => {
+      mockPrismaService.user.update.mockResolvedValue({
+        showBooks: false,
+        showReadlists: true,
+      });
+
+      const result = await service.updatePrivacySettings(userId, {
+        showBooks: false,
+        showReadlists: true,
+      });
+
+      expect(result).toEqual({
+        showBooks: false,
+        showReadlists: true,
+      });
+      expect(mockPrismaService.user.update).toHaveBeenCalledWith({
+        where: { id: userId },
+        data: { showBooks: false, showReadlists: true },
+        select: { showBooks: true, showReadlists: true },
+      });
+    });
+
+    it('should update only showBooks when only showBooks is provided', async () => {
+      mockPrismaService.user.update.mockResolvedValue({
+        showBooks: false,
+        showReadlists: true,
+      });
+
+      await service.updatePrivacySettings(userId, { showBooks: false });
+
+      expect(mockPrismaService.user.update).toHaveBeenCalledWith({
+        where: { id: userId },
+        data: { showBooks: false },
+        select: { showBooks: true, showReadlists: true },
       });
     });
   });

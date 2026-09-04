@@ -28,6 +28,8 @@ export type UserMinAggregateOutputType = {
   username: string | null
   password: string | null
   refreshToken: string | null
+  showBooks: boolean | null
+  showReadlists: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -37,6 +39,8 @@ export type UserMaxAggregateOutputType = {
   username: string | null
   password: string | null
   refreshToken: string | null
+  showBooks: boolean | null
+  showReadlists: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -46,6 +50,8 @@ export type UserCountAggregateOutputType = {
   username: number
   password: number
   refreshToken: number
+  showBooks: number
+  showReadlists: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -57,6 +63,8 @@ export type UserMinAggregateInputType = {
   username?: true
   password?: true
   refreshToken?: true
+  showBooks?: true
+  showReadlists?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -66,6 +74,8 @@ export type UserMaxAggregateInputType = {
   username?: true
   password?: true
   refreshToken?: true
+  showBooks?: true
+  showReadlists?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -75,6 +85,8 @@ export type UserCountAggregateInputType = {
   username?: true
   password?: true
   refreshToken?: true
+  showBooks?: true
+  showReadlists?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -157,6 +169,8 @@ export type UserGroupByOutputType = {
   username: string
   password: string
   refreshToken: string | null
+  showBooks: boolean
+  showReadlists: boolean
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -187,6 +201,8 @@ export type UserWhereInput = {
   username?: Prisma.StringFilter<"User"> | string
   password?: Prisma.StringFilter<"User"> | string
   refreshToken?: Prisma.StringNullableFilter<"User"> | string | null
+  showBooks?: Prisma.BoolFilter<"User"> | boolean
+  showReadlists?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   books?: Prisma.BookListRelationFilter
@@ -201,6 +217,8 @@ export type UserOrderByWithRelationInput = {
   username?: Prisma.SortOrder
   password?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  showBooks?: Prisma.SortOrder
+  showReadlists?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   books?: Prisma.BookOrderByRelationAggregateInput
@@ -218,6 +236,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   password?: Prisma.StringFilter<"User"> | string
   refreshToken?: Prisma.StringNullableFilter<"User"> | string | null
+  showBooks?: Prisma.BoolFilter<"User"> | boolean
+  showReadlists?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   books?: Prisma.BookListRelationFilter
@@ -232,6 +252,8 @@ export type UserOrderByWithAggregationInput = {
   username?: Prisma.SortOrder
   password?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  showBooks?: Prisma.SortOrder
+  showReadlists?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -247,6 +269,8 @@ export type UserScalarWhereWithAggregatesInput = {
   username?: Prisma.StringWithAggregatesFilter<"User"> | string
   password?: Prisma.StringWithAggregatesFilter<"User"> | string
   refreshToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  showBooks?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  showReadlists?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -256,6 +280,8 @@ export type UserCreateInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
@@ -270,6 +296,8 @@ export type UserUncheckedCreateInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
@@ -284,6 +312,8 @@ export type UserUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
@@ -298,6 +328,8 @@ export type UserUncheckedUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
@@ -312,6 +344,8 @@ export type UserCreateManyInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -321,6 +355,8 @@ export type UserUpdateManyMutationInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -330,6 +366,8 @@ export type UserUncheckedUpdateManyInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -339,6 +377,8 @@ export type UserCountOrderByAggregateInput = {
   username?: Prisma.SortOrder
   password?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
+  showBooks?: Prisma.SortOrder
+  showReadlists?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -348,6 +388,8 @@ export type UserMaxOrderByAggregateInput = {
   username?: Prisma.SortOrder
   password?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
+  showBooks?: Prisma.SortOrder
+  showReadlists?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -357,6 +399,8 @@ export type UserMinOrderByAggregateInput = {
   username?: Prisma.SortOrder
   password?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
+  showBooks?: Prisma.SortOrder
+  showReadlists?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -372,6 +416,10 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -453,6 +501,8 @@ export type UserCreateWithoutBooksInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
@@ -466,6 +516,8 @@ export type UserUncheckedCreateWithoutBooksInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
@@ -495,6 +547,8 @@ export type UserUpdateWithoutBooksInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
@@ -508,6 +562,8 @@ export type UserUncheckedUpdateWithoutBooksInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
@@ -521,6 +577,8 @@ export type UserCreateWithoutReadListsInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
@@ -534,6 +592,8 @@ export type UserUncheckedCreateWithoutReadListsInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
@@ -563,6 +623,8 @@ export type UserUpdateWithoutReadListsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
@@ -576,6 +638,8 @@ export type UserUncheckedUpdateWithoutReadListsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
@@ -589,6 +653,8 @@ export type UserCreateWithoutRatingsInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
@@ -602,6 +668,8 @@ export type UserUncheckedCreateWithoutRatingsInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
@@ -631,6 +699,8 @@ export type UserUpdateWithoutRatingsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
@@ -644,6 +714,8 @@ export type UserUncheckedUpdateWithoutRatingsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
@@ -657,6 +729,8 @@ export type UserCreateWithoutProgressInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
@@ -670,6 +744,8 @@ export type UserUncheckedCreateWithoutProgressInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
@@ -699,6 +775,8 @@ export type UserUpdateWithoutProgressInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
@@ -712,6 +790,8 @@ export type UserUncheckedUpdateWithoutProgressInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
@@ -725,6 +805,8 @@ export type UserCreateWithoutReadingStatsInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
@@ -738,6 +820,8 @@ export type UserUncheckedCreateWithoutReadingStatsInput = {
   username: string
   password: string
   refreshToken?: string | null
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
@@ -767,6 +851,8 @@ export type UserUpdateWithoutReadingStatsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
@@ -780,6 +866,8 @@ export type UserUncheckedUpdateWithoutReadingStatsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showBooks?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  showReadlists?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
@@ -851,6 +939,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   username?: boolean
   password?: boolean
   refreshToken?: boolean
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   books?: boolean | Prisma.User$booksArgs<ExtArgs>
@@ -866,6 +956,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   username?: boolean
   password?: boolean
   refreshToken?: boolean
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -875,6 +967,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   username?: boolean
   password?: boolean
   refreshToken?: boolean
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -884,11 +978,13 @@ export type UserSelectScalar = {
   username?: boolean
   password?: boolean
   refreshToken?: boolean
+  showBooks?: boolean
+  showReadlists?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "password" | "refreshToken" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "password" | "refreshToken" | "showBooks" | "showReadlists" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   books?: boolean | Prisma.User$booksArgs<ExtArgs>
   ratings?: boolean | Prisma.User$ratingsArgs<ExtArgs>
@@ -914,6 +1010,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     username: string
     password: string
     refreshToken: string | null
+    showBooks: boolean
+    showReadlists: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -1348,6 +1446,8 @@ export interface UserFieldRefs {
   readonly username: Prisma.FieldRef<"User", 'String'>
   readonly password: Prisma.FieldRef<"User", 'String'>
   readonly refreshToken: Prisma.FieldRef<"User", 'String'>
+  readonly showBooks: Prisma.FieldRef<"User", 'Boolean'>
+  readonly showReadlists: Prisma.FieldRef<"User", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }

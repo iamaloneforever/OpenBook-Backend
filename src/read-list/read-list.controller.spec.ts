@@ -24,6 +24,8 @@ describe('ReadListController', () => {
     username: 'testuser',
     password: 'hashed-password',
     refreshToken: null,
+    showBooks: true,
+    showReadlists: true,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

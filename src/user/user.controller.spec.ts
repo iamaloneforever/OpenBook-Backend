@@ -16,6 +16,8 @@ describe('User controller tests', () => {
     getMonthlyStats: vi.fn(),
     getStreak: vi.fn(),
     getReadListStats: vi.fn(),
+    getPrivacySettings: vi.fn(),
+    updatePrivacySettings: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -224,6 +226,44 @@ describe('User controller tests', () => {
 
       expect(result).toEqual(mockReadListStats);
       expect(service.getReadListStats).toHaveBeenCalledWith(userId);
+    });
+  });
+
+  describe('getPrivacySettings', () => {
+    it('should return privacy settings for user', async () => {
+      const userId = 'user-1';
+      const mockSettings = {
+        showBooks: true,
+        showReadlists: false,
+      };
+
+      service.getPrivacySettings.mockResolvedValue(mockSettings);
+
+      const result = await controller.getPrivacySettings({
+        id: userId,
+        username: 'test',
+      } as User);
+
+      expect(result).toEqual(mockSettings);
+      expect(service.getPrivacySettings).toHaveBeenCalledWith(userId);
+    });
+  });
+
+  describe('updatePrivacySettings', () => {
+    it('should update privacy settings', async () => {
+      const userId = 'user-1';
+      const dto = { showBooks: false, showReadlists: true };
+      const mockUpdated = { showBooks: false, showReadlists: true };
+
+      service.updatePrivacySettings.mockResolvedValue(mockUpdated);
+
+      const result = await controller.updatePrivacySettings(
+        { id: userId, username: 'test' } as User,
+        dto,
+      );
+
+      expect(result).toEqual(mockUpdated);
+      expect(service.updatePrivacySettings).toHaveBeenCalledWith(userId, dto);
     });
   });
 });

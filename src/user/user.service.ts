@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BookReadingStatus } from '../generated/prisma/client';
 
@@ -334,6 +334,37 @@ export class UserService {
         longestStreak,
         lastReadDate: new Date(),
       },
+    });
+  }
+
+  async getPrivacySettings(userId: string) {
+    this.logger.debug(`Getting privacy settings for user ${userId}`);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { showBooks: true, showReadlists: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      showBooks: user.showBooks,
+      showReadlists: user.showReadlists,
+    };
+  }
+
+  async updatePrivacySettings(
+    userId: string,
+    data: { showBooks?: boolean; showReadlists?: boolean },
+  ) {
+    this.logger.debug(`Updating privacy settings for user ${userId}`);
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data,
+      select: { showBooks: true, showReadlists: true },
     });
   }
 

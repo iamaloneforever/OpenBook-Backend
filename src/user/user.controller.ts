@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
   Logger,
+  Patch,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -9,6 +11,7 @@ import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/Current-user.decorator';
+import { UpdatePrivacyDto } from '../common/dtos/user/update-privacy.dto';
 import type { User } from '../generated/prisma/client';
 
 @Controller('user')
@@ -82,5 +85,22 @@ export class UserController {
   async getStreak(@CurrentUser() user: User) {
     this.logger.debug(`Getting streak for user ${user.id}`);
     return this.userService.getStreak(user.id);
+  }
+
+  @Get('settings/privacy')
+  @UseGuards(JwtAuthGuard)
+  async getPrivacySettings(@CurrentUser() user: User) {
+    this.logger.debug(`Getting privacy settings for user ${user.id}`);
+    return this.userService.getPrivacySettings(user.id);
+  }
+
+  @Patch('settings/privacy')
+  @UseGuards(JwtAuthGuard)
+  async updatePrivacySettings(
+    @CurrentUser() user: User,
+    @Body() dto: UpdatePrivacyDto,
+  ) {
+    this.logger.debug(`Updating privacy settings for user ${user.id}`);
+    return this.userService.updatePrivacySettings(user.id, dto);
   }
 }

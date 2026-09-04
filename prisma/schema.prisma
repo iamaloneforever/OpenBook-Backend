@@ -36,6 +36,9 @@ model User {
   password     String
   refreshToken String?
 
+  showBooks     Boolean @default(true)
+  showReadlists Boolean @default(true)
+
   books        Book[]
   ratings      Rating[]
   readLists    ReadList[]
