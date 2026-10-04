@@ -20,6 +20,7 @@ describe('UserService', () => {
       findMany: vi.fn(),
       findUnique: vi.fn(),
     },
+    rating: { aggregate: vi.fn() },
     book: {
       count: vi.fn(),
     },
@@ -441,77 +442,52 @@ describe('UserService', () => {
   });
 
   describe('updateStatsOnCompletion', () => {
-    it('should recompute stats from all completed progress', async () => {
-      const userId = 'user-1';
-      const bookId = 'book-1';
+    it.each([
+      { count: 3, pages: 900, average: 4.5 },
+      { count: 0, pages: null, average: null },
+      { count: 2, pages: 100, average: null },
+    ])(
+      'stores aggregate statistics for %j',
+      async ({ count, pages, average }) => {
+        mockPrismaService.bookProgress.aggregate.mockResolvedValue({
+          _count: { _all: count },
+          _sum: { totalPages: pages },
+        });
+        mockPrismaService.rating.aggregate.mockResolvedValue({
+          _avg: { value: average },
+        });
 
-      const mockProgress = {
-        id: 'progress-1',
-        userId,
-        bookId,
-        currentPage: 300,
-        totalPages: 300,
-        status: BookReadingStatus.COMPLETED,
-        progressPercentage: 100,
-        startedAt: new Date(),
-        completedAt: new Date(),
-        updatedAt: new Date(),
-        book: {
-          id: bookId,
-          title: 'Test Book',
-          author: 'Test Author',
-          description: null,
-          isbn: null,
-          type: 'PHYSICAL',
-          publishedAt: null,
-          coverUrl: null,
-          totalPages: 300,
-          averageRating: 0,
-          ratingsCount: 0,
-          ownerId: userId,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          ratings: [
-            { userId, bookId, value: 5, id: 'rating-1', createdAt: new Date() },
-          ],
-        },
-      };
+        await service.updateStatsOnCompletion(userId);
 
-      mockPrismaService.bookProgress.findMany.mockResolvedValue([mockProgress]);
-
-      await service.updateStatsOnCompletion(userId);
-
-      expect(mockPrismaService.bookProgress.findMany).toHaveBeenCalledWith({
-        where: {
-          userId,
-          status: BookReadingStatus.COMPLETED,
-        },
-        include: {
-          book: {
-            include: {
-              ratings: {
-                where: { userId },
+        expect(mockPrismaService.bookProgress.findMany).not.toHaveBeenCalled();
+        expect(mockPrismaService.bookProgress.aggregate).toHaveBeenCalledWith({
+          where: { userId, status: BookReadingStatus.COMPLETED },
+          _count: { _all: true },
+          _sum: { totalPages: true },
+        });
+        expect(mockPrismaService.rating.aggregate).toHaveBeenCalledWith({
+          where: {
+            userId,
+            book: {
+              progress: {
+                some: { userId, status: BookReadingStatus.COMPLETED },
               },
             },
           },
-        },
-      });
-
-      const expectedStats = {
-        totalBooksCompleted: 1,
-        totalPagesRead: 300,
-        averageRating: 5,
-      };
-
-      expect(mockPrismaService.readingStats.upsert).toHaveBeenCalledWith({
-        where: { userId },
-        update: expectedStats,
-        create: {
-          userId,
-          ...expectedStats,
-        },
-      });
-    });
+          _avg: { value: true },
+        });
+        const data = {
+          totalBooksCompleted: count,
+          totalPagesRead: pages ?? 0,
+          averageRating: average ?? 0,
+        };
+        expect(mockPrismaService.readingStats.upsert).toHaveBeenCalledWith({
+          where: { userId },
+          update: data,
+          create: { userId, ...data },
+        });
+      },
+    );
   });
 
   describe('updateStreak', () => {

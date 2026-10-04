@@ -231,42 +231,29 @@ export class UserService {
   async updateStatsOnCompletion(userId: string) {
     this.logger.debug(`Updating stats for user ${userId}`);
 
-    const progresses = await this.prisma.bookProgress.findMany({
-      where: {
-        userId,
-        status: BookReadingStatus.COMPLETED,
-      },
-      include: {
-        book: {
-          include: {
-            ratings: {
-              where: { userId },
+    const [progress, ratings] = await Promise.all([
+      this.prisma.bookProgress.aggregate({
+        where: { userId, status: BookReadingStatus.COMPLETED },
+        _count: { _all: true },
+        _sum: { totalPages: true },
+      }),
+      this.prisma.rating.aggregate({
+        where: {
+          userId,
+          book: {
+            progress: {
+              some: { userId, status: BookReadingStatus.COMPLETED },
             },
           },
         },
-      },
-    });
-
-    const totalBooksCompleted = progresses.length;
-
-    const totalPagesRead = progresses.reduce(
-      (sum, p) => sum + (p.totalPages ?? 0),
-      0,
-    );
-
-    const ratings = progresses
-      .map((p) => p.book.ratings[0]?.value)
-      .filter((rating): rating is number => rating !== undefined);
-
-    const averageRating =
-      ratings.length === 0
-        ? 0
-        : ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
+        _avg: { value: true },
+      }),
+    ]);
 
     const data = {
-      totalBooksCompleted,
-      totalPagesRead,
-      averageRating,
+      totalBooksCompleted: progress._count._all,
+      totalPagesRead: progress._sum.totalPages ?? 0,
+      averageRating: ratings._avg.value ?? 0,
     };
 
     // upsert ensures a ReadingStats row exists even for first-time users

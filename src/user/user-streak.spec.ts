@@ -98,14 +98,22 @@ function createInMemoryPrisma() {
     book: tx.book,
     bookProgress: {
       ...tx.bookProgress,
-      // Only `updateStatsOnCompletion` calls findMany on bookProgress, so the
-      // call count below doubles as "how many times completion stats ran".
-      findMany: vi.fn(({ where }: { where: Record<string, string> }) =>
-        progressStore
-          .filter((p) => p.userId === where.userId && p.status === where.status)
-          .map((p) => ({ ...p, book: { ratings: [] } })),
-      ),
+      aggregate: vi.fn(({ where }: { where: Record<string, string> }) => {
+        const completed = progressStore.filter(
+          (p) => p.userId === where.userId && p.status === where.status,
+        );
+        return {
+          _count: { _all: completed.length },
+          _sum: {
+            totalPages: completed.reduce(
+              (sum, p) => sum + Number(p.totalPages),
+              0,
+            ),
+          },
+        };
+      }),
     },
+    rating: { aggregate: vi.fn(() => ({ _avg: { value: null } })) },
     readingStats: {
       findUnique: vi.fn(() => (statsStore ? { ...statsStore } : null)),
       create: vi.fn(({ data }: { data: { userId: string } }) => {
@@ -244,14 +252,14 @@ describe('Reading streak', () => {
     await read('book-1', 50, 300);
     expect(fakePrisma.stats()?.totalBooksCompleted).toBe(0);
     // No completion yet → updateStatsOnCompletion must not have run.
-    expect(fakePrisma.prisma.bookProgress.findMany).not.toHaveBeenCalled();
+    expect(fakePrisma.prisma.bookProgress.aggregate).not.toHaveBeenCalled();
 
     vi.setSystemTime(new Date('2026-08-02T12:00:00'));
     await read('book-1', 300, 300);
 
     expect(fakePrisma.stats()?.totalBooksCompleted).toBe(1);
     expect(fakePrisma.stats()?.totalPagesRead).toBe(300);
-    expect(fakePrisma.prisma.bookProgress.findMany).toHaveBeenCalledTimes(1);
+    expect(fakePrisma.prisma.bookProgress.aggregate).toHaveBeenCalledTimes(1);
   });
 
   it('completing a book on the very first read still starts the streak at 1', async () => {
@@ -282,7 +290,7 @@ describe('Reading streak', () => {
     expect(fakePrisma.stats()?.currentStreak).toBe(1);
     expect(fakePrisma.stats()?.totalBooksCompleted).toBe(1);
     // updateStatsOnCompletion must not re-run for an already-completed book.
-    expect(fakePrisma.prisma.bookProgress.findMany).toHaveBeenCalledTimes(1);
+    expect(fakePrisma.prisma.bookProgress.aggregate).toHaveBeenCalledTimes(1);
   });
 
   it('resets the streak to 1 after a day is skipped, keeping the longest streak', async () => {
