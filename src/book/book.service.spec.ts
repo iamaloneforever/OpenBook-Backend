@@ -32,6 +32,7 @@ type BookTx = {
 type RatingTx = {
   book: {
     findUnique: ReturnType<typeof vi.fn>;
+    findFirst: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
   };
   rating: {
@@ -54,6 +55,7 @@ describe('BookService', () => {
     book: {
       findMany: ReturnType<typeof vi.fn>;
       findUnique: ReturnType<typeof vi.fn>;
+      findFirst: ReturnType<typeof vi.fn>;
       create: ReturnType<typeof vi.fn>;
       update: ReturnType<typeof vi.fn>;
       delete: ReturnType<typeof vi.fn>;
@@ -67,6 +69,10 @@ describe('BookService', () => {
       aggregate: ReturnType<typeof vi.fn>;
     };
 
+    bookProgress: {
+      findUnique: ReturnType<typeof vi.fn>;
+    };
+
     $transaction: ReturnType<typeof vi.fn>;
   };
 
@@ -75,6 +81,7 @@ describe('BookService', () => {
       book: {
         findMany: vi.fn(),
         findUnique: vi.fn(),
+        findFirst: vi.fn(),
         create: vi.fn(),
         update: vi.fn(),
         delete: vi.fn(),
@@ -86,6 +93,10 @@ describe('BookService', () => {
         create: vi.fn(),
         update: vi.fn(),
         aggregate: vi.fn(),
+      },
+
+      bookProgress: {
+        findUnique: vi.fn(),
       },
 
       $transaction: vi.fn(),
@@ -519,7 +530,8 @@ describe('BookService', () => {
 
       const tx: RatingTx = {
         book: {
-          findUnique: vi.fn().mockResolvedValue({
+          findUnique: vi.fn(),
+          findFirst: vi.fn().mockResolvedValue({
             id: 'book-1',
           }),
 
@@ -554,6 +566,10 @@ describe('BookService', () => {
 
       expect(result).toEqual(updatedBook);
 
+      expect(tx.book.findFirst).toHaveBeenCalledWith({
+        where: { id: 'book-1', ownerId: 'user-1' },
+      });
+
       expect(tx.rating.create).toHaveBeenCalledWith({
         data: {
           value: 5,
@@ -566,7 +582,8 @@ describe('BookService', () => {
     it('should update an existing rating', async () => {
       const tx: RatingTx = {
         book: {
-          findUnique: vi.fn().mockResolvedValue({
+          findUnique: vi.fn(),
+          findFirst: vi.fn().mockResolvedValue({
             id: 'book-1',
           }),
 
@@ -619,10 +636,11 @@ describe('BookService', () => {
       expect(tx.rating.create).not.toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if book does not exist', async () => {
+    it('should hide books not owned by the user', async () => {
       const tx: RatingTx = {
         book: {
-          findUnique: vi.fn().mockResolvedValue(null),
+          findUnique: vi.fn(),
+          findFirst: vi.fn().mockResolvedValue(null),
           update: vi.fn(),
         },
 
@@ -639,6 +657,57 @@ describe('BookService', () => {
       await expect(service.rateBook('book-1', 'user-1', 5)).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  it('excludes private addresses and download locations from public trending queries', async () => {
+    prisma.book.findMany.mockResolvedValue([]);
+    prisma.book.count.mockResolvedValue(0);
+    prisma.$transaction.mockResolvedValue([[], 0]);
+
+    await service.getTopBooks();
+
+    const query = prisma.book.findMany.mock.calls[0][0] as {
+      select: Record<string, unknown>;
+      include?: unknown;
+    };
+    expect(query.include).toBeUndefined();
+    expect(query.select.title).toBe(true);
+    expect(query.select.physicalBook).toBeUndefined();
+    expect(query.select.digitalBook).toBeUndefined();
+    expect(query.select.owner).toEqual({
+      select: { id: true, username: true },
+    });
+  });
+
+  describe('progress ownership', () => {
+    it('should not expose progress for a book owned by another user', async () => {
+      prisma.book.findFirst.mockResolvedValue(null);
+
+      await expect(service.getProgress('book-1', 'user-1')).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(prisma.bookProgress.findUnique).not.toHaveBeenCalled();
+      expect(prisma.book.findFirst).toHaveBeenCalledWith({
+        where: { id: 'book-1', ownerId: 'user-1' },
+        select: { id: true },
+      });
+    });
+
+    it('should not update progress for a book owned by another user', async () => {
+      const tx = {
+        book: { findFirst: vi.fn().mockResolvedValue(null) },
+        bookProgress: { findUnique: vi.fn(), upsert: vi.fn() },
+      };
+      prisma.$transaction.mockImplementation(runTransaction(tx));
+
+      await expect(
+        service.setProgress('book-1', 'user-1', { currentPage: 10 }),
+      ).rejects.toThrow(NotFoundException);
+      expect(tx.bookProgress.upsert).not.toHaveBeenCalled();
+      expect(tx.book.findFirst).toHaveBeenCalledWith({
+        where: { id: 'book-1', ownerId: 'user-1' },
+      });
     });
   });
 });

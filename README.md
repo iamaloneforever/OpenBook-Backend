@@ -65,3 +65,19 @@ npm run start:dev
 > You need a client to use this project for client visit - (Still in development)
 
 Developed By [Alone](https://www.iamalone.ir)
+# Security configuration
+
+Set distinct `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` values before starting
+the API. Startup fails when either is missing or both are equal. Use randomly
+generated secrets in deployment. `CORS_ORIGINS` is a comma-separated list of
+allowed browser origins; an empty list permits no cross-origin browser access.
+
+Authentication routes have per-IP and per-account/token rate limits. The current
+limiter and response cache are in-memory per process; deployments with multiple
+instances need shared storage for deployment-wide limits. Private book and user
+responses are cached separately for each authenticated user. Public trending
+results exclude physical addresses and digital download locations.
+
+Refresh tokens rotate once per use, including concurrent requests. Clients must
+serialize refresh attempts and retain the latest refresh cookie. Existing tokens
+remain valid until used, expired, or revoked.

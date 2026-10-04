@@ -29,7 +29,7 @@ describe('ReadListService', () => {
       delete: vi.fn(),
     },
     book: {
-      findUnique: vi.fn(),
+      findFirst: vi.fn(),
     },
     $transaction: vi.fn(),
   };
@@ -331,12 +331,15 @@ describe('ReadListService', () => {
       };
 
       prisma.readList.findUnique.mockResolvedValue(existingList);
-      prisma.book.findUnique.mockResolvedValue(book);
+      prisma.book.findFirst.mockResolvedValue(book);
       prisma.readListBook.create.mockResolvedValue(addedItem);
 
-      const result = await service.addBook('list-1', 'book-1');
+      const result = await service.addBook('list-1', 'book-1', 'user-1');
 
       expect(result).toEqual(addedItem);
+      expect(prisma.book.findFirst).toHaveBeenCalledWith({
+        where: { id: 'book-1', ownerId: 'user-1' },
+      });
       expect(prisma.readListBook.create).toHaveBeenCalledWith({
         data: {
           readListId: 'list-1',
@@ -348,9 +351,9 @@ describe('ReadListService', () => {
     it('should throw NotFoundException when list does not exist', async () => {
       prisma.readList.findUnique.mockResolvedValue(null);
 
-      await expect(service.addBook('nonexistent', 'book-1')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.addBook('nonexistent', 'book-1', 'user-1'),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw NotFoundException when book does not exist', async () => {
@@ -361,11 +364,11 @@ describe('ReadListService', () => {
       };
 
       prisma.readList.findUnique.mockResolvedValue(existingList);
-      prisma.book.findUnique.mockResolvedValue(null);
+      prisma.book.findFirst.mockResolvedValue(null);
 
-      await expect(service.addBook('list-1', 'nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.addBook('list-1', 'nonexistent', 'user-1'),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ConflictException when book already exists in list', async () => {
@@ -385,12 +388,12 @@ describe('ReadListService', () => {
       });
 
       prisma.readList.findUnique.mockResolvedValue(existingList);
-      prisma.book.findUnique.mockResolvedValue(book);
+      prisma.book.findFirst.mockResolvedValue(book);
       prisma.readListBook.create.mockRejectedValue(error);
 
-      await expect(service.addBook('list-1', 'book-1')).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(
+        service.addBook('list-1', 'book-1', 'user-1'),
+      ).rejects.toThrow(ConflictException);
     });
 
     it('should throw BadRequestException for unknown errors', async () => {
@@ -405,14 +408,14 @@ describe('ReadListService', () => {
       };
 
       prisma.readList.findUnique.mockResolvedValue(existingList);
-      prisma.book.findUnique.mockResolvedValue(book);
+      prisma.book.findFirst.mockResolvedValue(book);
       prisma.readListBook.create.mockRejectedValue(
         new Error('Database crashed'),
       );
 
-      await expect(service.addBook('list-1', 'book-1')).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.addBook('list-1', 'book-1', 'user-1'),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 

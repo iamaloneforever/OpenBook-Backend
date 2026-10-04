@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
+import { randomUUID } from 'node:crypto';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { SignupDto } from 'src/common/dtos/auth/signup.dto';
@@ -99,7 +100,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    return this.generateTokens(user.id, user.username);
+    return this.generateTokens(user.id, user.username, user.refreshToken);
   }
 
   async logout(userId: string) {
@@ -117,7 +118,11 @@ export class AuthService {
     };
   }
 
-  async generateTokens(userId: string, username: string) {
+  async generateTokens(
+    userId: string,
+    username: string,
+    expectedRefreshToken?: string,
+  ) {
     const payload = {
       sub: userId,
       username,
@@ -131,18 +136,27 @@ export class AuthService {
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: '7d',
+      jwtid: randomUUID(),
     });
 
     const hashedRefreshToken = await argon2.hash(refreshToken);
 
-    await this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        refreshToken: hashedRefreshToken,
-      },
-    });
+    if (expectedRefreshToken !== undefined) {
+      // Only the request holding the current token can rotate the session.
+      // A concurrent refresh or logout must not be overwritten.
+      const result = await this.prisma.user.updateMany({
+        where: { id: userId, refreshToken: expectedRefreshToken },
+        data: { refreshToken: hashedRefreshToken },
+      });
+      if (result.count !== 1) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+    } else {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { refreshToken: hashedRefreshToken },
+      });
+    }
 
     return {
       accessToken,

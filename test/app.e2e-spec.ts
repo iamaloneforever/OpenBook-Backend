@@ -97,7 +97,7 @@ describe('BookController (e2e)', () => {
   });
 
   afterEach(async () => {
-    await app.close();
+    await app?.close();
   });
 
   describe('GET /book', () => {

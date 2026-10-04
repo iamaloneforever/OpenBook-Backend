@@ -40,14 +40,14 @@ function createInMemoryPrisma() {
     progressStore.findIndex((p) => p.userId === userId && p.bookId === bookId);
 
   const tx: {
-    book: { findUnique: ReturnType<typeof vi.fn> };
+    book: { findFirst: ReturnType<typeof vi.fn> };
     bookProgress: {
       findUnique: ReturnType<typeof vi.fn>;
       upsert: ReturnType<typeof vi.fn>;
     };
   } = {
     book: {
-      findUnique: vi.fn(({ where }: { where: { id: string } }) =>
+      findFirst: vi.fn(({ where }: { where: { id: string } }) =>
         bookStore[where.id] ? { ...bookStore[where.id] } : null,
       ),
     },

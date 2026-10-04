@@ -175,9 +175,13 @@ describe('ReadListController', () => {
 
       readListService.addBook.mockResolvedValue(result);
 
-      const response = await controller.addBook('list-1', dto);
+      const response = await controller.addBook('list-1', dto, mockUser);
 
-      expect(readListService.addBook).toHaveBeenCalledWith('list-1', 'book-1');
+      expect(readListService.addBook).toHaveBeenCalledWith(
+        'list-1',
+        'book-1',
+        mockUser.id,
+      );
       expect(response).toEqual(result);
     });
   });

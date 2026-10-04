@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { UserCacheInterceptor } from '../common/interceptors/user-cache.interceptor';
 
 import { BookService } from './book.service';
 
@@ -36,7 +37,10 @@ import { Owner } from '../common/decorators/owner.decorator';
 
 import type { User } from '../generated/prisma/client';
 
-import { BookUploadInterceptor } from '../common/config/multer.config';
+import {
+  BookUploadInterceptor,
+  BookUploadValidationInterceptor,
+} from '../common/config/multer.config';
 
 @Controller('book')
 export class BookController {
@@ -49,7 +53,7 @@ export class BookController {
   // --------------------------------------------------------------------------
 
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(CacheInterceptor)
+  @UseInterceptors(UserCacheInterceptor)
   @CacheTTL(6000)
   @Get()
   findAll(
@@ -87,8 +91,8 @@ export class BookController {
   // GET ONE BOOK
   // --------------------------------------------------------------------------
 
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(CacheInterceptor)
+  @UseGuards(JwtAuthGuard, OwnerGuard)
+  @UseInterceptors(UserCacheInterceptor)
   @CacheTTL(6000)
   @Get(':id')
   @Owner('book')
@@ -100,8 +104,9 @@ export class BookController {
   // GET BOOK PROGRESS
   // --------------------------------------------------------------------------
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, OwnerGuard)
   @Get(':id/progress')
+  @Owner('book')
   getProgress(@Param() params: BookIDParamDto, @CurrentUser() user: User) {
     return this.bookService.getProgress(params.id, user.id);
   }
@@ -110,8 +115,9 @@ export class BookController {
   // SET BOOK PROGRESS
   // --------------------------------------------------------------------------
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, OwnerGuard)
   @Post(':id/progress')
+  @Owner('book')
   setProgress(
     @Param() params: BookIDParamDto,
     @Body() dto: UpdateProgressDto,
@@ -126,7 +132,7 @@ export class BookController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(BookUploadInterceptor)
+  @UseInterceptors(BookUploadInterceptor, BookUploadValidationInterceptor)
   create(
     @Body() dto: CreateBookDto,
 
@@ -160,7 +166,8 @@ export class BookController {
   // --------------------------------------------------------------------------
 
   @Post(':id/rate')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, OwnerGuard)
+  @Owner('book')
   rateBook(
     @Param('id') id: string,
 
@@ -204,7 +211,7 @@ export class BookController {
     OwnerGuard,
   )
   @Owner('book')
-  @UseInterceptors(BookUploadInterceptor)
+  @UseInterceptors(BookUploadInterceptor, BookUploadValidationInterceptor)
   updateBook(
     @Param('id') id: string,
 
@@ -273,7 +280,7 @@ export class BookController {
   // --------------------------------------------------------------------------
 
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(CacheInterceptor)
+  @UseInterceptors(UserCacheInterceptor)
   @CacheTTL(6000)
   @Get('tags/search')
   findByTags(@CurrentUser() user: User, @Query() query: FindByTagsDto) {

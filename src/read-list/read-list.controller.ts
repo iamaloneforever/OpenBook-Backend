@@ -68,8 +68,12 @@ export class ReadListController {
   @Post(':id/books')
   @UseGuards(OwnerGuard)
   @Owner('readList')
-  addBook(@Param('id') id: string, @Body() dto: AddBookToReadListDto) {
-    return this.readListService.addBook(id, dto.bookId);
+  addBook(
+    @Param('id') id: string,
+    @Body() dto: AddBookToReadListDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.readListService.addBook(id, dto.bookId, user.id);
   }
 
   @Delete(':id/books/:bookId')

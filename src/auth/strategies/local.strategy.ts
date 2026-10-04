@@ -19,9 +19,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(username: string, password: string) {
-    console.log('username:', username);
-    console.log('password:', password);
-
     if (!username || !password) {
       throw new BadRequestException('Username and password are required');
     }

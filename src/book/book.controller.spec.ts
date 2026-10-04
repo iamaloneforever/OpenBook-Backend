@@ -1,13 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, beforeEach, it, expect, vi } from 'vitest';
 
-import type { CallHandler, ExecutionContext } from '@nestjs/common';
-
 import { BookController } from './book.controller';
 import { BookService } from './book.service';
 import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
 import { OwnerGuard } from '../common/guards/auth/owner.guard';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+import { CacheModule } from '@nestjs/cache-manager';
 import { User, BookType } from 'src/generated/prisma/client';
 import { CreateBookDto } from '../common/dtos/book/create-book-dto';
 
@@ -36,6 +34,7 @@ describe('BookController', () => {
     vi.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()],
       controllers: [BookController],
       providers: [
         {
@@ -51,10 +50,6 @@ describe('BookController', () => {
       .overrideGuard(OwnerGuard)
       .useValue({
         canActivate: vi.fn().mockReturnValue(true),
-      })
-      .overrideInterceptor(CacheInterceptor)
-      .useValue({
-        intercept: (_: ExecutionContext, next: CallHandler) => next.handle(),
       })
       .compile();
 

@@ -152,12 +152,13 @@ export class ReadListService {
     };
   }
 
-  async addBook(listId: string, bookId: string) {
+  async addBook(listId: string, bookId: string, userId: string) {
     await this.exists(listId);
 
-    const book = await this.prisma.book.findUnique({
+    const book = await this.prisma.book.findFirst({
       where: {
         id: bookId,
+        ownerId: userId,
       },
     });
 

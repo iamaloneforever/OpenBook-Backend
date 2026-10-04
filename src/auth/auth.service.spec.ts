@@ -5,7 +5,7 @@ import { ConflictException, UnauthorizedException } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, type JwtSignOptions } from '@nestjs/jwt';
 
 vi.mock('argon2', () => ({
   hash: vi.fn(),
@@ -20,6 +20,7 @@ describe('AuthService', () => {
       findUnique: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
     },
   };
 
@@ -29,7 +30,8 @@ describe('AuthService', () => {
   };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
+    prisma.user.updateMany.mockResolvedValue({ count: 1 });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -153,6 +155,23 @@ describe('AuthService', () => {
   });
 
   describe('generateTokens', () => {
+    it('issues distinct refresh tokens even within the same second', async () => {
+      const realJwt = new JwtService();
+      jwt.signAsync.mockImplementation(
+        (payload: object, options: JwtSignOptions) =>
+          realJwt.signAsync(payload, { ...options, secret: 'test-secret' }),
+      );
+      vi.mocked(argon2.hash).mockResolvedValue('hashed');
+      vi.useFakeTimers();
+      try {
+        const first = await service.generateTokens('1', 'john');
+        const second = await service.generateTokens('1', 'john');
+        expect(first.refreshToken).not.toBe(second.refreshToken);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
     it('should generate access and refresh tokens', async () => {
       jwt.signAsync
         .mockResolvedValueOnce('access-token')
@@ -176,6 +195,60 @@ describe('AuthService', () => {
   });
 
   describe('refresh', () => {
+    it('allows only one concurrent refresh of the same session', async () => {
+      jwt.verify.mockReturnValue({ sub: '1' });
+      prisma.user.findUnique.mockResolvedValue({
+        id: '1',
+        username: 'john',
+        refreshToken: 'old-hash',
+      });
+      vi.mocked(argon2.verify).mockResolvedValue(true);
+      vi.mocked(argon2.hash).mockResolvedValue('new-hash');
+      jwt.signAsync.mockResolvedValue('new-token');
+      let storedHash = 'old-hash';
+      prisma.user.updateMany.mockImplementation(
+        ({
+          where,
+          data,
+        }: {
+          where: { refreshToken: string };
+          data: { refreshToken: string };
+        }) => {
+          if (where.refreshToken !== storedHash) return { count: 0 };
+          storedHash = data.refreshToken;
+          return { count: 1 };
+        },
+      );
+
+      const results = await Promise.allSettled([
+        service.refresh('old-token'),
+        service.refresh('old-token'),
+      ]);
+      expect(
+        results.filter((result) => result.status === 'fulfilled'),
+      ).toHaveLength(1);
+      const rejected = results.find((result) => result.status === 'rejected');
+      expect(rejected?.reason).toBeInstanceOf(UnauthorizedException);
+      expect(prisma.user.update).not.toHaveBeenCalled();
+    });
+
+    it('does not restore a session revoked during token verification', async () => {
+      jwt.verify.mockReturnValue({ sub: '1' });
+      prisma.user.findUnique.mockResolvedValue({
+        id: '1',
+        username: 'john',
+        refreshToken: 'old-hash',
+      });
+      vi.mocked(argon2.verify).mockResolvedValue(true);
+      vi.mocked(argon2.hash).mockResolvedValue('new-hash');
+      jwt.signAsync.mockResolvedValue('new-token');
+      prisma.user.updateMany.mockResolvedValue({ count: 0 });
+      await expect(service.refresh('old-token')).rejects.toThrow(
+        UnauthorizedException,
+      );
+      expect(prisma.user.update).not.toHaveBeenCalled();
+    });
+
     it('should throw when refresh token is missing', async () => {
       await expect(service.refresh('')).rejects.toThrow(UnauthorizedException);
     });

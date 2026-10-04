@@ -406,9 +406,10 @@ export class BookService {
     value: number,
   ) {
     return this.prisma.$transaction(async (tx) => {
-      const book = await tx.book.findUnique({
+      const book = await tx.book.findFirst({
         where: {
           id: bookId,
+          ownerId: userId,
         },
       });
 
@@ -622,6 +623,8 @@ export class BookService {
         status: BookReadingStatus;
       }
   > {
+    await this.requireOwnedBook(bookId, userId);
+
     const progress = await this.prisma.bookProgress.findUnique({
       where: {
         userId_bookId: {
@@ -653,8 +656,8 @@ export class BookService {
     let justCompleted = false;
 
     const progress = await this.prisma.$transaction(async (tx) => {
-      const book = await tx.book.findUnique({
-        where: { id: bookId },
+      const book = await tx.book.findFirst({
+        where: { id: bookId, ownerId: userId },
       });
 
       if (!book) {
@@ -749,7 +752,20 @@ export class BookService {
     }
 
     return progress;
-  } // --------------------------------------------------------------------------
+  }
+
+  private async requireOwnedBook(bookId: string, userId: string) {
+    const book = await this.prisma.book.findFirst({
+      where: { id: bookId, ownerId: userId },
+      select: { id: true },
+    });
+
+    if (!book) {
+      throw new NotFoundException('Book not found');
+    }
+  }
+
+  // --------------------------------------------------------------------------
   // TOP BOOKS
   // --------------------------------------------------------------------------
 
@@ -770,15 +786,24 @@ export class BookService {
         orderBy,
         skip: (page - 1) * limit,
         take: limit,
-        include: {
+        select: {
+          id: true,
+          title: true,
+          author: true,
+          description: true,
+          isbn: true,
+          type: true,
+          publishedAt: true,
+          coverUrl: true,
+          totalPages: true,
+          averageRating: true,
+          ratingsCount: true,
           owner: {
             select: {
               id: true,
               username: true,
             },
           },
-          digitalBook: true,
-          physicalBook: true,
           _count: {
             select: {
               ratings: true,

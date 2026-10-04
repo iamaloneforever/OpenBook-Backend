@@ -4,7 +4,7 @@ import {
   type CallHandler,
   type ExecutionContext,
 } from '@nestjs/common';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+import { UserCacheInterceptor } from '../src/common/interceptors/user-cache.interceptor';
 import { Test } from '@nestjs/testing';
 import type { Server } from 'http';
 import request from 'supertest';
@@ -43,7 +43,7 @@ describe.skipIf(!hasDatabase)('Reading streak (e2e, real database)', () => {
     })
       // The /user endpoint is guarded by the CacheInterceptor (6s TTL); a
       // no-op pass-through keeps every stats read fresh and deterministic.
-      .overrideInterceptor(CacheInterceptor)
+      .overrideInterceptor(UserCacheInterceptor)
       .useValue({
         intercept: (_: ExecutionContext, next: CallHandler) => next.handle(),
       })

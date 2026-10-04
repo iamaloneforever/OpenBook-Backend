@@ -5,7 +5,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { CacheTTL } from '@nestjs/cache-manager';
+import { UserCacheInterceptor } from '../common/interceptors/user-cache.interceptor';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/Current-user.decorator';
@@ -19,7 +20,7 @@ export class UserController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(CacheInterceptor)
+  @UseInterceptors(UserCacheInterceptor)
   @CacheTTL(6000)
   async getStats(@CurrentUser() user: User) {
     this.logger.debug(`Getting stats for user ${user.id}`);
@@ -28,7 +29,7 @@ export class UserController {
 
   @Get('dashboard')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(CacheInterceptor)
+  @UseInterceptors(UserCacheInterceptor)
   @CacheTTL(3000)
   async getDashboard(@CurrentUser() user: User) {
     this.logger.debug(`Getting dashboard for user ${user.id}`);
@@ -41,7 +42,7 @@ export class UserController {
 
   @Get('book-stats')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(CacheInterceptor)
+  @UseInterceptors(UserCacheInterceptor)
   @CacheTTL(3000)
   async getBookStats(@CurrentUser() user: User) {
     this.logger.debug(`Getting book stats for user ${user.id}`);
@@ -50,7 +51,7 @@ export class UserController {
 
   @Get('read-list-stats')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(CacheInterceptor)
+  @UseInterceptors(UserCacheInterceptor)
   @CacheTTL(3000)
   async getReadListStats(@CurrentUser() user: User) {
     this.logger.debug(`Getting read list stats for user ${user.id}`);
@@ -59,7 +60,7 @@ export class UserController {
 
   @Get('summary')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(CacheInterceptor)
+  @UseInterceptors(UserCacheInterceptor)
   @CacheTTL(3000)
   async getSummary(@CurrentUser() user: User) {
     this.logger.debug(`Getting summary for user ${user.id}`);
@@ -68,7 +69,7 @@ export class UserController {
 
   @Get('monthly-stats')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(CacheInterceptor)
+  @UseInterceptors(UserCacheInterceptor)
   @CacheTTL(3000)
   async getMonthlyStats(@CurrentUser() user: User) {
     this.logger.debug(`Getting monthly stats for user ${user.id}`);
@@ -77,7 +78,7 @@ export class UserController {
 
   @Get('streak')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(CacheInterceptor)
+  @UseInterceptors(UserCacheInterceptor)
   @CacheTTL(3000)
   async getStreak(@CurrentUser() user: User) {
     this.logger.debug(`Getting streak for user ${user.id}`);
