@@ -17,6 +17,7 @@ import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { UserCacheInterceptor } from '../common/interceptors/user-cache.interceptor';
 
 import { BookService } from './book.service';
+import { BookFilesService } from './book-files.service';
 
 import { CreateBookDto } from '../common/dtos/book/create-book-dto';
 import { UpdateBookDto } from '../common/dtos/book/update-book.dto';
@@ -46,7 +47,16 @@ import {
 export class BookController {
   private readonly logger = new Logger(BookController.name);
 
-  constructor(private readonly bookService: BookService) {}
+  constructor(
+    private readonly bookService: BookService,
+    private readonly bookFiles: BookFilesService,
+  ) {}
+
+  @Get(':id/file')
+  @UseGuards(JwtAuthGuard)
+  download(@Param() params: BookIDParamDto, @CurrentUser() user: User) {
+    return this.bookFiles.download(params.id, user.id);
+  }
 
   // --------------------------------------------------------------------------
   // GET ALL BOOKS
@@ -155,7 +165,7 @@ export class BookController {
 
       user.id,
 
-      cover?.path,
+      cover ? `/uploads/books/covers/${cover.filename}` : undefined,
 
       epub,
     );
@@ -233,7 +243,7 @@ export class BookController {
 
       dto,
 
-      cover?.path,
+      cover ? `/uploads/books/covers/${cover.filename}` : undefined,
 
       epub,
     );
@@ -292,11 +302,12 @@ export class BookController {
   // GET ALL TAGS
   // --------------------------------------------------------------------------
 
-  @UseInterceptors(CacheInterceptor)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(UserCacheInterceptor)
   @CacheTTL(3000)
   @Get('tags/all')
-  getAllTags() {
+  getAllTags(@CurrentUser() user: User) {
     this.logger.log('GET /book/tags/all');
-    return this.bookService.getAllTags();
+    return this.bookService.getAllTags(user.id);
   }
 }

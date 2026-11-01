@@ -15,10 +15,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: config.getOrThrow<string>('JWT_ACCESS_SECRET'),
+      algorithms: ['HS256'],
     });
   }
 
   async validate(payload: { sub: string }) {
+    if (
+      typeof payload?.sub !== 'string' ||
+      !payload.sub ||
+      payload.sub.length > 128
+    ) {
+      throw new UnauthorizedException();
+    }
     const user = await this.prisma.user.findUnique({
       where: {
         id: payload.sub,

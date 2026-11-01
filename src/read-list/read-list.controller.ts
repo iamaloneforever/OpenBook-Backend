@@ -12,18 +12,18 @@ import {
 
 import { ReadListService } from './read-list.service';
 
-import { JwtAuthGuard } from 'src/common/guards/auth/jwt-auth.guard';
-import { OwnerGuard } from 'src/common/guards/auth/owner.guard';
+import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
+import { OwnerGuard } from '../common/guards/auth/owner.guard';
 
-import { CurrentUser } from 'src/common/decorators/Current-user.decorator';
+import { CurrentUser } from '../common/decorators/Current-user.decorator';
 
-import type { User } from 'src/generated/prisma/client';
+import type { User } from '../generated/prisma/client';
 
-import { CreateReadListDto } from 'src/common/dtos/read-list/create-read-list.dto';
-import { UpdateReadListDto } from 'src/common/dtos/read-list/update-read-list.dto';
-import { AddBookToReadListDto } from 'src/common/dtos/read-list/add-book-to-read-list.dto';
-import { PaginationDto } from 'src/common/dtos/shared/pagination.dto';
-import { Owner } from 'src/common/decorators/owner.decorator';
+import { CreateReadListDto } from '../common/dtos/read-list/create-read-list.dto';
+import { UpdateReadListDto } from '../common/dtos/read-list/update-read-list.dto';
+import { AddBookToReadListDto } from '../common/dtos/read-list/add-book-to-read-list.dto';
+import { PaginationDto } from '../common/dtos/shared/pagination.dto';
+import { Owner } from '../common/decorators/owner.decorator';
 
 @Controller('read-list')
 @UseGuards(JwtAuthGuard)

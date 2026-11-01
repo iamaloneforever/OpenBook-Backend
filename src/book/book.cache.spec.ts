@@ -11,6 +11,7 @@ import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BookController } from './book.controller';
 import { BookService } from './book.service';
+import { BookFilesService } from './book-files.service';
 import { UserController } from '../user/user.controller';
 import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
@@ -28,6 +29,7 @@ describe('private response caching', () => {
       imports: [CacheModule.register()],
       controllers: [BookController, UserController],
       providers: [
+        { provide: BookFilesService, useValue: { download: vi.fn() } },
         { provide: BookService, useValue: books },
         { provide: UserService, useValue: users },
       ],

@@ -1,15 +1,15 @@
 import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
-import { PhysicalBookSource } from 'src/generated/prisma/enums';
+import { PhysicalBookSource } from '../../../generated/prisma/enums';
 
 export class PhysicalBookDto {
   @IsString()
-  address: string;
+  address!: string;
 
   @IsString()
-  city: string;
+  city!: string;
 
   @IsString()
-  country: string;
+  country!: string;
 
   @IsOptional()
   @IsString()

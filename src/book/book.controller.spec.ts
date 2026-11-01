@@ -3,10 +3,11 @@ import { describe, beforeEach, it, expect, vi } from 'vitest';
 
 import { BookController } from './book.controller';
 import { BookService } from './book.service';
+import { BookFilesService } from './book-files.service';
 import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
 import { OwnerGuard } from '../common/guards/auth/owner.guard';
 import { CacheModule } from '@nestjs/cache-manager';
-import { User, BookType } from 'src/generated/prisma/client';
+import { User, BookType } from '../generated/prisma/client';
 import { CreateBookDto } from '../common/dtos/book/create-book-dto';
 
 describe('BookController', () => {
@@ -37,6 +38,7 @@ describe('BookController', () => {
       imports: [CacheModule.register()],
       controllers: [BookController],
       providers: [
+        { provide: BookFilesService, useValue: { download: vi.fn() } },
         {
           provide: BookService,
           useValue: service,

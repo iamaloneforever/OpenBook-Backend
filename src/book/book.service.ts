@@ -293,7 +293,7 @@ export class BookService {
 
                 url: null,
 
-                filePath: `/uploads/books/${file.filename}`,
+                filePath: `/uploads/books/files/${file.filename}`,
 
                 fileType: 'EPUB',
 
@@ -564,7 +564,7 @@ export class BookService {
 
         url: null,
 
-        filePath: `/uploads/books/${file.filename}`,
+        filePath: `/uploads/books/files/${file.filename}`,
 
         fileType: 'EPUB',
 
@@ -1113,15 +1113,16 @@ export class BookService {
   // GET ALL TAGS
   // --------------------------------------------------------------------------
 
-  async getAllTags() {
+  async getAllTags(userId: string) {
     return this.prisma.tag.findMany({
+      where: { books: { some: { book: { ownerId: userId } } } },
       orderBy: {
         name: 'asc',
       },
       include: {
         _count: {
           select: {
-            books: true,
+            books: { where: { book: { ownerId: userId } } },
           },
         },
       },

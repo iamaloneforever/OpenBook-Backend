@@ -1,11 +1,14 @@
-import { IsString, MinLength } from 'class-validator';
+import { IsString, MinLength, MaxLength, Matches } from 'class-validator';
 
 export class SignupDto {
   @IsString()
   @MinLength(3)
-  username: string;
+  @MaxLength(64)
+  @Matches(/^[a-zA-Z0-9_.-]+$/)
+  username!: string;
 
   @IsString()
   @MinLength(8)
-  password: string;
+  @MaxLength(128)
+  password!: string;
 }

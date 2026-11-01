@@ -2,13 +2,33 @@ import {
   BadRequestException,
   Injectable,
   UnauthorizedException,
+  ValidationPipe,
 } from '@nestjs/common';
 import type { ExecutionContext } from '@nestjs/common';
 
 import { AuthGuard } from '@nestjs/passport';
+import type { Request } from 'express';
+import { LoginDto } from '../../dtos/auth/login.dto';
+import { firstValueFrom, isObservable } from 'rxjs';
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
+  private readonly validation = new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  });
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const req = context.switchToHttp().getRequest<Request>();
+    await this.validation.transform(req.body, {
+      type: 'body',
+      metatype: LoginDto,
+    });
+    const result = await super.canActivate(context);
+    return isObservable(result) ? firstValueFrom(result) : result;
+  }
+
   handleRequest<TUser = any>(
     err: unknown,
     user: TUser | false,
@@ -16,10 +36,6 @@ export class LocalAuthGuard extends AuthGuard('local') {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _context: ExecutionContext,
   ): TUser {
-    console.log('Guard error:', err);
-    console.log('User:', user);
-    console.log('Info:', info);
-
     if (err) {
       throw err as Error;
     }

@@ -1,83 +1,73 @@
-# 📖 OpenBook - Backend
+# OpenBook Backend
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Node-22.x-green?logo=nodedotjs" alt="Node Version" />
-  <img src="https://img.shields.io/badge/NestJS-11.x-red?logo=nestjs" alt="NestJS Version" />
-  <img src="https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/Prisma-6.x-white?logo=prisma" alt="Prisma" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow" alt="License" />
-  <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/iamaloneforever/OpenBook-Backend?style=plastic&logo=github" />
-</p>
+OpenBook is a self-hosted REST API for personal libraries, reading progress, reading lists, and reading statistics. An optional social layer provides public profiles, short posts, interactions, and RSS publishing. Private RSS and Atom subscriptions can be mixed into a user's feed without creating a public profile.
 
----
+The backend uses NestJS, PostgreSQL, Prisma, and Argon2. Authentication uses short-lived JWT access tokens and rotating refresh cookies. This repository contains the API; it does not include a web client.
 
-> **OpenBook** — A modern, self‑hosted backend service to manage your personal book collection with full privacy and control.
+## Requirements
 
----
+- Node.js 26.x and npm 11 or later; `.nvmrc` specifies the supported Node major.
+- PostgreSQL 16 or later.
+- Docker Compose, if using the container deployment.
 
-## ✨ Features
+## Local development
 
-- 📚 **Full Book Management** — Add, edit, delete, and organize your books
-- 🔍 **Advanced Search & Filter** — Find books by title, author, genre, and more
-- 👤 **User Authentication** — Secure JWT-based authentication
-- 🏷️ **Tags & Categories** — Organize books with custom tags
-- 📊 **Reading Status** — Track reading progress, wishlist, favorites
-- 🌐 **RESTful API** — Well-structured and documented API endpoints
-- 🗄️ **PostgreSQL + Prisma** — Robust database with type-safe ORM
-- 🔒 **Self‑Hosted** — Your data stays on your server
-- 🐳 **Docker Ready** — Easy deployment with Docker Compose
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js (v22.x or higher)
-- PostgreSQL (v16.x or higher)
-- npm / yarn / pnpm
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/iamaloneforever/OpenBook-Backend.git
-cd OpenBook-Backend
-
-# Install dependencies
-npm install
-
-# Copy environment variables
+```sh
+nvm use
+npm ci
 cp .env.example .env
-
-# Update .env with your database credentials
-
-# Run database migrations
-npx prisma migrate dev
-
-# Start the development server
-npm run start:dev
-
 ```
 
-> [!CAUTION]
-> You need a client to use this project for client visit - (Still in development)
+Edit `.env` with a reachable PostgreSQL database, distinct signing secrets, and the exact origins of your browser clients. Generate each secret separately:
 
-Developed By [Alone](https://www.iamalone.ir)
-# Security configuration
+```sh
+node -e "console.log(require('node:crypto').randomBytes(48).toString('hex'))"
+```
 
-Set distinct `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` values before starting
-the API. Startup fails when either is missing or both are equal. Use randomly
-generated secrets in deployment. `CORS_ORIGINS` is a comma-separated list of
-allowed browser origins; an empty list permits no cross-origin browser access.
+Then generate the database client, apply the migrations, and start the API:
 
-Authentication routes have per-IP and per-account/token rate limits. The current
-limiter and response cache are in-memory per process; deployments with multiple
-instances need shared storage for deployment-wide limits. Private book and user
-responses are cached separately for each authenticated user. Public trending
-results exclude physical addresses and digital download locations.
+```sh
+npm run prisma:generate
+npx prisma migrate deploy
+npm run start:dev
+```
 
-Refresh tokens rotate once per use, including concurrent requests. Clients must
-serialize refresh attempts and retain the latest refresh cookie. Existing tokens
-remain valid until used, expired, or revoked.
+The default address is `http://localhost:5000`. `GET /` returns `Hello World!`. Use the [configuration reference](docs/configuration.md) for environment variables and browser authentication requirements.
+
+## API capabilities
+
+| Area | Routes | Access |
+| --- | --- | --- |
+| Authentication | `/auth/signup`, `/auth/login`, `/auth/refresh`, `/auth/logout` | Public entry points; bearer token required for logout |
+| Personal library | `/book`, `/book/:id`, progress, ratings, tags, and EPUB downloads | Authenticated; individual resources require ownership |
+| Trending books | `/book/top/trending` | Public metadata; excludes physical addresses and digital sources |
+| Reading lists | `/read-list` and nested book membership | Authenticated; owner only |
+| Statistics | `/user`, dashboard, summary, monthly statistics, and streak | Authenticated; current account |
+| Social | `/social/me`, profiles, posts, interactions, and feed | Authenticated; visibility and blocking rules apply |
+| Public social and RSS | `/social/public/*`, `/social/rss` | Explicitly public profiles and their posts |
+| RSS subscriptions | `/social/rss/subscriptions`, `/social/rss/entries/:id/read` | Authenticated; private to the subscribing account |
+
+See the [core API reference](docs/api.md) and [social and RSS reference](docs/social-api.md) for requests, response formats, and privacy behavior. Uploaded EPUBs are downloaded through `GET /book/:id/file`; their storage paths are not public URLs.
+
+## Verification
+
+```sh
+npm run typecheck
+npm run lint
+npm test
+npm run test:e2e
+```
+
+The repository also includes a Postman collection with functional and security assertions, local upload fixtures, and an environment template:
+
+```sh
+npm run test:postman
+```
+
+The Postman run requires a running API connected to a disposable database. PostgreSQL integration tests require a dedicated database named `openbook_social_test`. Follow [the testing guide](docs/testing.md) before running either suite.
+
+## Deployment and security
+
+The [deployment guide](docs/deployment.md) covers Docker Compose, migrations, persistent storage, TLS, and backups. The [security policy](SECURITY.md) describes the implemented controls, compatibility changes, and operational limits. Current audit evidence is recorded in [dependency security status](docs/dependency-security.md).
+
+This project is private and marked `UNLICENSED` in `package.json`; no open-source license grant is included.

@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, Min, Max } from 'class-validator';
+import { IsInt, IsOptional, Min, Max, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class PaginationDto {
@@ -6,6 +6,7 @@ export class PaginationDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(1000000)
   page?: number = 1;
 
   @IsOptional()
@@ -18,5 +19,6 @@ export class PaginationDto {
 
 export class TopBooksQueryDto extends PaginationDto {
   @IsOptional()
+  @IsIn(['rating', 'reads', 'trending'])
   sort?: 'rating' | 'reads' | 'trending';
 }

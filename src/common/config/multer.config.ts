@@ -5,8 +5,9 @@ import {
   Injectable,
   NestInterceptor,
   UnsupportedMediaTypeException,
+  BadRequestException,
 } from '@nestjs/common';
-import type { Observable } from 'rxjs';
+import { catchError, type Observable } from 'rxjs';
 
 import { diskStorage } from 'multer';
 
@@ -47,7 +48,7 @@ export const BookUploadInterceptor = FileFieldsInterceptor(
       },
 
       filename: (_, file, callback) => {
-        const filename = `${randomUUID()}${extname(file.originalname)}`;
+        const filename = `${randomUUID()}${extname(file.originalname).toLowerCase()}`;
 
         callback(null, filename);
       },
@@ -57,14 +58,17 @@ export const BookUploadInterceptor = FileFieldsInterceptor(
       const extension = extname(file.originalname).toLowerCase();
 
       if (file.fieldname === 'file' && extension !== '.epub') {
-        return callback(new Error('Only EPUB files are allowed'), false);
+        return callback(
+          new BadRequestException('Only EPUB files are allowed'),
+          false,
+        );
       }
 
       if (
         file.fieldname === 'cover' &&
         !['.jpg', '.jpeg', '.png', '.webp'].includes(extension)
       ) {
-        return callback(new Error('Invalid cover format'), false);
+        return callback(new BadRequestException('Invalid cover format'), false);
       }
 
       callback(null, true);
@@ -72,6 +76,10 @@ export const BookUploadInterceptor = FileFieldsInterceptor(
 
     limits: {
       fileSize: 50 * 1024 * 1024,
+      files: 2,
+      fields: 16,
+      parts: 18,
+      fieldSize: 16 * 1024,
     },
   },
 );
@@ -150,6 +158,13 @@ export class BookUploadValidationInterceptor implements NestInterceptor {
       throw error;
     }
 
-    return next.handle();
+    return next.handle().pipe(
+      catchError(async (error: unknown) => {
+        await Promise.allSettled(
+          files.map((file) => fs.promises.unlink(file.path)),
+        );
+        throw error;
+      }),
+    );
   }
 }

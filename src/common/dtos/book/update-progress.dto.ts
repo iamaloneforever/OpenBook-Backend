@@ -1,15 +1,16 @@
-import { IsInt, IsOptional, Min, IsEnum } from 'class-validator';
-import { BookReadingStatus } from 'src/generated/prisma/enums';
+import { IsInt, IsOptional, Min, Max, IsEnum } from 'class-validator';
+import { BookReadingStatus } from '../../../generated/prisma/enums';
 
 export class UpdateProgressDto {
-  @IsOptional()
   @IsInt()
   @Min(0)
-  currentPage: number;
+  @Max(2147483647)
+  currentPage!: number;
 
   @IsOptional()
   @IsInt()
-  @Min(0)
+  @Min(1)
+  @Max(2147483647)
   totalPages?: number;
 
   @IsOptional()

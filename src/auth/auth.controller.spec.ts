@@ -5,7 +5,7 @@ import type { Request, Response } from 'express';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { SignupDto } from 'src/common/dtos/auth/signup.dto';
+import { SignupDto } from '../common/dtos/auth/signup.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;

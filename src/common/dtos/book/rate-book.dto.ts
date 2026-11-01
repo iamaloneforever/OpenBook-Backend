@@ -4,5 +4,5 @@ export class RateBookDto {
   @IsInt()
   @Min(1)
   @Max(5)
-  value: number;
+  value!: number;
 }

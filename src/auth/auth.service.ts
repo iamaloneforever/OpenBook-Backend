@@ -8,7 +8,7 @@ import * as argon2 from 'argon2';
 import { randomUUID } from 'node:crypto';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { SignupDto } from 'src/common/dtos/auth/signup.dto';
+import { SignupDto } from '../common/dtos/auth/signup.dto';
 
 interface JwtPayload {
   sub: string;
@@ -77,8 +77,12 @@ export class AuthService {
     return user;
   }
 
-  async refresh(refreshToken: string) {
-    if (!refreshToken) {
+  async refresh(refreshToken: unknown) {
+    if (
+      typeof refreshToken !== 'string' ||
+      !refreshToken ||
+      refreshToken.length > 4096
+    ) {
       throw new UnauthorizedException('Refresh token not found');
     }
 
@@ -131,12 +135,14 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_ACCESS_SECRET,
       expiresIn: '15m',
+      algorithm: 'HS256',
     });
 
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: '7d',
       jwtid: randomUUID(),
+      algorithm: 'HS256',
     });
 
     const hashedRefreshToken = await argon2.hash(refreshToken);
@@ -166,9 +172,17 @@ export class AuthService {
 
   private verifyRefreshToken(token: string): JwtPayload {
     try {
-      return this.jwtService.verify<JwtPayload>(token, {
+      const payload = this.jwtService.verify<JwtPayload>(token, {
         secret: process.env.JWT_REFRESH_SECRET,
+        algorithms: ['HS256'],
       });
+      if (
+        typeof payload.sub !== 'string' ||
+        !payload.sub ||
+        payload.sub.length > 128
+      )
+        throw new Error('Invalid subject');
+      return payload;
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }

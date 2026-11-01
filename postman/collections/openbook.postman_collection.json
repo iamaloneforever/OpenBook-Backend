@@ -1,0 +1,4500 @@
+{
+  "info": {
+    "name": "OpenBook API \u2014 functional and security regression",
+    "description": "Run all folders in order against a disposable OpenBook test instance. Generates two unique accounts and validates real authentication, ownership, uploads, reading lists, social privacy and SSRF defenses. See docs/testing.md for setup and cleanup limitations. Requests use explicit cookies with the cookie jar disabled.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test(\"Security headers and no-store policy\", () => {",
+          "  pm.expect(pm.response.headers.get(\"X-Content-Type-Options\")).to.equal(\"nosniff\");",
+          "  pm.expect((pm.response.headers.get(\"Cache-Control\") || \"\").split(\",\").map(value => value.trim())).to.include(\"no-store\");",
+          "  pm.expect(pm.response.headers.has(\"X-Powered-By\")).to.equal(false);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Security and public endpoints",
+      "description": "Stateless checks run before creating the two isolated test accounts.",
+      "item": [
+        {
+          "name": "Service responds",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const runId = pm.variables.replaceIn('{{$guid}}').replace(/-/g, '').slice(0, 16);",
+                  "for (const key of ['ownerToken','otherToken','ownerRefresh','otherRefresh','oldRefresh','bookId','otherBookId','uploadId','listId','postId','uploadedPath','coverPath']) pm.collectionVariables.unset(key);",
+                  "pm.collectionVariables.set('runId', runId);",
+                  "pm.collectionVariables.set('ownerUsername', 'pm_owner_' + runId);",
+                  "pm.collectionVariables.set('otherUsername', 'pm_other_' + runId);",
+                  "pm.collectionVariables.set('ownerHandle', 'pm_' + runId);",
+                  "pm.collectionVariables.set('otherHandle', 'pm2_' + runId);",
+                  "pm.collectionVariables.set('password', 'Pm-test-' + pm.variables.replaceIn('{{$guid}}'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Root response\", () => pm.expect(pm.response.text()).to.equal(\"Hello World!\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Public trending exposes safe fields",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/book/top/trending?limit=1",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Public results omit private book sources\", () => {",
+                  " pm.expect(pm.response.json().data).to.be.an('array');",
+                  " pm.response.json().data.forEach(book => { pm.expect(book).not.to.have.property('physicalBook'); pm.expect(book).not.to.have.property('digitalBook'); });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anonymous access denied: /book",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/book",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anonymous access denied: /book/tags/all",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/book/tags/all",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anonymous access denied: /read-list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/read-list",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anonymous access denied: /user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/user",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anonymous access denied: /social/feed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/social/feed",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anonymous access denied: /social/rss/subscriptions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/social/rss/subscriptions",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Malformed bearer token is rejected",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid.jwt.token"
+              }
+            ],
+            "url": "{{baseUrl}}/book",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Untrusted browser origin is rejected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Origin",
+                "value": "https://attacker.invalid"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"reader\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Opaque browser origin is rejected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "null"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/refresh",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cross-site form without Origin is rejected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Sec-Fetch-Site",
+                "value": "cross-site"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"reader\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Malformed login cannot reach Prisma",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": {\n    \"equals\": \"reader\"\n  },\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login rejects unknown properties",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"reader\",\n  \"password\": \"password\",\n  \"isAdmin\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Oversized JSON is rejected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"reader\",\n  \"password\": \"{{oversized}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.variables.set('oversized', 'x'.repeat(66000));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 413\", () => pm.response.to.have.status(413));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Signup rejects weak password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/signup",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{ownerUsername}}\",\n  \"password\": \"short\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Signup rejects mass assignment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/signup",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{ownerUsername}}\",\n  \"password\": \"{{password}}\",\n  \"role\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh requires a cookie",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/refresh",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Legacy EPUB directory is not public",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/uploads/books/probe.epub",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Private EPUB directory is not public",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/uploads/books/files/probe.epub",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pagination rejects fractional values",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/book/top/trending?page=1.5",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Trending sort is validated",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/book/top/trending?sort=unexpected",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 Authentication",
+      "description": "Creates unique owner and second-account credentials. Cookie jars are disabled; refresh cookies are sent explicitly for replay and revocation checks.",
+      "item": [
+        {
+          "name": "Create owner account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/signup",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{ownerUsername}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"ownerToken\", pm.response.json().accessToken);",
+                  "pm.test(\"Refresh cookie is protected and scoped\", () => {",
+                  "  const cookie = pm.response.headers.get('Set-Cookie') || '';",
+                  "  pm.expect(cookie).to.include('HttpOnly');",
+                  "  pm.expect(cookie).to.include('SameSite=Lax');",
+                  "  pm.expect(cookie).to.include('Path=/auth');",
+                  "  if (pm.environment.get('expectSecureCookies') === 'true') pm.expect(cookie).to.include('Secure');",
+                  "  const match = cookie.match(/refreshToken=([^;]+)/);",
+                  "  pm.expect(match).to.not.equal(null);",
+                  "  pm.collectionVariables.set('ownerRefresh', decodeURIComponent(match[1]));",
+                  "});",
+                  "pm.test(\"Response never contains password hashes or refresh tokens\", () => {",
+                  "  const data = pm.response.json();",
+                  "  pm.expect(data).not.to.have.property('refreshToken');",
+                  "  if (data.user) { pm.expect(data.user).not.to.have.property('password'); pm.expect(data.user).not.to.have.property('refreshToken'); }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create other account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/signup",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{otherUsername}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"otherToken\", pm.response.json().accessToken);",
+                  "pm.test(\"Refresh cookie is protected and scoped\", () => {",
+                  "  const cookie = pm.response.headers.get('Set-Cookie') || '';",
+                  "  pm.expect(cookie).to.include('HttpOnly');",
+                  "  pm.expect(cookie).to.include('SameSite=Lax');",
+                  "  pm.expect(cookie).to.include('Path=/auth');",
+                  "  if (pm.environment.get('expectSecureCookies') === 'true') pm.expect(cookie).to.include('Secure');",
+                  "  const match = cookie.match(/refreshToken=([^;]+)/);",
+                  "  pm.expect(match).to.not.equal(null);",
+                  "  pm.collectionVariables.set('otherRefresh', decodeURIComponent(match[1]));",
+                  "});",
+                  "pm.test(\"Response never contains password hashes or refresh tokens\", () => {",
+                  "  const data = pm.response.json();",
+                  "  pm.expect(data).not.to.have.property('refreshToken');",
+                  "  if (data.user) { pm.expect(data.user).not.to.have.property('password'); pm.expect(data.user).not.to.have.property('refreshToken'); }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Wrong password fails",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{ownerUsername}}\",\n  \"password\": \"incorrect-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login owner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{ownerUsername}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"ownerToken\", pm.response.json().accessToken);",
+                  "pm.test(\"Refresh cookie is protected and scoped\", () => {",
+                  "  const cookie = pm.response.headers.get('Set-Cookie') || '';",
+                  "  pm.expect(cookie).to.include('HttpOnly');",
+                  "  pm.expect(cookie).to.include('SameSite=Lax');",
+                  "  pm.expect(cookie).to.include('Path=/auth');",
+                  "  if (pm.environment.get('expectSecureCookies') === 'true') pm.expect(cookie).to.include('Secure');",
+                  "  const match = cookie.match(/refreshToken=([^;]+)/);",
+                  "  pm.expect(match).to.not.equal(null);",
+                  "  pm.collectionVariables.set('ownerRefresh', decodeURIComponent(match[1]));",
+                  "});",
+                  "pm.test(\"Response never contains password hashes or refresh tokens\", () => {",
+                  "  const data = pm.response.json();",
+                  "  pm.expect(data).not.to.have.property('refreshToken');",
+                  "  if (data.user) { pm.expect(data.user).not.to.have.property('password'); pm.expect(data.user).not.to.have.property('refreshToken'); }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rotate owner refresh cookie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "refreshToken={{ownerRefresh}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/refresh",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"oldRefresh\", pm.collectionVariables.get('ownerRefresh'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"ownerToken\", pm.response.json().accessToken);",
+                  "pm.test(\"Refresh cookie is protected and scoped\", () => {",
+                  "  const cookie = pm.response.headers.get('Set-Cookie') || '';",
+                  "  pm.expect(cookie).to.include('HttpOnly');",
+                  "  pm.expect(cookie).to.include('SameSite=Lax');",
+                  "  pm.expect(cookie).to.include('Path=/auth');",
+                  "  if (pm.environment.get('expectSecureCookies') === 'true') pm.expect(cookie).to.include('Secure');",
+                  "  const match = cookie.match(/refreshToken=([^;]+)/);",
+                  "  pm.expect(match).to.not.equal(null);",
+                  "  pm.collectionVariables.set('ownerRefresh', decodeURIComponent(match[1]));",
+                  "});",
+                  "pm.test(\"Response never contains password hashes or refresh tokens\", () => {",
+                  "  const data = pm.response.json();",
+                  "  pm.expect(data).not.to.have.property('refreshToken');",
+                  "  if (data.user) { pm.expect(data.user).not.to.have.property('password'); pm.expect(data.user).not.to.have.property('refreshToken'); }",
+                  "});pm.test(\"Refresh token rotates\", () => pm.expect(pm.collectionVariables.get('ownerRefresh')).not.to.equal(pm.collectionVariables.get('oldRefresh')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Replayed refresh cookie fails",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "refreshToken={{oldRefresh}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/refresh",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh token cannot be used as an access token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerRefresh}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 Books, tags and ownership",
+      "description": "Creates one book per account and checks that the second account cannot read or change the owner book.",
+      "item": [
+        {
+          "name": "Create owned physical book",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman security test {{runId}}\",\n  \"author\": \"API Test Runner\",\n  \"type\": \"PHYSICAL\",\n  \"physicalBook\": {\n    \"address\": \"PRIVATE_ADDRESS_{{runId}}\",\n    \"city\": \"Test City\",\n    \"country\": \"Test Country\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"bookId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create second account book",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Other account {{runId}}\",\n  \"author\": \"API Test Runner\",\n  \"type\": \"DIGITAL\",\n  \"digitalBook\": {\n    \"url\": \"https://example.com/book.epub\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"otherBookId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List own books",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book?limit=100",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Library belongs to owner\", () => {",
+                  " const ids=pm.response.json().data.map(book=>book.id);",
+                  " pm.expect(ids).to.include(pm.collectionVariables.get('bookId'));",
+                  " pm.expect(ids).not.to.include(pm.collectionVariables.get('otherBookId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read owned book",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Book ID\", () => pm.expect(pm.response.json().id).to.equal(pm.collectionVariables.get(\"bookId\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update owned book",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Postman {{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Set reading progress",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/progress",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPage\": 25,\n  \"totalPages\": 100,\n  \"status\": \"READING\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Progress is calculated\", () => pm.expect(pm.response.json().progressPercentage).to.equal(25));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/progress",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Progress belongs to this book\", () => pm.expect(pm.response.json().currentPage).to.equal(25));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject progress outside total pages",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/progress",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPage\": 101,\n  \"totalPages\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject progress without currentPage",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/progress",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"totalPages\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rate owned book",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/rate",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject invalid rating",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/rate",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 6\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Set private tags",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/tags",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tags\": [\n    \"private_{{runId}}\",\n    \"postman\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add a tag",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/tags/add",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tags\": [\n    \"security\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject normalized duplicate tags",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/tags",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tags\": [\n    \"security\",\n    \" SECURITY \"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read own tags",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/tags/all",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Own tag is visible\", () => pm.expect(pm.response.json().map(tag=>tag.name)).to.include(\"private_\"+pm.collectionVariables.get(\"runId\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot enumerate private tags",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/tags/all",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Private tag is hidden\", () => pm.expect(pm.response.json().map(tag=>tag.name)).not.to.include(\"private_\"+pm.collectionVariables.get(\"runId\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search own tags",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/tags/search?tags=private_{{runId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Tag search finds the owned book\", () => pm.expect(pm.response.json().data.map(book=>book.id)).to.include(pm.collectionVariables.get(\"bookId\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject fractional library pagination",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book?limit=1.5",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject book ownership mass assignment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ownerId\": \"other\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot read owned book",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot edit owned book",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Attack\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot delete owned book",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot read progress owned book",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/progress",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot write progress owned book",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/progress",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPage\": 1,\n  \"totalPages\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot rate owned book",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/rate",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot replace tags owned book",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/tags",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tags\": [\n    \"attack\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remove a tag",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}/tags",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tags\": [\n    \"security\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 Private EPUB uploads",
+      "description": "Requires the repository root as Postman working directory. Upload checks use small, committed local fixtures.",
+      "item": [
+        {
+          "name": "Upload a valid private EPUB and cover",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Private EPUB {{runId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "author",
+                  "value": "API Test Runner",
+                  "type": "text"
+                },
+                {
+                  "key": "type",
+                  "value": "DIGITAL",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "postman/fixtures/book.epub",
+                  "contentType": "application/epub+zip"
+                },
+                {
+                  "key": "cover",
+                  "type": "file",
+                  "src": "postman/fixtures/cover.png",
+                  "contentType": "image/png"
+                }
+              ]
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"uploadId\", pm.response.json().id);",
+                  "pm.collectionVariables.set(\"uploadedPath\", pm.response.json().digitalBook.filePath);",
+                  "pm.collectionVariables.set(\"coverPath\", pm.response.json().coverUrl);",
+                  "pm.test(\"Cover URL does not expose server paths\", () => pm.expect(pm.response.json().coverUrl).to.match(/^\\/uploads\\/books\\/covers\\/[a-f0-9-]+\\.png$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Owner downloads EPUB attachment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{uploadId}}/file",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Download is an EPUB attachment\", () => {",
+                  " pm.expect(pm.response.headers.get('Content-Type')).to.include('application/epub+zip');",
+                  " pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anonymous cannot download EPUB",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/book/{{uploadId}}/file",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot download EPUB",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{uploadId}}/file",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Storage path cannot bypass authentication",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{uploadedPath}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Public cover remains available",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{coverPath}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Cover has image media type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"image/png\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject a forged EPUB file",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Private EPUB {{runId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "author",
+                  "value": "API Test Runner",
+                  "type": "text"
+                },
+                {
+                  "key": "type",
+                  "value": "DIGITAL",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "postman/fixtures/invalid.epub",
+                  "contentType": "application/epub+zip"
+                }
+              ]
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 415\", () => pm.response.to.have.status(415));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 Reading lists and statistics",
+      "description": "Checks nested ownership when adding books to a reading list and exercises every statistics route.",
+      "item": [
+        {
+          "name": "Create reading list",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman {{runId}}\",\n  \"description\": \"API verification\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"listId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add owned book to list",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list/{{listId}}/books",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookId\": \"{{bookId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject other account book in own list",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list/{{listId}}/books",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookId\": \"{{otherBookId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read list with statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list/{{listId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"List includes own book\", () => pm.expect(pm.response.json().stats.totalBooks).to.equal(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update reading list",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list/{{listId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated by API tests\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List own reading lists",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot GET owned list",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list/{{listId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot PATCH owned list",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list/{{listId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Attack\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot DELETE owned list",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list/{{listId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot POST owned list/books",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list/{{listId}}/books",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookId\": \"{{otherBookId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot DELETE owned list/books/{{bookId}}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list/{{listId}}/books/{{bookId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "User statistics /",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/user",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "User statistics /dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/user/dashboard",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "User statistics /book-stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/user/book-stats",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "User statistics /read-list-stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/user/read-list-stats",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "User statistics /summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/user/summary",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "User statistics /monthly-stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/user/monthly-stats",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "User statistics /streak",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/user/streak",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 Social profiles, posts and RSS security",
+      "description": "Validates public opt-in, post ownership, interactions and SSRF rejection without external network dependencies.",
+      "item": [
+        {
+          "name": "Save owner social profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/me",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"handle\": \"{{ownerHandle}}\",\n  \"displayName\": \"Postman owner\",\n  \"isPublic\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Save other social profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/me",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"handle\": \"{{otherHandle}}\",\n  \"displayName\": \"Postman other\",\n  \"isPublic\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Own social settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/me",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Public profile is discoverable",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/social/public/profiles/{{ownerHandle}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Private profile remains hidden",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/social/public/profiles/{{otherHandle}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Enable second public profile for interactions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/me",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"handle\": \"{{otherHandle}}\",\n  \"displayName\": \"Postman other\",\n  \"isPublic\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create social post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/posts",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Security test #postman {{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"postId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read own post",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/posts/{{postId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read public post anonymously",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/social/public/posts/{{postId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot edit post",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/posts/{{postId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Attack\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Other account cannot delete post",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/posts/{{postId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Edit own post",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/posts/{{postId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Updated security test #postman {{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Like a visible post",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/posts/{{postId}}/like",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unlike a visible post",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/posts/{{postId}}/like",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Follow public profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/profiles/{{ownerHandle}}/follow",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Block second account",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/profiles/{{otherHandle}}/block",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Blocked account cannot read post",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/posts/{{postId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unblock second account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/profiles/{{otherHandle}}/block",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Record post view",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/posts/{{postId}}/views",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Restore second private profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/me",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"handle\": \"{{otherHandle}}\",\n  \"displayName\": \"Postman other\",\n  \"isPublic\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read recent feed",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/feed?mode=recent&limit=5",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Feed contract\", () => { pm.expect(pm.response.json().data).to.be.an(\"array\"); pm.expect(pm.response.json()).to.have.property(\"nextCursor\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read following feed",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/feed?mode=following&limit=5",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Feed contract\", () => { pm.expect(pm.response.json().data).to.be.an(\"array\"); pm.expect(pm.response.json()).to.have.property(\"nextCursor\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read for-you feed",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/feed?mode=for-you&limit=5",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Feed contract\", () => { pm.expect(pm.response.json().data).to.be.an(\"array\"); pm.expect(pm.response.json()).to.have.property(\"nextCursor\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject a forged feed cursor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/feed?cursor=forged",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List private RSS subscriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/rss/subscriptions",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"New account subscriptions are empty\", () => pm.expect(pm.response.json()).to.deep.equal([]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject unsafe feed: http://127.0.0.1/rss",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/rss/subscriptions",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"http://127.0.0.1/rss\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject unsafe feed: http://169.254.169.254/latest/meta-data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/rss/subscriptions",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"http://169.254.169.254/latest/meta-data\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject unsafe feed: http://[::1]/rss",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/rss/subscriptions",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"http://[::1]/rss\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject unsafe feed: https://user:password@example.com/rss",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/rss/subscriptions",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://user:password@example.com/rss\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject unsafe feed: ftp://example.com/rss",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/rss/subscriptions",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"ftp://example.com/rss\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Public RSS uses XML",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/social/rss",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"RSS document\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/rss+xml\"); pm.expect(pm.response.text()).to.include(\"<rss version=\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Private profile has no public RSS",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/social/rss/profiles/{{otherHandle}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Disable public profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/social/me",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"handle\": \"{{ownerHandle}}\",\n  \"displayName\": \"Postman owner\",\n  \"isPublic\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Disabled profile is no longer public",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/social/public/profiles/{{ownerHandle}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Disabled profile post is no longer public",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/social/public/posts/{{postId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 Cleanup and session revocation",
+      "description": "Deletes books, list and post created by the suite. Accounts remain because the API has no account deletion endpoint; use a disposable database.",
+      "item": [
+        {
+          "name": "Delete own post",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/social/posts/{{postId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remove book from reading list",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list/{{listId}}/books/{{bookId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete reading list",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/read-list/{{listId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete physical book",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{bookId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete uploaded book",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{uploadId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete second account book",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/book/{{otherBookId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout owner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ownerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/logout",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Refresh cookie expires\", () => pm.expect(pm.response.headers.get('Set-Cookie')).to.include('Expires=Thu, 01 Jan 1970'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoked owner refresh cookie fails",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "refreshToken={{ownerRefresh}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/refresh",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout other",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/logout",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Refresh cookie expires\", () => pm.expect(pm.response.headers.get('Set-Cookie')).to.include('Expires=Thu, 01 Jan 1970'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoked other refresh cookie fails",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "refreshToken={{otherRefresh}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/refresh",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

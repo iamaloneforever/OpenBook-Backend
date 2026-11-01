@@ -13,6 +13,7 @@ import { ReadListModule } from './read-list/read-list.module';
 import { UserModule } from './user/user.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { validateEnvironment } from './common/config/env.validation';
+import { SocialModule } from './social/social.module';
 
 @Module({
   imports: [
@@ -32,15 +33,18 @@ import { validateEnvironment } from './common/config/env.validation';
       ttl: 60_000,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(process.cwd(), 'uploads'),
-      serveRoot: '/uploads',
+      rootPath: join(process.cwd(), 'uploads', 'books', 'covers'),
+      serveRoot: '/uploads/books/covers',
       serveStaticOptions: {
         index: false,
         fallthrough: false,
+        dotfiles: 'deny',
+        cacheControl: false,
       },
     }),
     ReadListModule,
     UserModule,
+    SocialModule,
   ],
   controllers: [AppController],
   providers: [

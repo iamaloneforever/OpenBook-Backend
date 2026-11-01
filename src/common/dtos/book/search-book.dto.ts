@@ -5,26 +5,34 @@ import {
   IsString,
   Max,
   Min,
+  IsInt,
+  MaxLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SearchBookDto {
   @IsOptional()
   @IsString()
+  @MaxLength(200)
   q?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(100)
   author?: string;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
+  @Min(0)
+  @Max(5)
   minRating?: number;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
+  @Min(0)
+  @Max(5)
   maxRating?: number;
 
   @IsOptional()
@@ -37,11 +45,14 @@ export class SearchBookDto {
 
   @IsOptional()
   @Type(() => Number)
+  @IsInt()
   @Min(1)
+  @Max(1000000)
   page = 1;
 
   @IsOptional()
   @Type(() => Number)
+  @IsInt()
   @Min(1)
   @Max(100)
   limit = 10;

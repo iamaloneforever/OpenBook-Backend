@@ -7,7 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { OWNER_KEY } from '../../decorators/owner.decorator';
 import { OWNER_CONFIG } from '../../config/owner.config';
 
@@ -39,7 +39,7 @@ export class OwnerGuard implements CanActivate {
 
     const config = OWNER_CONFIG[metadata.resource];
 
-    const delegate = this.prisma[config.delegate as keyof PrismaService] as {
+    const delegate = this.prisma[config.delegate] as {
       findFirst(args: unknown): Promise<unknown>;
     };
 

@@ -3,7 +3,7 @@ import { CurrentUser } from '../common/decorators/Current-user.decorator';
 import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
 import type { User } from '../generated/prisma/client';
 
-import type { Request, Response } from 'express';
+import type { CookieOptions, Request, Response } from 'express';
 import { createHash } from 'crypto';
 import { Throttle } from '@nestjs/throttler';
 
@@ -35,23 +35,32 @@ const refreshTracker = (req: TrackerRequest) => {
     : ipTracker(req);
 };
 
+const refreshCookieOptions = (): CookieOptions => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  path: '/auth',
+});
+
+const setRefreshCookie = (res: Response, token: string) =>
+  res.cookie('refreshToken', token, {
+    ...refreshCookieOptions(),
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
+  @Throttle({ ip: { limit: 10, ttl: 60_000 } })
   async signup(
     @Body() dto: SignupDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     const { user, tokens } = await this.authService.signup(dto);
 
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    setRefreshCookie(res, tokens.refreshToken);
 
     return {
       message: 'User created successfully',
@@ -76,12 +85,7 @@ export class AuthController {
       user.username,
     );
 
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    setRefreshCookie(res, tokens.refreshToken);
 
     return {
       accessToken: tokens.accessToken,
@@ -96,16 +100,11 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken: string = req.cookies.refreshToken as string;
+    const refreshToken: unknown = req.cookies?.refreshToken;
 
     const tokens = await this.authService.refresh(refreshToken);
 
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    setRefreshCookie(res, tokens.refreshToken);
 
     return {
       accessToken: tokens.accessToken,
@@ -118,7 +117,9 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     await this.authService.logout(user.id);
-    res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken', refreshCookieOptions());
+    // Expire cookies issued before refresh cookies were scoped to /auth.
+    res.clearCookie('refreshToken', { ...refreshCookieOptions(), path: '/' });
 
     return {
       message: 'Logged out successfully',

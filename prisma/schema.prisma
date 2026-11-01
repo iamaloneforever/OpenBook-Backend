@@ -36,11 +36,13 @@ model User {
   password     String
   refreshToken String?
 
-  books        Book[]
-  ratings      Rating[]
-  readLists    ReadList[]
-  progress     BookProgress[]
-  readingStats ReadingStats?
+  books            Book[]
+  ratings          Rating[]
+  readLists        ReadList[]
+  progress         BookProgress[]
+  readingStats     ReadingStats?
+  socialProfile    SocialProfile?
+  rssSubscriptions RssSubscription[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -218,4 +220,126 @@ model ReadingStats {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model SocialProfile {
+  userId          String           @id
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  handle          String           @unique @db.VarChar(30)
+  displayName     String           @db.VarChar(80)
+  bio             String           @default("") @db.VarChar(160)
+  avatarUrl       String?          @db.VarChar(2048)
+  websiteUrl      String?          @db.VarChar(2048)
+  isPublic        Boolean          @default(false)
+  personalizeFeed Boolean          @default(true)
+  posts           SocialPost[]
+  likes           SocialLike[]
+  views           SocialPostView[]
+  following       SocialFollow[]   @relation("Follower")
+  followers       SocialFollow[]   @relation("Following")
+  blocking        SocialBlock[]    @relation("Blocker")
+  blockedBy       SocialBlock[]    @relation("Blocked")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([isPublic, handle])
+}
+
+model SocialPost {
+  id        String           @id @default(cuid())
+  authorId  String
+  author    SocialProfile    @relation(fields: [authorId], references: [userId], onDelete: Cascade)
+  content   String           @db.VarChar(280)
+  tags      String[]         @default([])
+  parentId  String?
+  parent    SocialPost?      @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   SocialPost[]     @relation("Replies")
+  likes     SocialLike[]
+  views     SocialPostView[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([createdAt(sort: Desc), id(sort: Desc)])
+  @@index([authorId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([parentId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([tags], type: Gin)
+}
+
+model SocialFollow {
+  followerId  String
+  followingId String
+  follower    SocialProfile @relation("Follower", fields: [followerId], references: [userId], onDelete: Cascade)
+  following   SocialProfile @relation("Following", fields: [followingId], references: [userId], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+}
+
+model SocialLike {
+  userId    String
+  postId    String
+  user      SocialProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  post      SocialPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+
+  @@id([userId, postId])
+  @@index([postId])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model SocialPostView {
+  userId    String
+  postId    String
+  user      SocialProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  post      SocialPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  updatedAt DateTime      @updatedAt
+
+  @@id([userId, postId])
+  @@index([postId])
+  @@index([userId, updatedAt(sort: Desc)])
+}
+
+model SocialBlock {
+  blockerId String
+  blockedId String
+  blocker   SocialProfile @relation("Blocker", fields: [blockerId], references: [userId], onDelete: Cascade)
+  blocked   SocialProfile @relation("Blocked", fields: [blockedId], references: [userId], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+
+  @@id([blockerId, blockedId])
+  @@index([blockedId])
+}
+
+model RssSubscription {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  url           String     @db.VarChar(2048)
+  title         String     @db.VarChar(200)
+  entries       RssEntry[]
+  lastFetchedAt DateTime   @default(now())
+  nextRefreshAt DateTime
+  lastError     String?    @db.VarChar(100)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([userId, url])
+}
+
+model RssEntry {
+  id             String          @id @default(cuid())
+  subscriptionId String
+  subscription   RssSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  guidHash       String          @db.VarChar(64)
+  title          String          @db.VarChar(300)
+  summary        String          @db.VarChar(2000)
+  url            String?         @db.VarChar(2048)
+  tags           String[]        @default([])
+  publishedAt    DateTime
+  importedAt     DateTime        @default(now())
+  readAt         DateTime?
+
+  @@unique([subscriptionId, guidHash])
+  @@index([subscriptionId, publishedAt(sort: Desc), id(sort: Desc)])
 }

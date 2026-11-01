@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'docker.arvancloud.ir/node:20'
+            image 'node:26'
             args '-u root'
         }
     }
@@ -16,6 +16,8 @@ pipeline {
 
     environment {
         CI = 'true'
+        JWT_ACCESS_SECRET = 'jenkins-test-access-secret-at-least-32-characters'
+        JWT_REFRESH_SECRET = 'jenkins-test-refresh-secret-at-least-32-characters'
 
         BRANCH_REQUESTED = "${env.CHANGE_BRANCH ?: env.BRANCH_NAME ?: 'unknown'}"
         COMMIT_SHA       = "${env.GIT_COMMIT ?: 'unknown'}"
@@ -71,6 +73,12 @@ pipeline {
                         npm ci --loglevel verbose
                     '''
                 }
+            }
+        }
+
+        stage('Generate Prisma Client') {
+            steps {
+                sh 'npm run prisma:generate'
             }
         }
 
