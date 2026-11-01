@@ -403,6 +403,8 @@ export const ModelName = {
   PhysicalBook: 'PhysicalBook',
   ReadList: 'ReadList',
   ReadListBook: 'ReadListBook',
+  ReadListCollaborator: 'ReadListCollaborator',
+  ReadListSave: 'ReadListSave',
   Rating: 'Rating',
   BookProgress: 'BookProgress',
   Tag: 'Tag',
@@ -415,7 +417,9 @@ export const ModelName = {
   SocialPostView: 'SocialPostView',
   SocialBlock: 'SocialBlock',
   RssSubscription: 'RssSubscription',
-  RssEntry: 'RssEntry'
+  RssEntry: 'RssEntry',
+  ChatConversation: 'ChatConversation',
+  ChatMessage: 'ChatMessage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -431,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "book" | "digitalBook" | "physicalBook" | "readList" | "readListBook" | "rating" | "bookProgress" | "tag" | "bookTag" | "readingStats" | "socialProfile" | "socialPost" | "socialFollow" | "socialLike" | "socialPostView" | "socialBlock" | "rssSubscription" | "rssEntry"
+    modelProps: "user" | "book" | "digitalBook" | "physicalBook" | "readList" | "readListBook" | "readListCollaborator" | "readListSave" | "rating" | "bookProgress" | "tag" | "bookTag" | "readingStats" | "socialProfile" | "socialPost" | "socialFollow" | "socialLike" | "socialPostView" | "socialBlock" | "rssSubscription" | "rssEntry" | "chatConversation" | "chatMessage"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -876,6 +880,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ReadListBookCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ReadListBookCountAggregateOutputType> | number
+        }
+      }
+    }
+    ReadListCollaborator: {
+      payload: Prisma.$ReadListCollaboratorPayload<ExtArgs>
+      fields: Prisma.ReadListCollaboratorFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReadListCollaboratorFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListCollaboratorPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReadListCollaboratorFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListCollaboratorPayload>
+        }
+        findFirst: {
+          args: Prisma.ReadListCollaboratorFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListCollaboratorPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReadListCollaboratorFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListCollaboratorPayload>
+        }
+        findMany: {
+          args: Prisma.ReadListCollaboratorFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListCollaboratorPayload>[]
+        }
+        create: {
+          args: Prisma.ReadListCollaboratorCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListCollaboratorPayload>
+        }
+        createMany: {
+          args: Prisma.ReadListCollaboratorCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReadListCollaboratorCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListCollaboratorPayload>[]
+        }
+        delete: {
+          args: Prisma.ReadListCollaboratorDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListCollaboratorPayload>
+        }
+        update: {
+          args: Prisma.ReadListCollaboratorUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListCollaboratorPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReadListCollaboratorDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReadListCollaboratorUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReadListCollaboratorUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListCollaboratorPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReadListCollaboratorUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListCollaboratorPayload>
+        }
+        aggregate: {
+          args: Prisma.ReadListCollaboratorAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReadListCollaborator>
+        }
+        groupBy: {
+          args: Prisma.ReadListCollaboratorGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadListCollaboratorGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReadListCollaboratorCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadListCollaboratorCountAggregateOutputType> | number
+        }
+      }
+    }
+    ReadListSave: {
+      payload: Prisma.$ReadListSavePayload<ExtArgs>
+      fields: Prisma.ReadListSaveFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReadListSaveFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListSavePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReadListSaveFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListSavePayload>
+        }
+        findFirst: {
+          args: Prisma.ReadListSaveFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListSavePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReadListSaveFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListSavePayload>
+        }
+        findMany: {
+          args: Prisma.ReadListSaveFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListSavePayload>[]
+        }
+        create: {
+          args: Prisma.ReadListSaveCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListSavePayload>
+        }
+        createMany: {
+          args: Prisma.ReadListSaveCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReadListSaveCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListSavePayload>[]
+        }
+        delete: {
+          args: Prisma.ReadListSaveDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListSavePayload>
+        }
+        update: {
+          args: Prisma.ReadListSaveUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListSavePayload>
+        }
+        deleteMany: {
+          args: Prisma.ReadListSaveDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReadListSaveUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReadListSaveUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListSavePayload>[]
+        }
+        upsert: {
+          args: Prisma.ReadListSaveUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadListSavePayload>
+        }
+        aggregate: {
+          args: Prisma.ReadListSaveAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReadListSave>
+        }
+        groupBy: {
+          args: Prisma.ReadListSaveGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadListSaveGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReadListSaveCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadListSaveCountAggregateOutputType> | number
         }
       }
     }
@@ -1841,6 +1993,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ChatConversation: {
+      payload: Prisma.$ChatConversationPayload<ExtArgs>
+      fields: Prisma.ChatConversationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChatConversationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatConversationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChatConversationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatConversationPayload>
+        }
+        findFirst: {
+          args: Prisma.ChatConversationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatConversationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChatConversationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatConversationPayload>
+        }
+        findMany: {
+          args: Prisma.ChatConversationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatConversationPayload>[]
+        }
+        create: {
+          args: Prisma.ChatConversationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatConversationPayload>
+        }
+        createMany: {
+          args: Prisma.ChatConversationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChatConversationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatConversationPayload>[]
+        }
+        delete: {
+          args: Prisma.ChatConversationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatConversationPayload>
+        }
+        update: {
+          args: Prisma.ChatConversationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatConversationPayload>
+        }
+        deleteMany: {
+          args: Prisma.ChatConversationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChatConversationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChatConversationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatConversationPayload>[]
+        }
+        upsert: {
+          args: Prisma.ChatConversationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatConversationPayload>
+        }
+        aggregate: {
+          args: Prisma.ChatConversationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChatConversation>
+        }
+        groupBy: {
+          args: Prisma.ChatConversationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChatConversationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChatConversationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChatConversationCountAggregateOutputType> | number
+        }
+      }
+    }
+    ChatMessage: {
+      payload: Prisma.$ChatMessagePayload<ExtArgs>
+      fields: Prisma.ChatMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChatMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChatMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.ChatMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChatMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        findMany: {
+          args: Prisma.ChatMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>[]
+        }
+        create: {
+          args: Prisma.ChatMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        createMany: {
+          args: Prisma.ChatMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChatMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.ChatMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        update: {
+          args: Prisma.ChatMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.ChatMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChatMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChatMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.ChatMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.ChatMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChatMessage>
+        }
+        groupBy: {
+          args: Prisma.ChatMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChatMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChatMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChatMessageCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1943,6 +2243,9 @@ export const ReadListScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
+  coverUrl: 'coverUrl',
+  visibility: 'visibility',
+  revision: 'revision',
   userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1952,12 +2255,38 @@ export type ReadListScalarFieldEnum = (typeof ReadListScalarFieldEnum)[keyof typ
 
 
 export const ReadListBookScalarFieldEnum = {
+  id: 'id',
   readListId: 'readListId',
   bookId: 'bookId',
+  catalogProvider: 'catalogProvider',
+  catalogId: 'catalogId',
+  catalogPreview: 'catalogPreview',
+  position: 'position',
+  note: 'note',
+  addedById: 'addedById',
   addedAt: 'addedAt'
 } as const
 
 export type ReadListBookScalarFieldEnum = (typeof ReadListBookScalarFieldEnum)[keyof typeof ReadListBookScalarFieldEnum]
+
+
+export const ReadListCollaboratorScalarFieldEnum = {
+  readListId: 'readListId',
+  userId: 'userId',
+  role: 'role',
+  createdAt: 'createdAt'
+} as const
+
+export type ReadListCollaboratorScalarFieldEnum = (typeof ReadListCollaboratorScalarFieldEnum)[keyof typeof ReadListCollaboratorScalarFieldEnum]
+
+
+export const ReadListSaveScalarFieldEnum = {
+  readListId: 'readListId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type ReadListSaveScalarFieldEnum = (typeof ReadListSaveScalarFieldEnum)[keyof typeof ReadListSaveScalarFieldEnum]
 
 
 export const RatingScalarFieldEnum = {
@@ -2117,12 +2446,57 @@ export const RssEntryScalarFieldEnum = {
 export type RssEntryScalarFieldEnum = (typeof RssEntryScalarFieldEnum)[keyof typeof RssEntryScalarFieldEnum]
 
 
+export const ChatConversationScalarFieldEnum = {
+  id: 'id',
+  firstUserId: 'firstUserId',
+  secondUserId: 'secondUserId',
+  lastSequence: 'lastSequence',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChatConversationScalarFieldEnum = (typeof ChatConversationScalarFieldEnum)[keyof typeof ChatConversationScalarFieldEnum]
+
+
+export const ChatMessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  senderId: 'senderId',
+  clientMessageId: 'clientMessageId',
+  sequence: 'sequence',
+  content: 'content',
+  spoiler: 'spoiler',
+  quote: 'quote',
+  bookPreviews: 'bookPreviews',
+  bookReferences: 'bookReferences',
+  replyToId: 'replyToId',
+  createdAt: 'createdAt'
+} as const
+
+export type ChatMessageScalarFieldEnum = (typeof ChatMessageScalarFieldEnum)[keyof typeof ChatMessageScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -2139,6 +2513,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -2228,6 +2611,48 @@ export type EnumDigitalBookSourceFieldRefInput<$PrismaModel> = FieldRefInputType
  * Reference to a field of type 'DigitalBookSource[]'
  */
 export type ListEnumDigitalBookSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DigitalBookSource[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ReadListVisibility'
+ */
+export type EnumReadListVisibilityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReadListVisibility'>
+    
+
+
+/**
+ * Reference to a field of type 'ReadListVisibility[]'
+ */
+export type ListEnumReadListVisibilityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReadListVisibility[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'ReadListRole'
+ */
+export type EnumReadListRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReadListRole'>
+    
+
+
+/**
+ * Reference to a field of type 'ReadListRole[]'
+ */
+export type ListEnumReadListRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReadListRole[]'>
     
 
 
@@ -2408,6 +2833,8 @@ export type GlobalOmitConfig = {
   physicalBook?: Prisma.PhysicalBookOmit
   readList?: Prisma.ReadListOmit
   readListBook?: Prisma.ReadListBookOmit
+  readListCollaborator?: Prisma.ReadListCollaboratorOmit
+  readListSave?: Prisma.ReadListSaveOmit
   rating?: Prisma.RatingOmit
   bookProgress?: Prisma.BookProgressOmit
   tag?: Prisma.TagOmit
@@ -2421,6 +2848,8 @@ export type GlobalOmitConfig = {
   socialBlock?: Prisma.SocialBlockOmit
   rssSubscription?: Prisma.RssSubscriptionOmit
   rssEntry?: Prisma.RssEntryOmit
+  chatConversation?: Prisma.ChatConversationOmit
+  chatMessage?: Prisma.ChatMessageOmit
 }
 
 /* Types for Logging */

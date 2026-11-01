@@ -12,9 +12,11 @@ Report suspected vulnerabilities privately to the repository maintainer through 
 - Refresh rotation uses a database compare-and-set operation. Replayed or concurrently consumed refresh tokens are rejected. Logout revokes the stored refresh token.
 - Browser writes require a configured trusted Origin, with an additional Fetch Metadata check for cross-site requests without Origin. Refresh cookies are scoped, HttpOnly, SameSite=Lax, and Secure in production.
 - Helmet sets security headers. Responses use `Cache-Control: no-store`, and framework identification is disabled. Internal response caches use account-specific keys.
-- Books and reading lists enforce ownership. Tag enumeration and counts are scoped to the current account. Unauthorized resource access returns 404.
+- Books enforce ownership. Reading lists default to private and use owner, editor, and viewer permissions for explicit sharing. Inaccessible resources return 404. Shared lists exclude private book sources, physical locations, credentials, and reading activity. Tag enumeration and counts are scoped to the current account.
 - EPUBs are outside the public static directory and require an owned-book download route. Uploads have size, part, extension, MIME, and signature checks. Failed requests clean up their newly uploaded files.
 - Social profiles require explicit public opt-in. Public serializers exclude credentials and private library sources. RSS fetching checks public addresses, pins DNS results, validates redirects, and limits time, response size, and format. RSS parsing rejects DTD/entity input and strips active markup from imported summaries.
+
+Chat checks membership on every read and send, validates Socket.IO handshake tokens and browser origins, and disconnects expired sessions. Sender IDs and rooms are server-controlled. Message retries are deduplicated in PostgreSQL. Optional Redis shares chat limits and live delivery across instances; its Pub/Sub endpoint is trusted internal infrastructure and must be isolated. See [the chat API guide](docs/chat-api.md) for the complete protocol and limits.
 
 ## Security boundaries and limits
 
@@ -40,3 +42,5 @@ File signatures do not constitute antivirus scanning, image decoding, or complet
 Run the unit, end-to-end, PostgreSQL integration, and Postman suites described in [the testing guide](docs/testing.md). Refresh the dependency audit for each release; the current evidence is in [dependency security status](docs/dependency-security.md).
 
 The HTTP controls follow the [OWASP REST Security guidance](https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html). These controls do not replace deployment-specific threat assessment and operational monitoring.
+
+Public book previews use fixed Open Library/Google Books API origins with redirect rejection, response/time limits, and bounded caches. Preview metadata is server-resolved; private library records are not a search source. Presence is visible only to conversation participants, honors existing blocks, and expires without persistent last-seen storage. Spoiler flags control presentation; authorized message recipients still receive the underlying text.

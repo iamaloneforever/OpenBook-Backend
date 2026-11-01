@@ -20,14 +20,27 @@ export type ReadListModel = runtime.Types.Result.DefaultSelection<Prisma.$ReadLi
 
 export type AggregateReadList = {
   _count: ReadListCountAggregateOutputType | null
+  _avg: ReadListAvgAggregateOutputType | null
+  _sum: ReadListSumAggregateOutputType | null
   _min: ReadListMinAggregateOutputType | null
   _max: ReadListMaxAggregateOutputType | null
+}
+
+export type ReadListAvgAggregateOutputType = {
+  revision: number | null
+}
+
+export type ReadListSumAggregateOutputType = {
+  revision: number | null
 }
 
 export type ReadListMinAggregateOutputType = {
   id: string | null
   title: string | null
   description: string | null
+  coverUrl: string | null
+  visibility: $Enums.ReadListVisibility | null
+  revision: number | null
   userId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -37,6 +50,9 @@ export type ReadListMaxAggregateOutputType = {
   id: string | null
   title: string | null
   description: string | null
+  coverUrl: string | null
+  visibility: $Enums.ReadListVisibility | null
+  revision: number | null
   userId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -46,6 +62,9 @@ export type ReadListCountAggregateOutputType = {
   id: number
   title: number
   description: number
+  coverUrl: number
+  visibility: number
+  revision: number
   userId: number
   createdAt: number
   updatedAt: number
@@ -53,10 +72,21 @@ export type ReadListCountAggregateOutputType = {
 }
 
 
+export type ReadListAvgAggregateInputType = {
+  revision?: true
+}
+
+export type ReadListSumAggregateInputType = {
+  revision?: true
+}
+
 export type ReadListMinAggregateInputType = {
   id?: true
   title?: true
   description?: true
+  coverUrl?: true
+  visibility?: true
+  revision?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -66,6 +96,9 @@ export type ReadListMaxAggregateInputType = {
   id?: true
   title?: true
   description?: true
+  coverUrl?: true
+  visibility?: true
+  revision?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -75,6 +108,9 @@ export type ReadListCountAggregateInputType = {
   id?: true
   title?: true
   description?: true
+  coverUrl?: true
+  visibility?: true
+  revision?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -119,6 +155,18 @@ export type ReadListAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ReadListAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ReadListSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ReadListMinAggregateInputType
@@ -149,6 +197,8 @@ export type ReadListGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   _count?: ReadListCountAggregateInputType | true
+  _avg?: ReadListAvgAggregateInputType
+  _sum?: ReadListSumAggregateInputType
   _min?: ReadListMinAggregateInputType
   _max?: ReadListMaxAggregateInputType
 }
@@ -157,10 +207,15 @@ export type ReadListGroupByOutputType = {
   id: string
   title: string
   description: string | null
+  coverUrl: string | null
+  visibility: $Enums.ReadListVisibility
+  revision: number
   userId: string
   createdAt: Date
   updatedAt: Date
   _count: ReadListCountAggregateOutputType | null
+  _avg: ReadListAvgAggregateOutputType | null
+  _sum: ReadListSumAggregateOutputType | null
   _min: ReadListMinAggregateOutputType | null
   _max: ReadListMaxAggregateOutputType | null
 }
@@ -187,22 +242,32 @@ export type ReadListWhereInput = {
   id?: Prisma.StringFilter<"ReadList"> | string
   title?: Prisma.StringFilter<"ReadList"> | string
   description?: Prisma.StringNullableFilter<"ReadList"> | string | null
+  coverUrl?: Prisma.StringNullableFilter<"ReadList"> | string | null
+  visibility?: Prisma.EnumReadListVisibilityFilter<"ReadList"> | $Enums.ReadListVisibility
+  revision?: Prisma.IntFilter<"ReadList"> | number
   userId?: Prisma.StringFilter<"ReadList"> | string
   createdAt?: Prisma.DateTimeFilter<"ReadList"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ReadList"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   items?: Prisma.ReadListBookListRelationFilter
+  collaborators?: Prisma.ReadListCollaboratorListRelationFilter
+  saves?: Prisma.ReadListSaveListRelationFilter
 }
 
 export type ReadListOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  coverUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  visibility?: Prisma.SortOrder
+  revision?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   owner?: Prisma.UserOrderByWithRelationInput
   items?: Prisma.ReadListBookOrderByRelationAggregateInput
+  collaborators?: Prisma.ReadListCollaboratorOrderByRelationAggregateInput
+  saves?: Prisma.ReadListSaveOrderByRelationAggregateInput
 }
 
 export type ReadListWhereUniqueInput = Prisma.AtLeast<{
@@ -213,23 +278,33 @@ export type ReadListWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ReadListWhereInput | Prisma.ReadListWhereInput[]
   title?: Prisma.StringFilter<"ReadList"> | string
   description?: Prisma.StringNullableFilter<"ReadList"> | string | null
+  coverUrl?: Prisma.StringNullableFilter<"ReadList"> | string | null
+  visibility?: Prisma.EnumReadListVisibilityFilter<"ReadList"> | $Enums.ReadListVisibility
+  revision?: Prisma.IntFilter<"ReadList"> | number
   userId?: Prisma.StringFilter<"ReadList"> | string
   createdAt?: Prisma.DateTimeFilter<"ReadList"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ReadList"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   items?: Prisma.ReadListBookListRelationFilter
+  collaborators?: Prisma.ReadListCollaboratorListRelationFilter
+  saves?: Prisma.ReadListSaveListRelationFilter
 }, "id" | "userId_title">
 
 export type ReadListOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  coverUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  visibility?: Prisma.SortOrder
+  revision?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ReadListCountOrderByAggregateInput
+  _avg?: Prisma.ReadListAvgOrderByAggregateInput
   _max?: Prisma.ReadListMaxOrderByAggregateInput
   _min?: Prisma.ReadListMinOrderByAggregateInput
+  _sum?: Prisma.ReadListSumOrderByAggregateInput
 }
 
 export type ReadListScalarWhereWithAggregatesInput = {
@@ -239,6 +314,9 @@ export type ReadListScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ReadList"> | string
   title?: Prisma.StringWithAggregatesFilter<"ReadList"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"ReadList"> | string | null
+  coverUrl?: Prisma.StringNullableWithAggregatesFilter<"ReadList"> | string | null
+  visibility?: Prisma.EnumReadListVisibilityWithAggregatesFilter<"ReadList"> | $Enums.ReadListVisibility
+  revision?: Prisma.IntWithAggregatesFilter<"ReadList"> | number
   userId?: Prisma.StringWithAggregatesFilter<"ReadList"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ReadList"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ReadList"> | Date | string
@@ -248,46 +326,69 @@ export type ReadListCreateInput = {
   id?: string
   title: string
   description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutReadListsInput
   items?: Prisma.ReadListBookCreateNestedManyWithoutReadListInput
+  collaborators?: Prisma.ReadListCollaboratorCreateNestedManyWithoutReadListInput
+  saves?: Prisma.ReadListSaveCreateNestedManyWithoutReadListInput
 }
 
 export type ReadListUncheckedCreateInput = {
   id?: string
   title: string
   description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutReadListInput
+  collaborators?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutReadListInput
+  saves?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutReadListInput
 }
 
 export type ReadListUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutReadListsNestedInput
   items?: Prisma.ReadListBookUpdateManyWithoutReadListNestedInput
+  collaborators?: Prisma.ReadListCollaboratorUpdateManyWithoutReadListNestedInput
+  saves?: Prisma.ReadListSaveUpdateManyWithoutReadListNestedInput
 }
 
 export type ReadListUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.ReadListBookUncheckedUpdateManyWithoutReadListNestedInput
+  collaborators?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutReadListNestedInput
+  saves?: Prisma.ReadListSaveUncheckedUpdateManyWithoutReadListNestedInput
 }
 
 export type ReadListCreateManyInput = {
   id?: string
   title: string
   description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -297,6 +398,9 @@ export type ReadListUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -305,6 +409,9 @@ export type ReadListUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -329,15 +436,25 @@ export type ReadListCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  coverUrl?: Prisma.SortOrder
+  visibility?: Prisma.SortOrder
+  revision?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ReadListAvgOrderByAggregateInput = {
+  revision?: Prisma.SortOrder
 }
 
 export type ReadListMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  coverUrl?: Prisma.SortOrder
+  visibility?: Prisma.SortOrder
+  revision?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -347,9 +464,16 @@ export type ReadListMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  coverUrl?: Prisma.SortOrder
+  visibility?: Prisma.SortOrder
+  revision?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ReadListSumOrderByAggregateInput = {
+  revision?: Prisma.SortOrder
 }
 
 export type ReadListScalarRelationFilter = {
@@ -399,6 +523,10 @@ export type ReadListUncheckedUpdateManyWithoutOwnerNestedInput = {
   deleteMany?: Prisma.ReadListScalarWhereInput | Prisma.ReadListScalarWhereInput[]
 }
 
+export type EnumReadListVisibilityFieldUpdateOperationsInput = {
+  set?: $Enums.ReadListVisibility
+}
+
 export type ReadListCreateNestedOneWithoutItemsInput = {
   create?: Prisma.XOR<Prisma.ReadListCreateWithoutItemsInput, Prisma.ReadListUncheckedCreateWithoutItemsInput>
   connectOrCreate?: Prisma.ReadListCreateOrConnectWithoutItemsInput
@@ -413,22 +541,60 @@ export type ReadListUpdateOneRequiredWithoutItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ReadListUpdateToOneWithWhereWithoutItemsInput, Prisma.ReadListUpdateWithoutItemsInput>, Prisma.ReadListUncheckedUpdateWithoutItemsInput>
 }
 
+export type ReadListCreateNestedOneWithoutCollaboratorsInput = {
+  create?: Prisma.XOR<Prisma.ReadListCreateWithoutCollaboratorsInput, Prisma.ReadListUncheckedCreateWithoutCollaboratorsInput>
+  connectOrCreate?: Prisma.ReadListCreateOrConnectWithoutCollaboratorsInput
+  connect?: Prisma.ReadListWhereUniqueInput
+}
+
+export type ReadListUpdateOneRequiredWithoutCollaboratorsNestedInput = {
+  create?: Prisma.XOR<Prisma.ReadListCreateWithoutCollaboratorsInput, Prisma.ReadListUncheckedCreateWithoutCollaboratorsInput>
+  connectOrCreate?: Prisma.ReadListCreateOrConnectWithoutCollaboratorsInput
+  upsert?: Prisma.ReadListUpsertWithoutCollaboratorsInput
+  connect?: Prisma.ReadListWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ReadListUpdateToOneWithWhereWithoutCollaboratorsInput, Prisma.ReadListUpdateWithoutCollaboratorsInput>, Prisma.ReadListUncheckedUpdateWithoutCollaboratorsInput>
+}
+
+export type ReadListCreateNestedOneWithoutSavesInput = {
+  create?: Prisma.XOR<Prisma.ReadListCreateWithoutSavesInput, Prisma.ReadListUncheckedCreateWithoutSavesInput>
+  connectOrCreate?: Prisma.ReadListCreateOrConnectWithoutSavesInput
+  connect?: Prisma.ReadListWhereUniqueInput
+}
+
+export type ReadListUpdateOneRequiredWithoutSavesNestedInput = {
+  create?: Prisma.XOR<Prisma.ReadListCreateWithoutSavesInput, Prisma.ReadListUncheckedCreateWithoutSavesInput>
+  connectOrCreate?: Prisma.ReadListCreateOrConnectWithoutSavesInput
+  upsert?: Prisma.ReadListUpsertWithoutSavesInput
+  connect?: Prisma.ReadListWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ReadListUpdateToOneWithWhereWithoutSavesInput, Prisma.ReadListUpdateWithoutSavesInput>, Prisma.ReadListUncheckedUpdateWithoutSavesInput>
+}
+
 export type ReadListCreateWithoutOwnerInput = {
   id?: string
   title: string
   description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.ReadListBookCreateNestedManyWithoutReadListInput
+  collaborators?: Prisma.ReadListCollaboratorCreateNestedManyWithoutReadListInput
+  saves?: Prisma.ReadListSaveCreateNestedManyWithoutReadListInput
 }
 
 export type ReadListUncheckedCreateWithoutOwnerInput = {
   id?: string
   title: string
   description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutReadListInput
+  collaborators?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutReadListInput
+  saves?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutReadListInput
 }
 
 export type ReadListCreateOrConnectWithoutOwnerInput = {
@@ -464,6 +630,9 @@ export type ReadListScalarWhereInput = {
   id?: Prisma.StringFilter<"ReadList"> | string
   title?: Prisma.StringFilter<"ReadList"> | string
   description?: Prisma.StringNullableFilter<"ReadList"> | string | null
+  coverUrl?: Prisma.StringNullableFilter<"ReadList"> | string | null
+  visibility?: Prisma.EnumReadListVisibilityFilter<"ReadList"> | $Enums.ReadListVisibility
+  revision?: Prisma.IntFilter<"ReadList"> | number
   userId?: Prisma.StringFilter<"ReadList"> | string
   createdAt?: Prisma.DateTimeFilter<"ReadList"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ReadList"> | Date | string
@@ -473,18 +642,28 @@ export type ReadListCreateWithoutItemsInput = {
   id?: string
   title: string
   description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutReadListsInput
+  collaborators?: Prisma.ReadListCollaboratorCreateNestedManyWithoutReadListInput
+  saves?: Prisma.ReadListSaveCreateNestedManyWithoutReadListInput
 }
 
 export type ReadListUncheckedCreateWithoutItemsInput = {
   id?: string
   title: string
   description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  collaborators?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutReadListInput
+  saves?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutReadListInput
 }
 
 export type ReadListCreateOrConnectWithoutItemsInput = {
@@ -507,24 +686,181 @@ export type ReadListUpdateWithoutItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutReadListsNestedInput
+  collaborators?: Prisma.ReadListCollaboratorUpdateManyWithoutReadListNestedInput
+  saves?: Prisma.ReadListSaveUpdateManyWithoutReadListNestedInput
 }
 
 export type ReadListUncheckedUpdateWithoutItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  collaborators?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutReadListNestedInput
+  saves?: Prisma.ReadListSaveUncheckedUpdateManyWithoutReadListNestedInput
+}
+
+export type ReadListCreateWithoutCollaboratorsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutReadListsInput
+  items?: Prisma.ReadListBookCreateNestedManyWithoutReadListInput
+  saves?: Prisma.ReadListSaveCreateNestedManyWithoutReadListInput
+}
+
+export type ReadListUncheckedCreateWithoutCollaboratorsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
+  userId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutReadListInput
+  saves?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutReadListInput
+}
+
+export type ReadListCreateOrConnectWithoutCollaboratorsInput = {
+  where: Prisma.ReadListWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReadListCreateWithoutCollaboratorsInput, Prisma.ReadListUncheckedCreateWithoutCollaboratorsInput>
+}
+
+export type ReadListUpsertWithoutCollaboratorsInput = {
+  update: Prisma.XOR<Prisma.ReadListUpdateWithoutCollaboratorsInput, Prisma.ReadListUncheckedUpdateWithoutCollaboratorsInput>
+  create: Prisma.XOR<Prisma.ReadListCreateWithoutCollaboratorsInput, Prisma.ReadListUncheckedCreateWithoutCollaboratorsInput>
+  where?: Prisma.ReadListWhereInput
+}
+
+export type ReadListUpdateToOneWithWhereWithoutCollaboratorsInput = {
+  where?: Prisma.ReadListWhereInput
+  data: Prisma.XOR<Prisma.ReadListUpdateWithoutCollaboratorsInput, Prisma.ReadListUncheckedUpdateWithoutCollaboratorsInput>
+}
+
+export type ReadListUpdateWithoutCollaboratorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutReadListsNestedInput
+  items?: Prisma.ReadListBookUpdateManyWithoutReadListNestedInput
+  saves?: Prisma.ReadListSaveUpdateManyWithoutReadListNestedInput
+}
+
+export type ReadListUncheckedUpdateWithoutCollaboratorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.ReadListBookUncheckedUpdateManyWithoutReadListNestedInput
+  saves?: Prisma.ReadListSaveUncheckedUpdateManyWithoutReadListNestedInput
+}
+
+export type ReadListCreateWithoutSavesInput = {
+  id?: string
+  title: string
+  description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutReadListsInput
+  items?: Prisma.ReadListBookCreateNestedManyWithoutReadListInput
+  collaborators?: Prisma.ReadListCollaboratorCreateNestedManyWithoutReadListInput
+}
+
+export type ReadListUncheckedCreateWithoutSavesInput = {
+  id?: string
+  title: string
+  description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
+  userId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutReadListInput
+  collaborators?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutReadListInput
+}
+
+export type ReadListCreateOrConnectWithoutSavesInput = {
+  where: Prisma.ReadListWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReadListCreateWithoutSavesInput, Prisma.ReadListUncheckedCreateWithoutSavesInput>
+}
+
+export type ReadListUpsertWithoutSavesInput = {
+  update: Prisma.XOR<Prisma.ReadListUpdateWithoutSavesInput, Prisma.ReadListUncheckedUpdateWithoutSavesInput>
+  create: Prisma.XOR<Prisma.ReadListCreateWithoutSavesInput, Prisma.ReadListUncheckedCreateWithoutSavesInput>
+  where?: Prisma.ReadListWhereInput
+}
+
+export type ReadListUpdateToOneWithWhereWithoutSavesInput = {
+  where?: Prisma.ReadListWhereInput
+  data: Prisma.XOR<Prisma.ReadListUpdateWithoutSavesInput, Prisma.ReadListUncheckedUpdateWithoutSavesInput>
+}
+
+export type ReadListUpdateWithoutSavesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutReadListsNestedInput
+  items?: Prisma.ReadListBookUpdateManyWithoutReadListNestedInput
+  collaborators?: Prisma.ReadListCollaboratorUpdateManyWithoutReadListNestedInput
+}
+
+export type ReadListUncheckedUpdateWithoutSavesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.ReadListBookUncheckedUpdateManyWithoutReadListNestedInput
+  collaborators?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutReadListNestedInput
 }
 
 export type ReadListCreateManyOwnerInput = {
   id?: string
   title: string
   description?: string | null
+  coverUrl?: string | null
+  visibility?: $Enums.ReadListVisibility
+  revision?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -533,24 +869,37 @@ export type ReadListUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.ReadListBookUpdateManyWithoutReadListNestedInput
+  collaborators?: Prisma.ReadListCollaboratorUpdateManyWithoutReadListNestedInput
+  saves?: Prisma.ReadListSaveUpdateManyWithoutReadListNestedInput
 }
 
 export type ReadListUncheckedUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.ReadListBookUncheckedUpdateManyWithoutReadListNestedInput
+  collaborators?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutReadListNestedInput
+  saves?: Prisma.ReadListSaveUncheckedUpdateManyWithoutReadListNestedInput
 }
 
 export type ReadListUncheckedUpdateManyWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumReadListVisibilityFieldUpdateOperationsInput | $Enums.ReadListVisibility
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -562,10 +911,14 @@ export type ReadListUncheckedUpdateManyWithoutOwnerInput = {
 
 export type ReadListCountOutputType = {
   items: number
+  collaborators: number
+  saves: number
 }
 
 export type ReadListCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | ReadListCountOutputTypeCountItemsArgs
+  collaborators?: boolean | ReadListCountOutputTypeCountCollaboratorsArgs
+  saves?: boolean | ReadListCountOutputTypeCountSavesArgs
 }
 
 /**
@@ -585,16 +938,35 @@ export type ReadListCountOutputTypeCountItemsArgs<ExtArgs extends runtime.Types.
   where?: Prisma.ReadListBookWhereInput
 }
 
+/**
+ * ReadListCountOutputType without action
+ */
+export type ReadListCountOutputTypeCountCollaboratorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReadListCollaboratorWhereInput
+}
+
+/**
+ * ReadListCountOutputType without action
+ */
+export type ReadListCountOutputTypeCountSavesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReadListSaveWhereInput
+}
+
 
 export type ReadListSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
   description?: boolean
+  coverUrl?: boolean
+  visibility?: boolean
+  revision?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   items?: boolean | Prisma.ReadList$itemsArgs<ExtArgs>
+  collaborators?: boolean | Prisma.ReadList$collaboratorsArgs<ExtArgs>
+  saves?: boolean | Prisma.ReadList$savesArgs<ExtArgs>
   _count?: boolean | Prisma.ReadListCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["readList"]>
 
@@ -602,6 +974,9 @@ export type ReadListSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   title?: boolean
   description?: boolean
+  coverUrl?: boolean
+  visibility?: boolean
+  revision?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -612,6 +987,9 @@ export type ReadListSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   title?: boolean
   description?: boolean
+  coverUrl?: boolean
+  visibility?: boolean
+  revision?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -622,15 +1000,20 @@ export type ReadListSelectScalar = {
   id?: boolean
   title?: boolean
   description?: boolean
+  coverUrl?: boolean
+  visibility?: boolean
+  revision?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ReadListOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["readList"]>
+export type ReadListOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "coverUrl" | "visibility" | "revision" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["readList"]>
 export type ReadListInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   items?: boolean | Prisma.ReadList$itemsArgs<ExtArgs>
+  collaborators?: boolean | Prisma.ReadList$collaboratorsArgs<ExtArgs>
+  saves?: boolean | Prisma.ReadList$savesArgs<ExtArgs>
   _count?: boolean | Prisma.ReadListCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ReadListIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -645,11 +1028,16 @@ export type $ReadListPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     owner: Prisma.$UserPayload<ExtArgs>
     items: Prisma.$ReadListBookPayload<ExtArgs>[]
+    collaborators: Prisma.$ReadListCollaboratorPayload<ExtArgs>[]
+    saves: Prisma.$ReadListSavePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     title: string
     description: string | null
+    coverUrl: string | null
+    visibility: $Enums.ReadListVisibility
+    revision: number
     userId: string
     createdAt: Date
     updatedAt: Date
@@ -1049,6 +1437,8 @@ export interface Prisma__ReadListClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   items<T extends Prisma.ReadList$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReadList$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReadListBookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  collaborators<T extends Prisma.ReadList$collaboratorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReadList$collaboratorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReadListCollaboratorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  saves<T extends Prisma.ReadList$savesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReadList$savesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReadListSavePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1081,6 +1471,9 @@ export interface ReadListFieldRefs {
   readonly id: Prisma.FieldRef<"ReadList", 'String'>
   readonly title: Prisma.FieldRef<"ReadList", 'String'>
   readonly description: Prisma.FieldRef<"ReadList", 'String'>
+  readonly coverUrl: Prisma.FieldRef<"ReadList", 'String'>
+  readonly visibility: Prisma.FieldRef<"ReadList", 'ReadListVisibility'>
+  readonly revision: Prisma.FieldRef<"ReadList", 'Int'>
   readonly userId: Prisma.FieldRef<"ReadList", 'String'>
   readonly createdAt: Prisma.FieldRef<"ReadList", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ReadList", 'DateTime'>
@@ -1506,6 +1899,54 @@ export type ReadList$itemsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.ReadListBookScalarFieldEnum | Prisma.ReadListBookScalarFieldEnum[]
+}
+
+/**
+ * ReadList.collaborators
+ */
+export type ReadList$collaboratorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReadListCollaborator
+   */
+  select?: Prisma.ReadListCollaboratorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReadListCollaborator
+   */
+  omit?: Prisma.ReadListCollaboratorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReadListCollaboratorInclude<ExtArgs> | null
+  where?: Prisma.ReadListCollaboratorWhereInput
+  orderBy?: Prisma.ReadListCollaboratorOrderByWithRelationInput | Prisma.ReadListCollaboratorOrderByWithRelationInput[]
+  cursor?: Prisma.ReadListCollaboratorWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReadListCollaboratorScalarFieldEnum | Prisma.ReadListCollaboratorScalarFieldEnum[]
+}
+
+/**
+ * ReadList.saves
+ */
+export type ReadList$savesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReadListSave
+   */
+  select?: Prisma.ReadListSaveSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReadListSave
+   */
+  omit?: Prisma.ReadListSaveOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReadListSaveInclude<ExtArgs> | null
+  where?: Prisma.ReadListSaveWhereInput
+  orderBy?: Prisma.ReadListSaveOrderByWithRelationInput | Prisma.ReadListSaveOrderByWithRelationInput[]
+  cursor?: Prisma.ReadListSaveWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReadListSaveScalarFieldEnum | Prisma.ReadListSaveScalarFieldEnum[]
 }
 
 /**

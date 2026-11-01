@@ -22,7 +22,10 @@
 		"lint:fix": "npm run lint -- --fix",
 		"prisma:generate": "prisma generate",
 		"pretest:e2e": "npm run build",
-		"test:postman": "postman collection run postman/collections/openbook.postman_collection.json -e postman/environments/local.postman_environment.json --working-dir ."
+		"test:postman": "postman collection run postman/collections/openbook.postman_collection.json -e postman/environments/local.postman_environment.json --working-dir .",
+		"test:chat": "vitest run --config test/vitest-chat.mts",
+		"test:postman:catalog": "postman collection run postman/collections/public-books-live.postman_collection.json -e postman/environments/local.postman_environment.json --working-dir .",
+		"test:read-list": "vitest run --config test/vitest-read-list.mts"
 	},
 	"dependencies": {
 		"@nestjs/cache-manager": "^12.0.2",
@@ -33,10 +36,13 @@
 		"@nestjs/mapped-types": "^12.0.0",
 		"@nestjs/passport": "^12.0.0",
 		"@nestjs/platform-express": "^12.3.2",
+		"@nestjs/platform-socket.io": "12.3.2",
 		"@nestjs/serve-static": "^12.1.1",
 		"@nestjs/throttler": "^6.7.1",
+		"@nestjs/websockets": "12.3.2",
 		"@prisma/adapter-pg": "^7.10.1",
 		"@prisma/client": "^7.10.1",
+		"@socket.io/redis-adapter": "8.3.0",
 		"argon2": "^0.45.1",
 		"cache-manager": "^7.2.9",
 		"class-transformer": "^0.5.1",
@@ -48,9 +54,11 @@
 		"passport": "^0.7.0",
 		"passport-jwt": "^4.0.1",
 		"passport-local": "^1.0.0",
+		"redis": "6.3.1",
 		"reflect-metadata": "^0.2.2",
 		"rxjs": "^7.8.2",
-		"saxes": "^6.0.0"
+		"saxes": "^6.0.0",
+		"socket.io": "4.8.4"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
@@ -74,6 +82,7 @@
 		"postman-cli": "1.83.0",
 		"prettier": "^3.9.10",
 		"prisma": "^7.10.1",
+		"socket.io-client": "4.8.4",
 		"supertest": "^7.3.1",
 		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"typescript-eslint": "^8.72.1",

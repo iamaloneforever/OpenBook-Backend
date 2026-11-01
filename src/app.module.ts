@@ -11,9 +11,11 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ReadListModule } from './read-list/read-list.module';
 import { UserModule } from './user/user.module';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { validateEnvironment } from './common/config/env.validation';
 import { SocialModule } from './social/social.module';
+import { ChatModule } from './chat/chat.module';
+import { HttpThrottlerGuard } from './common/guards/http-throttler.guard';
 
 @Module({
   imports: [
@@ -45,13 +47,14 @@ import { SocialModule } from './social/social.module';
     ReadListModule,
     UserModule,
     SocialModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: HttpThrottlerGuard,
     },
   ],
 })

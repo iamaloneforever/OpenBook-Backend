@@ -1,10 +1,10 @@
 import {
   registerDecorator,
-  ValidatorOptions,
+  ValidationOptions,
   ValidationArguments,
 } from 'class-validator';
 
-export function IsCuid(validatorOption?: ValidatorOptions) {
+export function IsCuid(validatorOption?: ValidationOptions) {
   return function (object: object, propertyName: string) {
     registerDecorator({
       name: 'IsCuid',

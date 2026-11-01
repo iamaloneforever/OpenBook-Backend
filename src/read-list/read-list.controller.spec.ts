@@ -76,7 +76,7 @@ describe('ReadListController', () => {
 
       const response = await controller.getLists(mockUser, query);
 
-      expect(readListService.getLists).toHaveBeenCalledWith('user-1', 1, 10);
+      expect(readListService.getLists).toHaveBeenCalledWith('user-1', query);
       expect(response).toEqual(result);
     });
 
@@ -85,7 +85,7 @@ describe('ReadListController', () => {
 
       await controller.getLists(mockUser, {});
 
-      expect(readListService.getLists).toHaveBeenCalledWith('user-1', 1, 10);
+      expect(readListService.getLists).toHaveBeenCalledWith('user-1', {});
     });
   });
 
@@ -105,9 +105,9 @@ describe('ReadListController', () => {
 
       readListService.getList.mockResolvedValue(result);
 
-      const response = await controller.getList('list-1');
+      const response = await controller.getList({ id: 'list-1' }, mockUser);
 
-      expect(readListService.getList).toHaveBeenCalledWith('list-1');
+      expect(readListService.getList).toHaveBeenCalledWith('list-1', 'user-1');
       expect(response).toEqual(result);
     });
   });
@@ -143,9 +143,17 @@ describe('ReadListController', () => {
 
       readListService.updateList.mockResolvedValue(result);
 
-      const response = await controller.updateList('list-1', dto);
+      const response = await controller.updateList(
+        { id: 'list-1' },
+        dto,
+        mockUser,
+      );
 
-      expect(readListService.updateList).toHaveBeenCalledWith('list-1', dto);
+      expect(readListService.updateList).toHaveBeenCalledWith(
+        'list-1',
+        dto,
+        'user-1',
+      );
       expect(response).toEqual(result);
     });
   });
@@ -158,9 +166,12 @@ describe('ReadListController', () => {
 
       readListService.deleteList.mockResolvedValue(result);
 
-      const response = await controller.deleteList('list-1');
+      const response = await controller.deleteList({ id: 'list-1' }, mockUser);
 
-      expect(readListService.deleteList).toHaveBeenCalledWith('list-1');
+      expect(readListService.deleteList).toHaveBeenCalledWith(
+        'list-1',
+        'user-1',
+      );
       expect(response).toEqual(result);
     });
   });
@@ -175,12 +186,17 @@ describe('ReadListController', () => {
 
       readListService.addBook.mockResolvedValue(result);
 
-      const response = await controller.addBook('list-1', dto, mockUser);
+      const response = await controller.addBook(
+        { id: 'list-1' },
+        dto,
+        mockUser,
+      );
 
       expect(readListService.addBook).toHaveBeenCalledWith(
         'list-1',
         'book-1',
         mockUser.id,
+        undefined,
       );
       expect(response).toEqual(result);
     });
@@ -194,11 +210,15 @@ describe('ReadListController', () => {
 
       readListService.removeBook.mockResolvedValue(result);
 
-      const response = await controller.removeBook('list-1', 'book-1');
+      const response = await controller.removeBook(
+        { id: 'list-1', bookId: 'book-1' },
+        mockUser,
+      );
 
       expect(readListService.removeBook).toHaveBeenCalledWith(
         'list-1',
         'book-1',
+        mockUser.id,
       );
       expect(response).toEqual(result);
     });

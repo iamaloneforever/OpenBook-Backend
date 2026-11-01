@@ -160,6 +160,15 @@ jobs:
     needs: install
     runs-on: ubuntu-latest
     services:
+      chat-redis:
+        image: redis:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
       postgres:
         image: postgres:16
         env:
@@ -176,6 +185,9 @@ jobs:
     env:
       DATABASE_URL: postgresql://test:test@localhost:5432/openbook_social_test
       SOCIAL_TEST_DATABASE_URL: postgresql://test:test@localhost:5432/openbook_social_test
+      CHAT_TEST_DATABASE_URL: postgresql://test:test@localhost:5432/openbook_chat_test
+      READ_LIST_TEST_DATABASE_URL: postgresql://test:test@localhost:5432/openbook_read_list_test
+      CHAT_TEST_REDIS_URL: redis://localhost:6379/15
       JWT_ACCESS_SECRET: ci-test-access-secret-at-least-32-characters
       JWT_REFRESH_SECRET: ci-test-refresh-secret-at-least-32-characters
     steps:
@@ -202,6 +214,22 @@ jobs:
 
       - name: Run social and RSS integration tests
         run: npm run test:social
+
+      - name: Prepare isolated chat database
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c 'CREATE DATABASE openbook_chat_test'
+          DATABASE_URL="$CHAT_TEST_DATABASE_URL" npx prisma migrate deploy
+
+      - name: Run chat history and WebSocket integration tests
+        run: npm run test:chat
+
+      - name: Prepare isolated reading-list database
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c 'CREATE DATABASE openbook_read_list_test'
+          DATABASE_URL="$READ_LIST_TEST_DATABASE_URL" npx prisma migrate deploy
+
+      - name: Run reading-list sharing and collaboration integration tests
+        run: npm run test:read-list
 
       - name: Run Postman functional and security tests
         env:

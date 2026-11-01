@@ -618,6 +618,11 @@ export type BookScalarRelationFilter = {
   isNot?: Prisma.BookWhereInput
 }
 
+export type BookNullableScalarRelationFilter = {
+  is?: Prisma.BookWhereInput | null
+  isNot?: Prisma.BookWhereInput | null
+}
+
 export type BookCreateNestedManyWithoutOwnerInput = {
   create?: Prisma.XOR<Prisma.BookCreateWithoutOwnerInput, Prisma.BookUncheckedCreateWithoutOwnerInput> | Prisma.BookCreateWithoutOwnerInput[] | Prisma.BookUncheckedCreateWithoutOwnerInput[]
   connectOrCreate?: Prisma.BookCreateOrConnectWithoutOwnerInput | Prisma.BookCreateOrConnectWithoutOwnerInput[]
@@ -726,10 +731,12 @@ export type BookCreateNestedOneWithoutReadListBooksInput = {
   connect?: Prisma.BookWhereUniqueInput
 }
 
-export type BookUpdateOneRequiredWithoutReadListBooksNestedInput = {
+export type BookUpdateOneWithoutReadListBooksNestedInput = {
   create?: Prisma.XOR<Prisma.BookCreateWithoutReadListBooksInput, Prisma.BookUncheckedCreateWithoutReadListBooksInput>
   connectOrCreate?: Prisma.BookCreateOrConnectWithoutReadListBooksInput
   upsert?: Prisma.BookUpsertWithoutReadListBooksInput
+  disconnect?: Prisma.BookWhereInput | boolean
+  delete?: Prisma.BookWhereInput | boolean
   connect?: Prisma.BookWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.BookUpdateToOneWithWhereWithoutReadListBooksInput, Prisma.BookUpdateWithoutReadListBooksInput>, Prisma.BookUncheckedUpdateWithoutReadListBooksInput>
 }

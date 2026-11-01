@@ -41,3 +41,20 @@ export const BookReadingStatus = {
 } as const
 
 export type BookReadingStatus = (typeof BookReadingStatus)[keyof typeof BookReadingStatus]
+
+
+export const ReadListVisibility = {
+  PRIVATE: 'PRIVATE',
+  UNLISTED: 'UNLISTED',
+  PUBLIC: 'PUBLIC'
+} as const
+
+export type ReadListVisibility = (typeof ReadListVisibility)[keyof typeof ReadListVisibility]
+
+
+export const ReadListRole = {
+  VIEWER: 'VIEWER',
+  EDITOR: 'EDITOR'
+} as const
+
+export type ReadListRole = (typeof ReadListRole)[keyof typeof ReadListRole]

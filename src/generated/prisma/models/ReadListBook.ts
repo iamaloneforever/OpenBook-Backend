@@ -20,45 +20,101 @@ export type ReadListBookModel = runtime.Types.Result.DefaultSelection<Prisma.$Re
 
 export type AggregateReadListBook = {
   _count: ReadListBookCountAggregateOutputType | null
+  _avg: ReadListBookAvgAggregateOutputType | null
+  _sum: ReadListBookSumAggregateOutputType | null
   _min: ReadListBookMinAggregateOutputType | null
   _max: ReadListBookMaxAggregateOutputType | null
 }
 
+export type ReadListBookAvgAggregateOutputType = {
+  position: number | null
+}
+
+export type ReadListBookSumAggregateOutputType = {
+  position: number | null
+}
+
 export type ReadListBookMinAggregateOutputType = {
+  id: string | null
   readListId: string | null
   bookId: string | null
+  catalogProvider: string | null
+  catalogId: string | null
+  position: number | null
+  note: string | null
+  addedById: string | null
   addedAt: Date | null
 }
 
 export type ReadListBookMaxAggregateOutputType = {
+  id: string | null
   readListId: string | null
   bookId: string | null
+  catalogProvider: string | null
+  catalogId: string | null
+  position: number | null
+  note: string | null
+  addedById: string | null
   addedAt: Date | null
 }
 
 export type ReadListBookCountAggregateOutputType = {
+  id: number
   readListId: number
   bookId: number
+  catalogProvider: number
+  catalogId: number
+  catalogPreview: number
+  position: number
+  note: number
+  addedById: number
   addedAt: number
   _all: number
 }
 
 
+export type ReadListBookAvgAggregateInputType = {
+  position?: true
+}
+
+export type ReadListBookSumAggregateInputType = {
+  position?: true
+}
+
 export type ReadListBookMinAggregateInputType = {
+  id?: true
   readListId?: true
   bookId?: true
+  catalogProvider?: true
+  catalogId?: true
+  position?: true
+  note?: true
+  addedById?: true
   addedAt?: true
 }
 
 export type ReadListBookMaxAggregateInputType = {
+  id?: true
   readListId?: true
   bookId?: true
+  catalogProvider?: true
+  catalogId?: true
+  position?: true
+  note?: true
+  addedById?: true
   addedAt?: true
 }
 
 export type ReadListBookCountAggregateInputType = {
+  id?: true
   readListId?: true
   bookId?: true
+  catalogProvider?: true
+  catalogId?: true
+  catalogPreview?: true
+  position?: true
+  note?: true
+  addedById?: true
   addedAt?: true
   _all?: true
 }
@@ -101,6 +157,18 @@ export type ReadListBookAggregateArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ReadListBookAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ReadListBookSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ReadListBookMinAggregateInputType
@@ -131,15 +199,26 @@ export type ReadListBookGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   _count?: ReadListBookCountAggregateInputType | true
+  _avg?: ReadListBookAvgAggregateInputType
+  _sum?: ReadListBookSumAggregateInputType
   _min?: ReadListBookMinAggregateInputType
   _max?: ReadListBookMaxAggregateInputType
 }
 
 export type ReadListBookGroupByOutputType = {
+  id: string
   readListId: string
-  bookId: string
+  bookId: string | null
+  catalogProvider: string | null
+  catalogId: string | null
+  catalogPreview: runtime.JsonValue | null
+  position: number
+  note: string | null
+  addedById: string | null
   addedAt: Date
   _count: ReadListBookCountAggregateOutputType | null
+  _avg: ReadListBookAvgAggregateOutputType | null
+  _sum: ReadListBookSumAggregateOutputType | null
   _min: ReadListBookMinAggregateOutputType | null
   _max: ReadListBookMaxAggregateOutputType | null
 }
@@ -163,88 +242,178 @@ export type ReadListBookWhereInput = {
   AND?: Prisma.ReadListBookWhereInput | Prisma.ReadListBookWhereInput[]
   OR?: Prisma.ReadListBookWhereInput[]
   NOT?: Prisma.ReadListBookWhereInput | Prisma.ReadListBookWhereInput[]
+  id?: Prisma.StringFilter<"ReadListBook"> | string
   readListId?: Prisma.StringFilter<"ReadListBook"> | string
-  bookId?: Prisma.StringFilter<"ReadListBook"> | string
+  bookId?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  catalogProvider?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  catalogId?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  catalogPreview?: Prisma.JsonNullableFilter<"ReadListBook">
+  position?: Prisma.IntFilter<"ReadListBook"> | number
+  note?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  addedById?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
   addedAt?: Prisma.DateTimeFilter<"ReadListBook"> | Date | string
+  addedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   readList?: Prisma.XOR<Prisma.ReadListScalarRelationFilter, Prisma.ReadListWhereInput>
-  book?: Prisma.XOR<Prisma.BookScalarRelationFilter, Prisma.BookWhereInput>
+  book?: Prisma.XOR<Prisma.BookNullableScalarRelationFilter, Prisma.BookWhereInput> | null
 }
 
 export type ReadListBookOrderByWithRelationInput = {
+  id?: Prisma.SortOrder
   readListId?: Prisma.SortOrder
-  bookId?: Prisma.SortOrder
+  bookId?: Prisma.SortOrderInput | Prisma.SortOrder
+  catalogProvider?: Prisma.SortOrderInput | Prisma.SortOrder
+  catalogId?: Prisma.SortOrderInput | Prisma.SortOrder
+  catalogPreview?: Prisma.SortOrderInput | Prisma.SortOrder
+  position?: Prisma.SortOrder
+  note?: Prisma.SortOrderInput | Prisma.SortOrder
+  addedById?: Prisma.SortOrderInput | Prisma.SortOrder
   addedAt?: Prisma.SortOrder
+  addedBy?: Prisma.UserOrderByWithRelationInput
   readList?: Prisma.ReadListOrderByWithRelationInput
   book?: Prisma.BookOrderByWithRelationInput
 }
 
 export type ReadListBookWhereUniqueInput = Prisma.AtLeast<{
+  id?: string
   readListId_bookId?: Prisma.ReadListBookReadListIdBookIdCompoundUniqueInput
+  readListId_catalogProvider_catalogId?: Prisma.ReadListBookReadListIdCatalogProviderCatalogIdCompoundUniqueInput
+  readListId_position?: Prisma.ReadListBookReadListIdPositionCompoundUniqueInput
   AND?: Prisma.ReadListBookWhereInput | Prisma.ReadListBookWhereInput[]
   OR?: Prisma.ReadListBookWhereInput[]
   NOT?: Prisma.ReadListBookWhereInput | Prisma.ReadListBookWhereInput[]
   readListId?: Prisma.StringFilter<"ReadListBook"> | string
-  bookId?: Prisma.StringFilter<"ReadListBook"> | string
+  bookId?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  catalogProvider?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  catalogId?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  catalogPreview?: Prisma.JsonNullableFilter<"ReadListBook">
+  position?: Prisma.IntFilter<"ReadListBook"> | number
+  note?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  addedById?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
   addedAt?: Prisma.DateTimeFilter<"ReadListBook"> | Date | string
+  addedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   readList?: Prisma.XOR<Prisma.ReadListScalarRelationFilter, Prisma.ReadListWhereInput>
-  book?: Prisma.XOR<Prisma.BookScalarRelationFilter, Prisma.BookWhereInput>
-}, "readListId_bookId">
+  book?: Prisma.XOR<Prisma.BookNullableScalarRelationFilter, Prisma.BookWhereInput> | null
+}, "id" | "readListId_bookId" | "readListId_catalogProvider_catalogId" | "readListId_position">
 
 export type ReadListBookOrderByWithAggregationInput = {
+  id?: Prisma.SortOrder
   readListId?: Prisma.SortOrder
-  bookId?: Prisma.SortOrder
+  bookId?: Prisma.SortOrderInput | Prisma.SortOrder
+  catalogProvider?: Prisma.SortOrderInput | Prisma.SortOrder
+  catalogId?: Prisma.SortOrderInput | Prisma.SortOrder
+  catalogPreview?: Prisma.SortOrderInput | Prisma.SortOrder
+  position?: Prisma.SortOrder
+  note?: Prisma.SortOrderInput | Prisma.SortOrder
+  addedById?: Prisma.SortOrderInput | Prisma.SortOrder
   addedAt?: Prisma.SortOrder
   _count?: Prisma.ReadListBookCountOrderByAggregateInput
+  _avg?: Prisma.ReadListBookAvgOrderByAggregateInput
   _max?: Prisma.ReadListBookMaxOrderByAggregateInput
   _min?: Prisma.ReadListBookMinOrderByAggregateInput
+  _sum?: Prisma.ReadListBookSumOrderByAggregateInput
 }
 
 export type ReadListBookScalarWhereWithAggregatesInput = {
   AND?: Prisma.ReadListBookScalarWhereWithAggregatesInput | Prisma.ReadListBookScalarWhereWithAggregatesInput[]
   OR?: Prisma.ReadListBookScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ReadListBookScalarWhereWithAggregatesInput | Prisma.ReadListBookScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<"ReadListBook"> | string
   readListId?: Prisma.StringWithAggregatesFilter<"ReadListBook"> | string
-  bookId?: Prisma.StringWithAggregatesFilter<"ReadListBook"> | string
+  bookId?: Prisma.StringNullableWithAggregatesFilter<"ReadListBook"> | string | null
+  catalogProvider?: Prisma.StringNullableWithAggregatesFilter<"ReadListBook"> | string | null
+  catalogId?: Prisma.StringNullableWithAggregatesFilter<"ReadListBook"> | string | null
+  catalogPreview?: Prisma.JsonNullableWithAggregatesFilter<"ReadListBook">
+  position?: Prisma.IntWithAggregatesFilter<"ReadListBook"> | number
+  note?: Prisma.StringNullableWithAggregatesFilter<"ReadListBook"> | string | null
+  addedById?: Prisma.StringNullableWithAggregatesFilter<"ReadListBook"> | string | null
   addedAt?: Prisma.DateTimeWithAggregatesFilter<"ReadListBook"> | Date | string
 }
 
 export type ReadListBookCreateInput = {
+  id?: string
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
   addedAt?: Date | string
+  addedBy?: Prisma.UserCreateNestedOneWithoutReadListContributionsInput
   readList: Prisma.ReadListCreateNestedOneWithoutItemsInput
-  book: Prisma.BookCreateNestedOneWithoutReadListBooksInput
+  book?: Prisma.BookCreateNestedOneWithoutReadListBooksInput
 }
 
 export type ReadListBookUncheckedCreateInput = {
+  id?: string
   readListId: string
-  bookId: string
+  bookId?: string | null
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
+  addedById?: string | null
   addedAt?: Date | string
 }
 
 export type ReadListBookUpdateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  addedBy?: Prisma.UserUpdateOneWithoutReadListContributionsNestedInput
   readList?: Prisma.ReadListUpdateOneRequiredWithoutItemsNestedInput
-  book?: Prisma.BookUpdateOneRequiredWithoutReadListBooksNestedInput
+  book?: Prisma.BookUpdateOneWithoutReadListBooksNestedInput
 }
 
 export type ReadListBookUncheckedUpdateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   readListId?: Prisma.StringFieldUpdateOperationsInput | string
-  bookId?: Prisma.StringFieldUpdateOperationsInput | string
+  bookId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReadListBookCreateManyInput = {
+  id?: string
   readListId: string
-  bookId: string
+  bookId?: string | null
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
+  addedById?: string | null
   addedAt?: Date | string
 }
 
 export type ReadListBookUpdateManyMutationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReadListBookUncheckedUpdateManyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   readListId?: Prisma.StringFieldUpdateOperationsInput | string
-  bookId?: Prisma.StringFieldUpdateOperationsInput | string
+  bookId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -263,22 +432,102 @@ export type ReadListBookReadListIdBookIdCompoundUniqueInput = {
   bookId: string
 }
 
+export type ReadListBookReadListIdCatalogProviderCatalogIdCompoundUniqueInput = {
+  readListId: string
+  catalogProvider: string
+  catalogId: string
+}
+
+export type ReadListBookReadListIdPositionCompoundUniqueInput = {
+  readListId: string
+  position: number
+}
+
 export type ReadListBookCountOrderByAggregateInput = {
+  id?: Prisma.SortOrder
   readListId?: Prisma.SortOrder
   bookId?: Prisma.SortOrder
+  catalogProvider?: Prisma.SortOrder
+  catalogId?: Prisma.SortOrder
+  catalogPreview?: Prisma.SortOrder
+  position?: Prisma.SortOrder
+  note?: Prisma.SortOrder
+  addedById?: Prisma.SortOrder
   addedAt?: Prisma.SortOrder
 }
 
+export type ReadListBookAvgOrderByAggregateInput = {
+  position?: Prisma.SortOrder
+}
+
 export type ReadListBookMaxOrderByAggregateInput = {
+  id?: Prisma.SortOrder
   readListId?: Prisma.SortOrder
   bookId?: Prisma.SortOrder
+  catalogProvider?: Prisma.SortOrder
+  catalogId?: Prisma.SortOrder
+  position?: Prisma.SortOrder
+  note?: Prisma.SortOrder
+  addedById?: Prisma.SortOrder
   addedAt?: Prisma.SortOrder
 }
 
 export type ReadListBookMinOrderByAggregateInput = {
+  id?: Prisma.SortOrder
   readListId?: Prisma.SortOrder
   bookId?: Prisma.SortOrder
+  catalogProvider?: Prisma.SortOrder
+  catalogId?: Prisma.SortOrder
+  position?: Prisma.SortOrder
+  note?: Prisma.SortOrder
+  addedById?: Prisma.SortOrder
   addedAt?: Prisma.SortOrder
+}
+
+export type ReadListBookSumOrderByAggregateInput = {
+  position?: Prisma.SortOrder
+}
+
+export type ReadListBookCreateNestedManyWithoutAddedByInput = {
+  create?: Prisma.XOR<Prisma.ReadListBookCreateWithoutAddedByInput, Prisma.ReadListBookUncheckedCreateWithoutAddedByInput> | Prisma.ReadListBookCreateWithoutAddedByInput[] | Prisma.ReadListBookUncheckedCreateWithoutAddedByInput[]
+  connectOrCreate?: Prisma.ReadListBookCreateOrConnectWithoutAddedByInput | Prisma.ReadListBookCreateOrConnectWithoutAddedByInput[]
+  createMany?: Prisma.ReadListBookCreateManyAddedByInputEnvelope
+  connect?: Prisma.ReadListBookWhereUniqueInput | Prisma.ReadListBookWhereUniqueInput[]
+}
+
+export type ReadListBookUncheckedCreateNestedManyWithoutAddedByInput = {
+  create?: Prisma.XOR<Prisma.ReadListBookCreateWithoutAddedByInput, Prisma.ReadListBookUncheckedCreateWithoutAddedByInput> | Prisma.ReadListBookCreateWithoutAddedByInput[] | Prisma.ReadListBookUncheckedCreateWithoutAddedByInput[]
+  connectOrCreate?: Prisma.ReadListBookCreateOrConnectWithoutAddedByInput | Prisma.ReadListBookCreateOrConnectWithoutAddedByInput[]
+  createMany?: Prisma.ReadListBookCreateManyAddedByInputEnvelope
+  connect?: Prisma.ReadListBookWhereUniqueInput | Prisma.ReadListBookWhereUniqueInput[]
+}
+
+export type ReadListBookUpdateManyWithoutAddedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ReadListBookCreateWithoutAddedByInput, Prisma.ReadListBookUncheckedCreateWithoutAddedByInput> | Prisma.ReadListBookCreateWithoutAddedByInput[] | Prisma.ReadListBookUncheckedCreateWithoutAddedByInput[]
+  connectOrCreate?: Prisma.ReadListBookCreateOrConnectWithoutAddedByInput | Prisma.ReadListBookCreateOrConnectWithoutAddedByInput[]
+  upsert?: Prisma.ReadListBookUpsertWithWhereUniqueWithoutAddedByInput | Prisma.ReadListBookUpsertWithWhereUniqueWithoutAddedByInput[]
+  createMany?: Prisma.ReadListBookCreateManyAddedByInputEnvelope
+  set?: Prisma.ReadListBookWhereUniqueInput | Prisma.ReadListBookWhereUniqueInput[]
+  disconnect?: Prisma.ReadListBookWhereUniqueInput | Prisma.ReadListBookWhereUniqueInput[]
+  delete?: Prisma.ReadListBookWhereUniqueInput | Prisma.ReadListBookWhereUniqueInput[]
+  connect?: Prisma.ReadListBookWhereUniqueInput | Prisma.ReadListBookWhereUniqueInput[]
+  update?: Prisma.ReadListBookUpdateWithWhereUniqueWithoutAddedByInput | Prisma.ReadListBookUpdateWithWhereUniqueWithoutAddedByInput[]
+  updateMany?: Prisma.ReadListBookUpdateManyWithWhereWithoutAddedByInput | Prisma.ReadListBookUpdateManyWithWhereWithoutAddedByInput[]
+  deleteMany?: Prisma.ReadListBookScalarWhereInput | Prisma.ReadListBookScalarWhereInput[]
+}
+
+export type ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ReadListBookCreateWithoutAddedByInput, Prisma.ReadListBookUncheckedCreateWithoutAddedByInput> | Prisma.ReadListBookCreateWithoutAddedByInput[] | Prisma.ReadListBookUncheckedCreateWithoutAddedByInput[]
+  connectOrCreate?: Prisma.ReadListBookCreateOrConnectWithoutAddedByInput | Prisma.ReadListBookCreateOrConnectWithoutAddedByInput[]
+  upsert?: Prisma.ReadListBookUpsertWithWhereUniqueWithoutAddedByInput | Prisma.ReadListBookUpsertWithWhereUniqueWithoutAddedByInput[]
+  createMany?: Prisma.ReadListBookCreateManyAddedByInputEnvelope
+  set?: Prisma.ReadListBookWhereUniqueInput | Prisma.ReadListBookWhereUniqueInput[]
+  disconnect?: Prisma.ReadListBookWhereUniqueInput | Prisma.ReadListBookWhereUniqueInput[]
+  delete?: Prisma.ReadListBookWhereUniqueInput | Prisma.ReadListBookWhereUniqueInput[]
+  connect?: Prisma.ReadListBookWhereUniqueInput | Prisma.ReadListBookWhereUniqueInput[]
+  update?: Prisma.ReadListBookUpdateWithWhereUniqueWithoutAddedByInput | Prisma.ReadListBookUpdateWithWhereUniqueWithoutAddedByInput[]
+  updateMany?: Prisma.ReadListBookUpdateManyWithWhereWithoutAddedByInput | Prisma.ReadListBookUpdateManyWithWhereWithoutAddedByInput[]
+  deleteMany?: Prisma.ReadListBookScalarWhereInput | Prisma.ReadListBookScalarWhereInput[]
 }
 
 export type ReadListBookCreateNestedManyWithoutBookInput = {
@@ -365,13 +614,93 @@ export type ReadListBookUncheckedUpdateManyWithoutReadListNestedInput = {
   deleteMany?: Prisma.ReadListBookScalarWhereInput | Prisma.ReadListBookScalarWhereInput[]
 }
 
-export type ReadListBookCreateWithoutBookInput = {
+export type ReadListBookCreateWithoutAddedByInput = {
+  id?: string
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
   addedAt?: Date | string
+  readList: Prisma.ReadListCreateNestedOneWithoutItemsInput
+  book?: Prisma.BookCreateNestedOneWithoutReadListBooksInput
+}
+
+export type ReadListBookUncheckedCreateWithoutAddedByInput = {
+  id?: string
+  readListId: string
+  bookId?: string | null
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
+  addedAt?: Date | string
+}
+
+export type ReadListBookCreateOrConnectWithoutAddedByInput = {
+  where: Prisma.ReadListBookWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReadListBookCreateWithoutAddedByInput, Prisma.ReadListBookUncheckedCreateWithoutAddedByInput>
+}
+
+export type ReadListBookCreateManyAddedByInputEnvelope = {
+  data: Prisma.ReadListBookCreateManyAddedByInput | Prisma.ReadListBookCreateManyAddedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type ReadListBookUpsertWithWhereUniqueWithoutAddedByInput = {
+  where: Prisma.ReadListBookWhereUniqueInput
+  update: Prisma.XOR<Prisma.ReadListBookUpdateWithoutAddedByInput, Prisma.ReadListBookUncheckedUpdateWithoutAddedByInput>
+  create: Prisma.XOR<Prisma.ReadListBookCreateWithoutAddedByInput, Prisma.ReadListBookUncheckedCreateWithoutAddedByInput>
+}
+
+export type ReadListBookUpdateWithWhereUniqueWithoutAddedByInput = {
+  where: Prisma.ReadListBookWhereUniqueInput
+  data: Prisma.XOR<Prisma.ReadListBookUpdateWithoutAddedByInput, Prisma.ReadListBookUncheckedUpdateWithoutAddedByInput>
+}
+
+export type ReadListBookUpdateManyWithWhereWithoutAddedByInput = {
+  where: Prisma.ReadListBookScalarWhereInput
+  data: Prisma.XOR<Prisma.ReadListBookUpdateManyMutationInput, Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByInput>
+}
+
+export type ReadListBookScalarWhereInput = {
+  AND?: Prisma.ReadListBookScalarWhereInput | Prisma.ReadListBookScalarWhereInput[]
+  OR?: Prisma.ReadListBookScalarWhereInput[]
+  NOT?: Prisma.ReadListBookScalarWhereInput | Prisma.ReadListBookScalarWhereInput[]
+  id?: Prisma.StringFilter<"ReadListBook"> | string
+  readListId?: Prisma.StringFilter<"ReadListBook"> | string
+  bookId?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  catalogProvider?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  catalogId?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  catalogPreview?: Prisma.JsonNullableFilter<"ReadListBook">
+  position?: Prisma.IntFilter<"ReadListBook"> | number
+  note?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  addedById?: Prisma.StringNullableFilter<"ReadListBook"> | string | null
+  addedAt?: Prisma.DateTimeFilter<"ReadListBook"> | Date | string
+}
+
+export type ReadListBookCreateWithoutBookInput = {
+  id?: string
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
+  addedAt?: Date | string
+  addedBy?: Prisma.UserCreateNestedOneWithoutReadListContributionsInput
   readList: Prisma.ReadListCreateNestedOneWithoutItemsInput
 }
 
 export type ReadListBookUncheckedCreateWithoutBookInput = {
+  id?: string
   readListId: string
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
+  addedById?: string | null
   addedAt?: Date | string
 }
 
@@ -401,22 +730,27 @@ export type ReadListBookUpdateManyWithWhereWithoutBookInput = {
   data: Prisma.XOR<Prisma.ReadListBookUpdateManyMutationInput, Prisma.ReadListBookUncheckedUpdateManyWithoutBookInput>
 }
 
-export type ReadListBookScalarWhereInput = {
-  AND?: Prisma.ReadListBookScalarWhereInput | Prisma.ReadListBookScalarWhereInput[]
-  OR?: Prisma.ReadListBookScalarWhereInput[]
-  NOT?: Prisma.ReadListBookScalarWhereInput | Prisma.ReadListBookScalarWhereInput[]
-  readListId?: Prisma.StringFilter<"ReadListBook"> | string
-  bookId?: Prisma.StringFilter<"ReadListBook"> | string
-  addedAt?: Prisma.DateTimeFilter<"ReadListBook"> | Date | string
-}
-
 export type ReadListBookCreateWithoutReadListInput = {
+  id?: string
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
   addedAt?: Date | string
-  book: Prisma.BookCreateNestedOneWithoutReadListBooksInput
+  addedBy?: Prisma.UserCreateNestedOneWithoutReadListContributionsInput
+  book?: Prisma.BookCreateNestedOneWithoutReadListBooksInput
 }
 
 export type ReadListBookUncheckedCreateWithoutReadListInput = {
-  bookId: string
+  id?: string
+  bookId?: string | null
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
+  addedById?: string | null
   addedAt?: Date | string
 }
 
@@ -446,101 +780,247 @@ export type ReadListBookUpdateManyWithWhereWithoutReadListInput = {
   data: Prisma.XOR<Prisma.ReadListBookUpdateManyMutationInput, Prisma.ReadListBookUncheckedUpdateManyWithoutReadListInput>
 }
 
-export type ReadListBookCreateManyBookInput = {
+export type ReadListBookCreateManyAddedByInput = {
+  id?: string
   readListId: string
+  bookId?: string | null
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
+  addedAt?: Date | string
+}
+
+export type ReadListBookUpdateWithoutAddedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readList?: Prisma.ReadListUpdateOneRequiredWithoutItemsNestedInput
+  book?: Prisma.BookUpdateOneWithoutReadListBooksNestedInput
+}
+
+export type ReadListBookUncheckedUpdateWithoutAddedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  readListId?: Prisma.StringFieldUpdateOperationsInput | string
+  bookId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ReadListBookUncheckedUpdateManyWithoutAddedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  readListId?: Prisma.StringFieldUpdateOperationsInput | string
+  bookId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ReadListBookCreateManyBookInput = {
+  id?: string
+  readListId: string
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
+  addedById?: string | null
   addedAt?: Date | string
 }
 
 export type ReadListBookUpdateWithoutBookInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  addedBy?: Prisma.UserUpdateOneWithoutReadListContributionsNestedInput
   readList?: Prisma.ReadListUpdateOneRequiredWithoutItemsNestedInput
 }
 
 export type ReadListBookUncheckedUpdateWithoutBookInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   readListId?: Prisma.StringFieldUpdateOperationsInput | string
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReadListBookUncheckedUpdateManyWithoutBookInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   readListId?: Prisma.StringFieldUpdateOperationsInput | string
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReadListBookCreateManyReadListInput = {
-  bookId: string
+  id?: string
+  bookId?: string | null
+  catalogProvider?: string | null
+  catalogId?: string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position: number
+  note?: string | null
+  addedById?: string | null
   addedAt?: Date | string
 }
 
 export type ReadListBookUpdateWithoutReadListInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  book?: Prisma.BookUpdateOneRequiredWithoutReadListBooksNestedInput
+  addedBy?: Prisma.UserUpdateOneWithoutReadListContributionsNestedInput
+  book?: Prisma.BookUpdateOneWithoutReadListBooksNestedInput
 }
 
 export type ReadListBookUncheckedUpdateWithoutReadListInput = {
-  bookId?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  bookId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReadListBookUncheckedUpdateManyWithoutReadListInput = {
-  bookId?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  bookId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  catalogPreview?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   addedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
 
 export type ReadListBookSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
   readListId?: boolean
   bookId?: boolean
+  catalogProvider?: boolean
+  catalogId?: boolean
+  catalogPreview?: boolean
+  position?: boolean
+  note?: boolean
+  addedById?: boolean
   addedAt?: boolean
+  addedBy?: boolean | Prisma.ReadListBook$addedByArgs<ExtArgs>
   readList?: boolean | Prisma.ReadListDefaultArgs<ExtArgs>
-  book?: boolean | Prisma.BookDefaultArgs<ExtArgs>
+  book?: boolean | Prisma.ReadListBook$bookArgs<ExtArgs>
 }, ExtArgs["result"]["readListBook"]>
 
 export type ReadListBookSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
   readListId?: boolean
   bookId?: boolean
+  catalogProvider?: boolean
+  catalogId?: boolean
+  catalogPreview?: boolean
+  position?: boolean
+  note?: boolean
+  addedById?: boolean
   addedAt?: boolean
+  addedBy?: boolean | Prisma.ReadListBook$addedByArgs<ExtArgs>
   readList?: boolean | Prisma.ReadListDefaultArgs<ExtArgs>
-  book?: boolean | Prisma.BookDefaultArgs<ExtArgs>
+  book?: boolean | Prisma.ReadListBook$bookArgs<ExtArgs>
 }, ExtArgs["result"]["readListBook"]>
 
 export type ReadListBookSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
   readListId?: boolean
   bookId?: boolean
+  catalogProvider?: boolean
+  catalogId?: boolean
+  catalogPreview?: boolean
+  position?: boolean
+  note?: boolean
+  addedById?: boolean
   addedAt?: boolean
+  addedBy?: boolean | Prisma.ReadListBook$addedByArgs<ExtArgs>
   readList?: boolean | Prisma.ReadListDefaultArgs<ExtArgs>
-  book?: boolean | Prisma.BookDefaultArgs<ExtArgs>
+  book?: boolean | Prisma.ReadListBook$bookArgs<ExtArgs>
 }, ExtArgs["result"]["readListBook"]>
 
 export type ReadListBookSelectScalar = {
+  id?: boolean
   readListId?: boolean
   bookId?: boolean
+  catalogProvider?: boolean
+  catalogId?: boolean
+  catalogPreview?: boolean
+  position?: boolean
+  note?: boolean
+  addedById?: boolean
   addedAt?: boolean
 }
 
-export type ReadListBookOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"readListId" | "bookId" | "addedAt", ExtArgs["result"]["readListBook"]>
+export type ReadListBookOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "readListId" | "bookId" | "catalogProvider" | "catalogId" | "catalogPreview" | "position" | "note" | "addedById" | "addedAt", ExtArgs["result"]["readListBook"]>
 export type ReadListBookInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  addedBy?: boolean | Prisma.ReadListBook$addedByArgs<ExtArgs>
   readList?: boolean | Prisma.ReadListDefaultArgs<ExtArgs>
-  book?: boolean | Prisma.BookDefaultArgs<ExtArgs>
+  book?: boolean | Prisma.ReadListBook$bookArgs<ExtArgs>
 }
 export type ReadListBookIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  addedBy?: boolean | Prisma.ReadListBook$addedByArgs<ExtArgs>
   readList?: boolean | Prisma.ReadListDefaultArgs<ExtArgs>
-  book?: boolean | Prisma.BookDefaultArgs<ExtArgs>
+  book?: boolean | Prisma.ReadListBook$bookArgs<ExtArgs>
 }
 export type ReadListBookIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  addedBy?: boolean | Prisma.ReadListBook$addedByArgs<ExtArgs>
   readList?: boolean | Prisma.ReadListDefaultArgs<ExtArgs>
-  book?: boolean | Prisma.BookDefaultArgs<ExtArgs>
+  book?: boolean | Prisma.ReadListBook$bookArgs<ExtArgs>
 }
 
 export type $ReadListBookPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ReadListBook"
   objects: {
+    addedBy: Prisma.$UserPayload<ExtArgs> | null
     readList: Prisma.$ReadListPayload<ExtArgs>
-    book: Prisma.$BookPayload<ExtArgs>
+    book: Prisma.$BookPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    id: string
     readListId: string
-    bookId: string
+    bookId: string | null
+    catalogProvider: string | null
+    catalogId: string | null
+    catalogPreview: runtime.JsonValue | null
+    position: number
+    note: string | null
+    addedById: string | null
     addedAt: Date
   }, ExtArgs["result"]["readListBook"]>
   composites: {}
@@ -625,8 +1105,8 @@ export interface ReadListBookDelegate<ExtArgs extends runtime.Types.Extensions.I
    * // Get first 10 ReadListBooks
    * const readListBooks = await prisma.readListBook.findMany({ take: 10 })
    * 
-   * // Only select the `readListId`
-   * const readListBookWithReadListIdOnly = await prisma.readListBook.findMany({ select: { readListId: true } })
+   * // Only select the `id`
+   * const readListBookWithIdOnly = await prisma.readListBook.findMany({ select: { id: true } })
    * 
    */
   findMany<T extends ReadListBookFindManyArgs>(args?: Prisma.SelectSubset<T, ReadListBookFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReadListBookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -670,9 +1150,9 @@ export interface ReadListBookDelegate<ExtArgs extends runtime.Types.Extensions.I
    *   ]
    * })
    * 
-   * // Create many ReadListBooks and only return the `readListId`
-   * const readListBookWithReadListIdOnly = await prisma.readListBook.createManyAndReturn({
-   *   select: { readListId: true },
+   * // Create many ReadListBooks and only return the `id`
+   * const readListBookWithIdOnly = await prisma.readListBook.createManyAndReturn({
+   *   select: { id: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -761,9 +1241,9 @@ export interface ReadListBookDelegate<ExtArgs extends runtime.Types.Extensions.I
    *   ]
    * })
    * 
-   * // Update zero or more ReadListBooks and only return the `readListId`
-   * const readListBookWithReadListIdOnly = await prisma.readListBook.updateManyAndReturn({
-   *   select: { readListId: true },
+   * // Update zero or more ReadListBooks and only return the `id`
+   * const readListBookWithIdOnly = await prisma.readListBook.updateManyAndReturn({
+   *   select: { id: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -936,8 +1416,9 @@ readonly fields: ReadListBookFieldRefs;
  */
 export interface Prisma__ReadListBookClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  addedBy<T extends Prisma.ReadListBook$addedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReadListBook$addedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   readList<T extends Prisma.ReadListDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReadListDefaultArgs<ExtArgs>>): Prisma.Prisma__ReadListClient<runtime.Types.Result.GetResult<Prisma.$ReadListPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  book<T extends Prisma.BookDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BookDefaultArgs<ExtArgs>>): Prisma.Prisma__BookClient<runtime.Types.Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  book<T extends Prisma.ReadListBook$bookArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReadListBook$bookArgs<ExtArgs>>): Prisma.Prisma__BookClient<runtime.Types.Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -967,8 +1448,15 @@ export interface Prisma__ReadListBookClient<T, Null = never, ExtArgs extends run
  * Fields of the ReadListBook model
  */
 export interface ReadListBookFieldRefs {
+  readonly id: Prisma.FieldRef<"ReadListBook", 'String'>
   readonly readListId: Prisma.FieldRef<"ReadListBook", 'String'>
   readonly bookId: Prisma.FieldRef<"ReadListBook", 'String'>
+  readonly catalogProvider: Prisma.FieldRef<"ReadListBook", 'String'>
+  readonly catalogId: Prisma.FieldRef<"ReadListBook", 'String'>
+  readonly catalogPreview: Prisma.FieldRef<"ReadListBook", 'Json'>
+  readonly position: Prisma.FieldRef<"ReadListBook", 'Int'>
+  readonly note: Prisma.FieldRef<"ReadListBook", 'String'>
+  readonly addedById: Prisma.FieldRef<"ReadListBook", 'String'>
   readonly addedAt: Prisma.FieldRef<"ReadListBook", 'DateTime'>
 }
     
@@ -1368,6 +1856,44 @@ export type ReadListBookDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many ReadListBooks to delete.
    */
   limit?: number
+}
+
+/**
+ * ReadListBook.addedBy
+ */
+export type ReadListBook$addedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
+ * ReadListBook.book
+ */
+export type ReadListBook$bookArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Book
+   */
+  select?: Prisma.BookSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Book
+   */
+  omit?: Prisma.BookOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BookInclude<ExtArgs> | null
+  where?: Prisma.BookWhereInput
 }
 
 /**

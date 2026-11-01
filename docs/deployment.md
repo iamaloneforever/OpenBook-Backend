@@ -37,6 +37,32 @@ Do not delete the database or upload volumes during a routine upgrade. `docker c
 4. Keep secrets outside images and source control. Configure the exact browser origins and canonical public API URL.
 5. Monitor failed authentication, rate-limit responses, RSS fetch failures, disk usage, database health, and backup completion. Avoid logging credentials, cookies, bearer tokens, or private request bodies.
 
-The application's cache and throttler storage are local to each process. Multi-instance deployments need a shared limiter or an edge policy for deployment-wide limits. Express does not trust forwarded IP headers by default; a reverse proxy is therefore the apparent client for rate limiting. Configure a reviewed proxy trust policy for the actual network topology before relying on per-client IP limits. Do not enable blanket trust of client-supplied forwarded headers.
+The HTTP response cache and general HTTP throttler storage are local to each process. Multi-instance deployments need a shared limiter or an edge policy for deployment-wide HTTP limits. Chat-specific account and provider budgets use Redis when configured. Express does not trust forwarded IP headers by default; a reverse proxy is therefore the apparent client for rate limiting. Configure a reviewed proxy trust policy for the actual network topology before relying on per-client IP limits. Do not enable blanket trust of client-supplied forwarded headers.
 
 The root endpoint confirms the HTTP process is responding; it does not check database readiness. Use database and infrastructure probes alongside it.
+
+## Upgrading chat and reading lists
+
+Apply these migrations, along with any earlier pending migrations, before starting the updated API:
+
+| Migration | Change |
+| --- | --- |
+| `20261101090000_add_private_chat` | Persistent direct conversations and message history |
+| `20261101120000_add_rich_chat_messages` | Stored book previews, quotations, replies, and spoilers |
+| `20261101140000_advanced_read_lists` | Visibility, ordered entries, public catalog cards, collaborators, saves, and revisions |
+
+For a host installation, run `npm run prisma:generate`, build the application, and run `npx prisma migrate deploy` with the deployment's `DATABASE_URL` before restarting it. Compose performs migration deployment through its `migration` service.
+
+Existing reading lists retain their IDs and memberships and start as private with revision zero. List responses use safe book metadata, including for owners; clients should fetch private sources and reading progress through the owned-book API. List details embed at most 100 entries, so clients must use item pagination for longer lists. Review [the reading-list upgrade notes](reading-lists.md#upgrade-and-verify) before updating clients.
+
+## WebSocket chat and Redis
+
+Proxy `/socket.io/` with WebSocket Upgrade support. Clients connect to the Socket.IO `/chat` namespace using WSS and the existing access token. Configure the canonical public URL and browser origins before exposing chat.
+
+A single API instance can run without Redis. For multiple instances, set the same private `CHAT_REDIS_URL` on each instance or use the optional Compose overlay:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.chat-redis.yml up --build -d
+```
+
+The overlay keeps Redis off host ports, disables Redis persistence, and applies memory and privilege limits. PostgreSQL stores chat history and belongs in backups. Use separate Redis credentials, network access controls, and TLS when connecting across hosts. See [the chat API guide](chat-api.md) for recovery semantics and failure behavior.

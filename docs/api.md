@@ -116,15 +116,23 @@ Tag search accepts one `tags` value or repeated query parameters, for example `/
 
 | Method | Route | Request |
 | --- | --- | --- |
-| GET | `/read-list` | Optional `page` and `limit` |
-| POST | `/read-list` | Required `title`, optional `description` |
-| GET | `/read-list/:id` | Returns list items and aggregate statistics |
-| PATCH | `/read-list/:id` | Partial title/description update |
+| GET | `/read-list` | `page`, `limit`, `q`, and `scope=owned\|saved\|collaborating\|all` |
+| GET | `/read-list/discover` | Search public lists with `q`, `page`, and `limit` |
+| POST | `/read-list` | Required `title`; optional `description`, `coverUrl`, and `visibility` |
+| GET | `/read-list/:id` | Metadata, first 100 ordered items, statistics, role, revision, and counts |
+| PATCH | `/read-list/:id` | Owner updates details/visibility; optional `expectedRevision` |
 | DELETE | `/read-list/:id` | Deletes the list |
 | POST | `/read-list/:id/books` | `{ "bookId": "<owned-book-id>" }` |
 | DELETE | `/read-list/:id/books/:bookId` | Removes the membership |
+| GET/POST | `/read-list/:id/items` | Paginated entries or add a library book/public catalog card |
+| PATCH | `/read-list/:id/items/order` | Complete `itemIds` order and required `expectedRevision` |
+| PATCH/DELETE | `/read-list/:id/items/:itemId` | Edit an entry note or remove it |
+| GET/POST | `/read-list/:id/collaborators` | Owner reads or grants `VIEWER`/`EDITOR` access |
+| DELETE | `/read-list/:id/collaborators/:userId` | Owner revokes access; collaborator can leave |
+| POST/DELETE | `/read-list/:id/save` | Save or unsave an accessible list |
+| POST | `/read-list/:id/duplicate` | `{ "title": "My copy" }`; creates a private copy |
 
-All reading-list routes require authentication and ownership. Adding a book also checks that the book belongs to the caller. List titles are unique per account. A duplicate title or membership returns 409.
+All reading-list routes require authentication. Lists default to `PRIVATE`; `UNLISTED` lists can be opened by ID, and `PUBLIC` lists appear in discovery. Owners control details, visibility, deletion, and collaborator grants. Editors curate entries; viewers can read. Social blocks restrict access in either direction. Library additions require a book owned by the caller; shared responses exclude private book sources and reading activity. List titles are unique per account. Duplicate entries and stale revisions return 409. See [the reading-list guide](reading-lists.md) for payloads, migration behavior, and limits.
 
 ## Statistics
 
@@ -148,15 +156,20 @@ Some GET responses have an internal per-account cache lasting 3–6 seconds. Wri
 | --- | --- |
 | 400 | Invalid input, unknown fields, invalid pagination, or unsupported book state |
 | 401 | Missing, invalid, expired, replayed, or revoked credentials |
-| 403 | Browser write from an untrusted origin |
+| 403 | Browser write from an untrusted origin, insufficient list editing rights, or blocked chat send |
 | 404 | Missing resource or resource inaccessible to the caller |
-| 409 | Unique constraint or duplicate membership |
+| 409 | Unique constraint, duplicate membership, stale list revision, or reused message ID with changed content |
 | 413 | Body or file exceeds its configured limit |
 | 415 | Uploaded content does not match the allowed signature/MIME combination |
 | 429 | Rate limit or RSS refresh cooldown |
 | 500 | Unexpected server failure; internal details are not returned |
 | 502 | External RSS download or refresh failed |
+| 503 | Temporary transaction or configured chat infrastructure failure |
 
 Validation errors normally contain `statusCode`, `message`, and `error`. The `message` can be an array for DTO validation errors. Clients should branch on HTTP status and documented fields, rather than matching human-readable error text.
 
 See the [social and RSS reference](social-api.md) for social routes and cursor-based feed pagination.
+
+## Private chat
+
+Authenticated REST endpoints under `/chat/conversations` create and list direct conversations, persist messages, and page through history. Live delivery uses the authenticated Socket.IO `/chat` namespace. See [the chat API reference](chat-api.md) for request bodies, events, retry safety, and reconnect recovery.

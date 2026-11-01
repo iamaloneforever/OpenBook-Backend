@@ -193,10 +193,16 @@ export type UserWhereInput = {
   books?: Prisma.BookListRelationFilter
   ratings?: Prisma.RatingListRelationFilter
   readLists?: Prisma.ReadListListRelationFilter
+  readListMemberships?: Prisma.ReadListCollaboratorListRelationFilter
+  savedReadLists?: Prisma.ReadListSaveListRelationFilter
+  readListContributions?: Prisma.ReadListBookListRelationFilter
   progress?: Prisma.BookProgressListRelationFilter
   readingStats?: Prisma.XOR<Prisma.ReadingStatsNullableScalarRelationFilter, Prisma.ReadingStatsWhereInput> | null
   socialProfile?: Prisma.XOR<Prisma.SocialProfileNullableScalarRelationFilter, Prisma.SocialProfileWhereInput> | null
   rssSubscriptions?: Prisma.RssSubscriptionListRelationFilter
+  chatsAsFirst?: Prisma.ChatConversationListRelationFilter
+  chatsAsSecond?: Prisma.ChatConversationListRelationFilter
+  chatMessages?: Prisma.ChatMessageListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -209,10 +215,16 @@ export type UserOrderByWithRelationInput = {
   books?: Prisma.BookOrderByRelationAggregateInput
   ratings?: Prisma.RatingOrderByRelationAggregateInput
   readLists?: Prisma.ReadListOrderByRelationAggregateInput
+  readListMemberships?: Prisma.ReadListCollaboratorOrderByRelationAggregateInput
+  savedReadLists?: Prisma.ReadListSaveOrderByRelationAggregateInput
+  readListContributions?: Prisma.ReadListBookOrderByRelationAggregateInput
   progress?: Prisma.BookProgressOrderByRelationAggregateInput
   readingStats?: Prisma.ReadingStatsOrderByWithRelationInput
   socialProfile?: Prisma.SocialProfileOrderByWithRelationInput
   rssSubscriptions?: Prisma.RssSubscriptionOrderByRelationAggregateInput
+  chatsAsFirst?: Prisma.ChatConversationOrderByRelationAggregateInput
+  chatsAsSecond?: Prisma.ChatConversationOrderByRelationAggregateInput
+  chatMessages?: Prisma.ChatMessageOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -228,10 +240,16 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   books?: Prisma.BookListRelationFilter
   ratings?: Prisma.RatingListRelationFilter
   readLists?: Prisma.ReadListListRelationFilter
+  readListMemberships?: Prisma.ReadListCollaboratorListRelationFilter
+  savedReadLists?: Prisma.ReadListSaveListRelationFilter
+  readListContributions?: Prisma.ReadListBookListRelationFilter
   progress?: Prisma.BookProgressListRelationFilter
   readingStats?: Prisma.XOR<Prisma.ReadingStatsNullableScalarRelationFilter, Prisma.ReadingStatsWhereInput> | null
   socialProfile?: Prisma.XOR<Prisma.SocialProfileNullableScalarRelationFilter, Prisma.SocialProfileWhereInput> | null
   rssSubscriptions?: Prisma.RssSubscriptionListRelationFilter
+  chatsAsFirst?: Prisma.ChatConversationListRelationFilter
+  chatsAsSecond?: Prisma.ChatConversationListRelationFilter
+  chatMessages?: Prisma.ChatMessageListRelationFilter
 }, "id" | "username">
 
 export type UserOrderByWithAggregationInput = {
@@ -268,10 +286,16 @@ export type UserCreateInput = {
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -284,10 +308,16 @@ export type UserUncheckedCreateInput = {
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
 }
 
 export type UserUpdateInput = {
@@ -300,10 +330,16 @@ export type UserUpdateInput = {
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -316,10 +352,16 @@ export type UserUncheckedUpdateInput = {
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -381,6 +423,11 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -419,6 +466,50 @@ export type UserUpdateOneRequiredWithoutReadListsNestedInput = {
   upsert?: Prisma.UserUpsertWithoutReadListsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReadListsInput, Prisma.UserUpdateWithoutReadListsInput>, Prisma.UserUncheckedUpdateWithoutReadListsInput>
+}
+
+export type UserCreateNestedOneWithoutReadListContributionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReadListContributionsInput, Prisma.UserUncheckedCreateWithoutReadListContributionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReadListContributionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutReadListContributionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReadListContributionsInput, Prisma.UserUncheckedCreateWithoutReadListContributionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReadListContributionsInput
+  upsert?: Prisma.UserUpsertWithoutReadListContributionsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReadListContributionsInput, Prisma.UserUpdateWithoutReadListContributionsInput>, Prisma.UserUncheckedUpdateWithoutReadListContributionsInput>
+}
+
+export type UserCreateNestedOneWithoutReadListMembershipsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReadListMembershipsInput, Prisma.UserUncheckedCreateWithoutReadListMembershipsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReadListMembershipsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutReadListMembershipsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReadListMembershipsInput, Prisma.UserUncheckedCreateWithoutReadListMembershipsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReadListMembershipsInput
+  upsert?: Prisma.UserUpsertWithoutReadListMembershipsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReadListMembershipsInput, Prisma.UserUpdateWithoutReadListMembershipsInput>, Prisma.UserUncheckedUpdateWithoutReadListMembershipsInput>
+}
+
+export type UserCreateNestedOneWithoutSavedReadListsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedReadListsInput, Prisma.UserUncheckedCreateWithoutSavedReadListsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedReadListsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSavedReadListsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedReadListsInput, Prisma.UserUncheckedCreateWithoutSavedReadListsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedReadListsInput
+  upsert?: Prisma.UserUpsertWithoutSavedReadListsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSavedReadListsInput, Prisma.UserUpdateWithoutSavedReadListsInput>, Prisma.UserUncheckedUpdateWithoutSavedReadListsInput>
 }
 
 export type UserCreateNestedOneWithoutRatingsInput = {
@@ -491,6 +582,48 @@ export type UserUpdateOneRequiredWithoutRssSubscriptionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRssSubscriptionsInput, Prisma.UserUpdateWithoutRssSubscriptionsInput>, Prisma.UserUncheckedUpdateWithoutRssSubscriptionsInput>
 }
 
+export type UserCreateNestedOneWithoutChatsAsFirstInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChatsAsFirstInput, Prisma.UserUncheckedCreateWithoutChatsAsFirstInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChatsAsFirstInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutChatsAsSecondInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChatsAsSecondInput, Prisma.UserUncheckedCreateWithoutChatsAsSecondInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChatsAsSecondInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutChatsAsFirstNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChatsAsFirstInput, Prisma.UserUncheckedCreateWithoutChatsAsFirstInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChatsAsFirstInput
+  upsert?: Prisma.UserUpsertWithoutChatsAsFirstInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChatsAsFirstInput, Prisma.UserUpdateWithoutChatsAsFirstInput>, Prisma.UserUncheckedUpdateWithoutChatsAsFirstInput>
+}
+
+export type UserUpdateOneRequiredWithoutChatsAsSecondNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChatsAsSecondInput, Prisma.UserUncheckedCreateWithoutChatsAsSecondInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChatsAsSecondInput
+  upsert?: Prisma.UserUpsertWithoutChatsAsSecondInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChatsAsSecondInput, Prisma.UserUpdateWithoutChatsAsSecondInput>, Prisma.UserUncheckedUpdateWithoutChatsAsSecondInput>
+}
+
+export type UserCreateNestedOneWithoutChatMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChatMessagesInput, Prisma.UserUncheckedCreateWithoutChatMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChatMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutChatMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChatMessagesInput, Prisma.UserUncheckedCreateWithoutChatMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChatMessagesInput
+  upsert?: Prisma.UserUpsertWithoutChatMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChatMessagesInput, Prisma.UserUpdateWithoutChatMessagesInput>, Prisma.UserUncheckedUpdateWithoutChatMessagesInput>
+}
+
 export type UserCreateWithoutBooksInput = {
   id?: string
   username: string
@@ -500,10 +633,16 @@ export type UserCreateWithoutBooksInput = {
   updatedAt?: Date | string
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
 }
 
 export type UserUncheckedCreateWithoutBooksInput = {
@@ -515,10 +654,16 @@ export type UserUncheckedCreateWithoutBooksInput = {
   updatedAt?: Date | string
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
 }
 
 export type UserCreateOrConnectWithoutBooksInput = {
@@ -546,10 +691,16 @@ export type UserUpdateWithoutBooksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBooksInput = {
@@ -561,10 +712,16 @@ export type UserUncheckedUpdateWithoutBooksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
 }
 
 export type UserCreateWithoutReadListsInput = {
@@ -576,10 +733,16 @@ export type UserCreateWithoutReadListsInput = {
   updatedAt?: Date | string
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
 }
 
 export type UserUncheckedCreateWithoutReadListsInput = {
@@ -591,10 +754,16 @@ export type UserUncheckedCreateWithoutReadListsInput = {
   updatedAt?: Date | string
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
 }
 
 export type UserCreateOrConnectWithoutReadListsInput = {
@@ -622,10 +791,16 @@ export type UserUpdateWithoutReadListsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReadListsInput = {
@@ -637,10 +812,316 @@ export type UserUncheckedUpdateWithoutReadListsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+}
+
+export type UserCreateWithoutReadListContributionsInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+}
+
+export type UserUncheckedCreateWithoutReadListContributionsInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+}
+
+export type UserCreateOrConnectWithoutReadListContributionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReadListContributionsInput, Prisma.UserUncheckedCreateWithoutReadListContributionsInput>
+}
+
+export type UserUpsertWithoutReadListContributionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReadListContributionsInput, Prisma.UserUncheckedUpdateWithoutReadListContributionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReadListContributionsInput, Prisma.UserUncheckedCreateWithoutReadListContributionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReadListContributionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReadListContributionsInput, Prisma.UserUncheckedUpdateWithoutReadListContributionsInput>
+}
+
+export type UserUpdateWithoutReadListContributionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReadListContributionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+}
+
+export type UserCreateWithoutReadListMembershipsInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
+  progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+}
+
+export type UserUncheckedCreateWithoutReadListMembershipsInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
+  progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+}
+
+export type UserCreateOrConnectWithoutReadListMembershipsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReadListMembershipsInput, Prisma.UserUncheckedCreateWithoutReadListMembershipsInput>
+}
+
+export type UserUpsertWithoutReadListMembershipsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReadListMembershipsInput, Prisma.UserUncheckedUpdateWithoutReadListMembershipsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReadListMembershipsInput, Prisma.UserUncheckedCreateWithoutReadListMembershipsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReadListMembershipsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReadListMembershipsInput, Prisma.UserUncheckedUpdateWithoutReadListMembershipsInput>
+}
+
+export type UserUpdateWithoutReadListMembershipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
+  progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReadListMembershipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
+  progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+}
+
+export type UserCreateWithoutSavedReadListsInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
+  progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+}
+
+export type UserUncheckedCreateWithoutSavedReadListsInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
+  progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+}
+
+export type UserCreateOrConnectWithoutSavedReadListsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedReadListsInput, Prisma.UserUncheckedCreateWithoutSavedReadListsInput>
+}
+
+export type UserUpsertWithoutSavedReadListsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSavedReadListsInput, Prisma.UserUncheckedUpdateWithoutSavedReadListsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedReadListsInput, Prisma.UserUncheckedCreateWithoutSavedReadListsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSavedReadListsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSavedReadListsInput, Prisma.UserUncheckedUpdateWithoutSavedReadListsInput>
+}
+
+export type UserUpdateWithoutSavedReadListsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
+  progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSavedReadListsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
+  progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
 }
 
 export type UserCreateWithoutRatingsInput = {
@@ -652,10 +1133,16 @@ export type UserCreateWithoutRatingsInput = {
   updatedAt?: Date | string
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
   readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
 }
 
 export type UserUncheckedCreateWithoutRatingsInput = {
@@ -667,10 +1154,16 @@ export type UserUncheckedCreateWithoutRatingsInput = {
   updatedAt?: Date | string
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
   readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
 }
 
 export type UserCreateOrConnectWithoutRatingsInput = {
@@ -698,10 +1191,16 @@ export type UserUpdateWithoutRatingsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
   readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRatingsInput = {
@@ -713,10 +1212,16 @@ export type UserUncheckedUpdateWithoutRatingsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
   readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
 }
 
 export type UserCreateWithoutProgressInput = {
@@ -729,9 +1234,15 @@ export type UserCreateWithoutProgressInput = {
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
   readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
 }
 
 export type UserUncheckedCreateWithoutProgressInput = {
@@ -744,9 +1255,15 @@ export type UserUncheckedCreateWithoutProgressInput = {
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
   readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
 }
 
 export type UserCreateOrConnectWithoutProgressInput = {
@@ -775,9 +1292,15 @@ export type UserUpdateWithoutProgressInput = {
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
   readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProgressInput = {
@@ -790,9 +1313,15 @@ export type UserUncheckedUpdateWithoutProgressInput = {
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
   readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
 }
 
 export type UserCreateWithoutReadingStatsInput = {
@@ -805,9 +1334,15 @@ export type UserCreateWithoutReadingStatsInput = {
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
   socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
 }
 
 export type UserUncheckedCreateWithoutReadingStatsInput = {
@@ -820,9 +1355,15 @@ export type UserUncheckedCreateWithoutReadingStatsInput = {
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
   socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
 }
 
 export type UserCreateOrConnectWithoutReadingStatsInput = {
@@ -851,9 +1392,15 @@ export type UserUpdateWithoutReadingStatsInput = {
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReadingStatsInput = {
@@ -866,9 +1413,15 @@ export type UserUncheckedUpdateWithoutReadingStatsInput = {
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
 }
 
 export type UserCreateWithoutSocialProfileInput = {
@@ -881,9 +1434,15 @@ export type UserCreateWithoutSocialProfileInput = {
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
 }
 
 export type UserUncheckedCreateWithoutSocialProfileInput = {
@@ -896,9 +1455,15 @@ export type UserUncheckedCreateWithoutSocialProfileInput = {
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
 }
 
 export type UserCreateOrConnectWithoutSocialProfileInput = {
@@ -927,9 +1492,15 @@ export type UserUpdateWithoutSocialProfileInput = {
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSocialProfileInput = {
@@ -942,9 +1513,15 @@ export type UserUncheckedUpdateWithoutSocialProfileInput = {
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
   rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
 }
 
 export type UserCreateWithoutRssSubscriptionsInput = {
@@ -957,9 +1534,15 @@ export type UserCreateWithoutRssSubscriptionsInput = {
   books?: Prisma.BookCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
 }
 
 export type UserUncheckedCreateWithoutRssSubscriptionsInput = {
@@ -972,9 +1555,15 @@ export type UserUncheckedCreateWithoutRssSubscriptionsInput = {
   books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
   ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
   readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
   progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
   readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
   socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
 }
 
 export type UserCreateOrConnectWithoutRssSubscriptionsInput = {
@@ -1003,9 +1592,15 @@ export type UserUpdateWithoutRssSubscriptionsInput = {
   books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRssSubscriptionsInput = {
@@ -1018,9 +1613,315 @@ export type UserUncheckedUpdateWithoutRssSubscriptionsInput = {
   books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
   ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
   readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
   progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
   readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
   socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+}
+
+export type UserCreateWithoutChatsAsFirstInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
+  progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+}
+
+export type UserUncheckedCreateWithoutChatsAsFirstInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
+  progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+}
+
+export type UserCreateOrConnectWithoutChatsAsFirstInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutChatsAsFirstInput, Prisma.UserUncheckedCreateWithoutChatsAsFirstInput>
+}
+
+export type UserCreateWithoutChatsAsSecondInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
+  progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatMessages?: Prisma.ChatMessageCreateNestedManyWithoutSenderInput
+}
+
+export type UserUncheckedCreateWithoutChatsAsSecondInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
+  progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutSenderInput
+}
+
+export type UserCreateOrConnectWithoutChatsAsSecondInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutChatsAsSecondInput, Prisma.UserUncheckedCreateWithoutChatsAsSecondInput>
+}
+
+export type UserUpsertWithoutChatsAsFirstInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutChatsAsFirstInput, Prisma.UserUncheckedUpdateWithoutChatsAsFirstInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutChatsAsFirstInput, Prisma.UserUncheckedCreateWithoutChatsAsFirstInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutChatsAsFirstInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutChatsAsFirstInput, Prisma.UserUncheckedUpdateWithoutChatsAsFirstInput>
+}
+
+export type UserUpdateWithoutChatsAsFirstInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
+  progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+}
+
+export type UserUncheckedUpdateWithoutChatsAsFirstInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
+  progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+}
+
+export type UserUpsertWithoutChatsAsSecondInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutChatsAsSecondInput, Prisma.UserUncheckedUpdateWithoutChatsAsSecondInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutChatsAsSecondInput, Prisma.UserUncheckedCreateWithoutChatsAsSecondInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutChatsAsSecondInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutChatsAsSecondInput, Prisma.UserUncheckedUpdateWithoutChatsAsSecondInput>
+}
+
+export type UserUpdateWithoutChatsAsSecondInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
+  progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatMessages?: Prisma.ChatMessageUpdateManyWithoutSenderNestedInput
+}
+
+export type UserUncheckedUpdateWithoutChatsAsSecondInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
+  progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
+}
+
+export type UserCreateWithoutChatMessagesInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookCreateNestedManyWithoutAddedByInput
+  progress?: Prisma.BookProgressCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationCreateNestedManyWithoutSecondUserInput
+}
+
+export type UserUncheckedCreateWithoutChatMessagesInput = {
+  id?: string
+  username: string
+  password: string
+  refreshToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  books?: Prisma.BookUncheckedCreateNestedManyWithoutOwnerInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserInput
+  readLists?: Prisma.ReadListUncheckedCreateNestedManyWithoutOwnerInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedCreateNestedManyWithoutUserInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedCreateNestedManyWithoutUserInput
+  readListContributions?: Prisma.ReadListBookUncheckedCreateNestedManyWithoutAddedByInput
+  progress?: Prisma.BookProgressUncheckedCreateNestedManyWithoutUserInput
+  readingStats?: Prisma.ReadingStatsUncheckedCreateNestedOneWithoutUserInput
+  socialProfile?: Prisma.SocialProfileUncheckedCreateNestedOneWithoutUserInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutFirstUserInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedCreateNestedManyWithoutSecondUserInput
+}
+
+export type UserCreateOrConnectWithoutChatMessagesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutChatMessagesInput, Prisma.UserUncheckedCreateWithoutChatMessagesInput>
+}
+
+export type UserUpsertWithoutChatMessagesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutChatMessagesInput, Prisma.UserUncheckedUpdateWithoutChatMessagesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutChatMessagesInput, Prisma.UserUncheckedCreateWithoutChatMessagesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutChatMessagesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutChatMessagesInput, Prisma.UserUncheckedUpdateWithoutChatMessagesInput>
+}
+
+export type UserUpdateWithoutChatMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUpdateManyWithoutAddedByNestedInput
+  progress?: Prisma.BookProgressUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUpdateManyWithoutSecondUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutChatMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  books?: Prisma.BookUncheckedUpdateManyWithoutOwnerNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserNestedInput
+  readLists?: Prisma.ReadListUncheckedUpdateManyWithoutOwnerNestedInput
+  readListMemberships?: Prisma.ReadListCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+  savedReadLists?: Prisma.ReadListSaveUncheckedUpdateManyWithoutUserNestedInput
+  readListContributions?: Prisma.ReadListBookUncheckedUpdateManyWithoutAddedByNestedInput
+  progress?: Prisma.BookProgressUncheckedUpdateManyWithoutUserNestedInput
+  readingStats?: Prisma.ReadingStatsUncheckedUpdateOneWithoutUserNestedInput
+  socialProfile?: Prisma.SocialProfileUncheckedUpdateOneWithoutUserNestedInput
+  rssSubscriptions?: Prisma.RssSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  chatsAsFirst?: Prisma.ChatConversationUncheckedUpdateManyWithoutFirstUserNestedInput
+  chatsAsSecond?: Prisma.ChatConversationUncheckedUpdateManyWithoutSecondUserNestedInput
 }
 
 
@@ -1032,16 +1933,28 @@ export type UserCountOutputType = {
   books: number
   ratings: number
   readLists: number
+  readListMemberships: number
+  savedReadLists: number
+  readListContributions: number
   progress: number
   rssSubscriptions: number
+  chatsAsFirst: number
+  chatsAsSecond: number
+  chatMessages: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   books?: boolean | UserCountOutputTypeCountBooksArgs
   ratings?: boolean | UserCountOutputTypeCountRatingsArgs
   readLists?: boolean | UserCountOutputTypeCountReadListsArgs
+  readListMemberships?: boolean | UserCountOutputTypeCountReadListMembershipsArgs
+  savedReadLists?: boolean | UserCountOutputTypeCountSavedReadListsArgs
+  readListContributions?: boolean | UserCountOutputTypeCountReadListContributionsArgs
   progress?: boolean | UserCountOutputTypeCountProgressArgs
   rssSubscriptions?: boolean | UserCountOutputTypeCountRssSubscriptionsArgs
+  chatsAsFirst?: boolean | UserCountOutputTypeCountChatsAsFirstArgs
+  chatsAsSecond?: boolean | UserCountOutputTypeCountChatsAsSecondArgs
+  chatMessages?: boolean | UserCountOutputTypeCountChatMessagesArgs
 }
 
 /**
@@ -1078,6 +1991,27 @@ export type UserCountOutputTypeCountReadListsArgs<ExtArgs extends runtime.Types.
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountReadListMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReadListCollaboratorWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSavedReadListsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReadListSaveWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReadListContributionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReadListBookWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountProgressArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.BookProgressWhereInput
 }
@@ -1087,6 +2021,27 @@ export type UserCountOutputTypeCountProgressArgs<ExtArgs extends runtime.Types.E
  */
 export type UserCountOutputTypeCountRssSubscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.RssSubscriptionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountChatsAsFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ChatConversationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountChatsAsSecondArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ChatConversationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountChatMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ChatMessageWhereInput
 }
 
 
@@ -1100,10 +2055,16 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   books?: boolean | Prisma.User$booksArgs<ExtArgs>
   ratings?: boolean | Prisma.User$ratingsArgs<ExtArgs>
   readLists?: boolean | Prisma.User$readListsArgs<ExtArgs>
+  readListMemberships?: boolean | Prisma.User$readListMembershipsArgs<ExtArgs>
+  savedReadLists?: boolean | Prisma.User$savedReadListsArgs<ExtArgs>
+  readListContributions?: boolean | Prisma.User$readListContributionsArgs<ExtArgs>
   progress?: boolean | Prisma.User$progressArgs<ExtArgs>
   readingStats?: boolean | Prisma.User$readingStatsArgs<ExtArgs>
   socialProfile?: boolean | Prisma.User$socialProfileArgs<ExtArgs>
   rssSubscriptions?: boolean | Prisma.User$rssSubscriptionsArgs<ExtArgs>
+  chatsAsFirst?: boolean | Prisma.User$chatsAsFirstArgs<ExtArgs>
+  chatsAsSecond?: boolean | Prisma.User$chatsAsSecondArgs<ExtArgs>
+  chatMessages?: boolean | Prisma.User$chatMessagesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1139,10 +2100,16 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   books?: boolean | Prisma.User$booksArgs<ExtArgs>
   ratings?: boolean | Prisma.User$ratingsArgs<ExtArgs>
   readLists?: boolean | Prisma.User$readListsArgs<ExtArgs>
+  readListMemberships?: boolean | Prisma.User$readListMembershipsArgs<ExtArgs>
+  savedReadLists?: boolean | Prisma.User$savedReadListsArgs<ExtArgs>
+  readListContributions?: boolean | Prisma.User$readListContributionsArgs<ExtArgs>
   progress?: boolean | Prisma.User$progressArgs<ExtArgs>
   readingStats?: boolean | Prisma.User$readingStatsArgs<ExtArgs>
   socialProfile?: boolean | Prisma.User$socialProfileArgs<ExtArgs>
   rssSubscriptions?: boolean | Prisma.User$rssSubscriptionsArgs<ExtArgs>
+  chatsAsFirst?: boolean | Prisma.User$chatsAsFirstArgs<ExtArgs>
+  chatsAsSecond?: boolean | Prisma.User$chatsAsSecondArgs<ExtArgs>
+  chatMessages?: boolean | Prisma.User$chatMessagesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1154,10 +2121,16 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     books: Prisma.$BookPayload<ExtArgs>[]
     ratings: Prisma.$RatingPayload<ExtArgs>[]
     readLists: Prisma.$ReadListPayload<ExtArgs>[]
+    readListMemberships: Prisma.$ReadListCollaboratorPayload<ExtArgs>[]
+    savedReadLists: Prisma.$ReadListSavePayload<ExtArgs>[]
+    readListContributions: Prisma.$ReadListBookPayload<ExtArgs>[]
     progress: Prisma.$BookProgressPayload<ExtArgs>[]
     readingStats: Prisma.$ReadingStatsPayload<ExtArgs> | null
     socialProfile: Prisma.$SocialProfilePayload<ExtArgs> | null
     rssSubscriptions: Prisma.$RssSubscriptionPayload<ExtArgs>[]
+    chatsAsFirst: Prisma.$ChatConversationPayload<ExtArgs>[]
+    chatsAsSecond: Prisma.$ChatConversationPayload<ExtArgs>[]
+    chatMessages: Prisma.$ChatMessagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1563,10 +2536,16 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   books<T extends Prisma.User$booksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$booksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ratings<T extends Prisma.User$ratingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ratingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RatingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   readLists<T extends Prisma.User$readListsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$readListsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReadListPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  readListMemberships<T extends Prisma.User$readListMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$readListMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReadListCollaboratorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  savedReadLists<T extends Prisma.User$savedReadListsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedReadListsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReadListSavePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  readListContributions<T extends Prisma.User$readListContributionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$readListContributionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReadListBookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   progress<T extends Prisma.User$progressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$progressArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   readingStats<T extends Prisma.User$readingStatsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$readingStatsArgs<ExtArgs>>): Prisma.Prisma__ReadingStatsClient<runtime.Types.Result.GetResult<Prisma.$ReadingStatsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   socialProfile<T extends Prisma.User$socialProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$socialProfileArgs<ExtArgs>>): Prisma.Prisma__SocialProfileClient<runtime.Types.Result.GetResult<Prisma.$SocialProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   rssSubscriptions<T extends Prisma.User$rssSubscriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rssSubscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RssSubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  chatsAsFirst<T extends Prisma.User$chatsAsFirstArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$chatsAsFirstArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  chatsAsSecond<T extends Prisma.User$chatsAsSecondArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$chatsAsSecondArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  chatMessages<T extends Prisma.User$chatMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$chatMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2067,6 +3046,78 @@ export type User$readListsArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * User.readListMemberships
+ */
+export type User$readListMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReadListCollaborator
+   */
+  select?: Prisma.ReadListCollaboratorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReadListCollaborator
+   */
+  omit?: Prisma.ReadListCollaboratorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReadListCollaboratorInclude<ExtArgs> | null
+  where?: Prisma.ReadListCollaboratorWhereInput
+  orderBy?: Prisma.ReadListCollaboratorOrderByWithRelationInput | Prisma.ReadListCollaboratorOrderByWithRelationInput[]
+  cursor?: Prisma.ReadListCollaboratorWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReadListCollaboratorScalarFieldEnum | Prisma.ReadListCollaboratorScalarFieldEnum[]
+}
+
+/**
+ * User.savedReadLists
+ */
+export type User$savedReadListsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReadListSave
+   */
+  select?: Prisma.ReadListSaveSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReadListSave
+   */
+  omit?: Prisma.ReadListSaveOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReadListSaveInclude<ExtArgs> | null
+  where?: Prisma.ReadListSaveWhereInput
+  orderBy?: Prisma.ReadListSaveOrderByWithRelationInput | Prisma.ReadListSaveOrderByWithRelationInput[]
+  cursor?: Prisma.ReadListSaveWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReadListSaveScalarFieldEnum | Prisma.ReadListSaveScalarFieldEnum[]
+}
+
+/**
+ * User.readListContributions
+ */
+export type User$readListContributionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReadListBook
+   */
+  select?: Prisma.ReadListBookSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReadListBook
+   */
+  omit?: Prisma.ReadListBookOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReadListBookInclude<ExtArgs> | null
+  where?: Prisma.ReadListBookWhereInput
+  orderBy?: Prisma.ReadListBookOrderByWithRelationInput | Prisma.ReadListBookOrderByWithRelationInput[]
+  cursor?: Prisma.ReadListBookWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReadListBookScalarFieldEnum | Prisma.ReadListBookScalarFieldEnum[]
+}
+
+/**
  * User.progress
  */
 export type User$progressArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2150,6 +3201,78 @@ export type User$rssSubscriptionsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.RssSubscriptionScalarFieldEnum | Prisma.RssSubscriptionScalarFieldEnum[]
+}
+
+/**
+ * User.chatsAsFirst
+ */
+export type User$chatsAsFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ChatConversation
+   */
+  select?: Prisma.ChatConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ChatConversation
+   */
+  omit?: Prisma.ChatConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChatConversationInclude<ExtArgs> | null
+  where?: Prisma.ChatConversationWhereInput
+  orderBy?: Prisma.ChatConversationOrderByWithRelationInput | Prisma.ChatConversationOrderByWithRelationInput[]
+  cursor?: Prisma.ChatConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ChatConversationScalarFieldEnum | Prisma.ChatConversationScalarFieldEnum[]
+}
+
+/**
+ * User.chatsAsSecond
+ */
+export type User$chatsAsSecondArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ChatConversation
+   */
+  select?: Prisma.ChatConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ChatConversation
+   */
+  omit?: Prisma.ChatConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChatConversationInclude<ExtArgs> | null
+  where?: Prisma.ChatConversationWhereInput
+  orderBy?: Prisma.ChatConversationOrderByWithRelationInput | Prisma.ChatConversationOrderByWithRelationInput[]
+  cursor?: Prisma.ChatConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ChatConversationScalarFieldEnum | Prisma.ChatConversationScalarFieldEnum[]
+}
+
+/**
+ * User.chatMessages
+ */
+export type User$chatMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ChatMessage
+   */
+  select?: Prisma.ChatMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ChatMessage
+   */
+  omit?: Prisma.ChatMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChatMessageInclude<ExtArgs> | null
+  where?: Prisma.ChatMessageWhereInput
+  orderBy?: Prisma.ChatMessageOrderByWithRelationInput | Prisma.ChatMessageOrderByWithRelationInput[]
+  cursor?: Prisma.ChatMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ChatMessageScalarFieldEnum | Prisma.ChatMessageScalarFieldEnum[]
 }
 
 /**

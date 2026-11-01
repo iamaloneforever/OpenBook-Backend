@@ -3,6 +3,34 @@ import { describe, expect, it } from 'vitest';
 import { validateEnvironment } from './env.validation';
 
 describe('validateEnvironment', () => {
+  it.each([
+    { GOOGLE_BOOKS_API_KEY: 123 },
+    { GOOGLE_BOOKS_API_KEY: '   ' },
+    { BOOK_CATALOG_USER_AGENT: 'OpenBook\r\nInjected: value' },
+    { BOOK_CATALOG_USER_AGENT: 'x'.repeat(513) },
+  ])('rejects invalid public catalog configuration %j', (extra) => {
+    expect(() =>
+      validateEnvironment({
+        JWT_ACCESS_SECRET: 'access',
+        JWT_REFRESH_SECRET: 'refresh',
+        ...extra,
+      }),
+    ).toThrow(/GOOGLE_BOOKS_API_KEY|BOOK_CATALOG_USER_AGENT/);
+  });
+  it.each([
+    'https://redis.example',
+    'redis://',
+    'redis://example.com/#fragment',
+    {},
+  ])('rejects invalid chat Redis configuration %j', (CHAT_REDIS_URL) => {
+    expect(() =>
+      validateEnvironment({
+        JWT_ACCESS_SECRET: 'access',
+        JWT_REFRESH_SECRET: 'refresh',
+        CHAT_REDIS_URL,
+      }),
+    ).toThrow('CHAT_REDIS_URL');
+  });
   const secrets = {
     JWT_ACCESS_SECRET: 'a'.repeat(48),
     JWT_REFRESH_SECRET: 'b'.repeat(48),

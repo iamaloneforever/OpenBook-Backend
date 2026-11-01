@@ -23,6 +23,36 @@ export function validateEnvironment(
     }
   }
   configuredOrigins(config.CORS_ORIGINS);
+  for (const name of ['GOOGLE_BOOKS_API_KEY', 'BOOK_CATALOG_USER_AGENT']) {
+    const value = config[name];
+    if (
+      value !== undefined &&
+      value !== '' &&
+      (typeof value !== 'string' ||
+        !value.trim() ||
+        value.length > 512 ||
+        /[\r\n]/.test(value))
+    )
+      throw new Error(
+        `${name} must be a nonempty string of at most 512 characters without line breaks`,
+      );
+  }
+  if (config.CHAT_REDIS_URL !== undefined && config.CHAT_REDIS_URL !== '') {
+    try {
+      if (typeof config.CHAT_REDIS_URL !== 'string') throw new Error();
+      const redisUrl = new URL(config.CHAT_REDIS_URL);
+      if (
+        !['redis:', 'rediss:'].includes(redisUrl.protocol) ||
+        !redisUrl.hostname ||
+        redisUrl.hash
+      )
+        throw new Error();
+    } catch {
+      throw new Error(
+        'CHAT_REDIS_URL must be a valid redis:// or rediss:// URL',
+      );
+    }
+  }
   if (
     config.PORT !== undefined &&
     ((typeof config.PORT !== 'string' && typeof config.PORT !== 'number') ||

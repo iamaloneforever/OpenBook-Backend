@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ReadListController } from './read-list.controller';
 import { ReadListService } from './read-list.service';
+import { PublicBooksModule } from '../chat/books/public-books.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
+  imports: [PrismaModule, PublicBooksModule],
   controllers: [ReadListController],
   providers: [ReadListService],
 })

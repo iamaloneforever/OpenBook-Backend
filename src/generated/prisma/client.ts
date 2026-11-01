@@ -70,6 +70,16 @@ export type ReadList = Prisma.ReadListModel
  */
 export type ReadListBook = Prisma.ReadListBookModel
 /**
+ * Model ReadListCollaborator
+ * 
+ */
+export type ReadListCollaborator = Prisma.ReadListCollaboratorModel
+/**
+ * Model ReadListSave
+ * 
+ */
+export type ReadListSave = Prisma.ReadListSaveModel
+/**
  * Model Rating
  * 
  */
@@ -134,3 +144,13 @@ export type RssSubscription = Prisma.RssSubscriptionModel
  * 
  */
 export type RssEntry = Prisma.RssEntryModel
+/**
+ * Model ChatConversation
+ * 
+ */
+export type ChatConversation = Prisma.ChatConversationModel
+/**
+ * Model ChatMessage
+ * 
+ */
+export type ChatMessage = Prisma.ChatMessageModel

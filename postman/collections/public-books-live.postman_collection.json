@@ -1,0 +1,155 @@
+{
+  "info": {
+    "name": "OpenBook \u2014 opt-in live public book catalogs",
+    "description": "Requires an isolated running API and external network access. Uses real public catalogs and creates one temporary account; do not run against production. Google Books is included only when the server has GOOGLE_BOOKS_API_KEY configured.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create an isolated catalog test account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/signup",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{catalogUsername}}\",\n  \"password\": \"{{catalogPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('catalogUsername', 'catalog_' + pm.variables.replaceIn('{{$guid}}').replace(/-/g,'').slice(0,16));",
+              "pm.collectionVariables.set('catalogPassword', 'Catalog-test-' + pm.variables.replaceIn('{{$guid}}'));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('catalogToken', pm.response.json().accessToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search configured public book databases",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{catalogToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/chat/books/search?q=The%20Hobbit&provider=all&limit=3",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test('At least one public book is returned', () => pm.expect(pm.response.json().data.length).to.be.above(0));",
+              "const book=pm.response.json().data[0];",
+              "pm.collectionVariables.set('catalogProvider', book.provider); pm.collectionVariables.set('catalogBookId', book.id); pm.collectionVariables.set('catalogBookUrl', book.url);",
+              "pm.test('Provider source is public', () => pm.expect(['openlibrary','google']).to.include(book.provider));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resolve a selected public book preview",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{catalogToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/chat/books/{{catalogProvider}}/{{catalogBookId}}",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test('Preview matches selected book', () => { pm.expect(pm.response.json().id).to.equal(pm.collectionVariables.get('catalogBookId')); pm.expect(pm.response.json().title.length).to.be.above(0); pm.expect(pm.response.json().url).to.match(/^https:/); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resolve the public book hyperlink",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{catalogToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/chat/books/preview?url={{catalogBookUrl}}",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test('Link preview matches public identity', () => pm.expect(pm.response.json().id).to.equal(pm.collectionVariables.get('catalogBookId')));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

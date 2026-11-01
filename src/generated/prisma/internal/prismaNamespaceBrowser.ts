@@ -57,6 +57,8 @@ export const ModelName = {
   PhysicalBook: 'PhysicalBook',
   ReadList: 'ReadList',
   ReadListBook: 'ReadListBook',
+  ReadListCollaborator: 'ReadListCollaborator',
+  ReadListSave: 'ReadListSave',
   Rating: 'Rating',
   BookProgress: 'BookProgress',
   Tag: 'Tag',
@@ -69,7 +71,9 @@ export const ModelName = {
   SocialPostView: 'SocialPostView',
   SocialBlock: 'SocialBlock',
   RssSubscription: 'RssSubscription',
-  RssEntry: 'RssEntry'
+  RssEntry: 'RssEntry',
+  ChatConversation: 'ChatConversation',
+  ChatMessage: 'ChatMessage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -151,6 +155,9 @@ export const ReadListScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
+  coverUrl: 'coverUrl',
+  visibility: 'visibility',
+  revision: 'revision',
   userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -160,12 +167,38 @@ export type ReadListScalarFieldEnum = (typeof ReadListScalarFieldEnum)[keyof typ
 
 
 export const ReadListBookScalarFieldEnum = {
+  id: 'id',
   readListId: 'readListId',
   bookId: 'bookId',
+  catalogProvider: 'catalogProvider',
+  catalogId: 'catalogId',
+  catalogPreview: 'catalogPreview',
+  position: 'position',
+  note: 'note',
+  addedById: 'addedById',
   addedAt: 'addedAt'
 } as const
 
 export type ReadListBookScalarFieldEnum = (typeof ReadListBookScalarFieldEnum)[keyof typeof ReadListBookScalarFieldEnum]
+
+
+export const ReadListCollaboratorScalarFieldEnum = {
+  readListId: 'readListId',
+  userId: 'userId',
+  role: 'role',
+  createdAt: 'createdAt'
+} as const
+
+export type ReadListCollaboratorScalarFieldEnum = (typeof ReadListCollaboratorScalarFieldEnum)[keyof typeof ReadListCollaboratorScalarFieldEnum]
+
+
+export const ReadListSaveScalarFieldEnum = {
+  readListId: 'readListId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type ReadListSaveScalarFieldEnum = (typeof ReadListSaveScalarFieldEnum)[keyof typeof ReadListSaveScalarFieldEnum]
 
 
 export const RatingScalarFieldEnum = {
@@ -325,12 +358,57 @@ export const RssEntryScalarFieldEnum = {
 export type RssEntryScalarFieldEnum = (typeof RssEntryScalarFieldEnum)[keyof typeof RssEntryScalarFieldEnum]
 
 
+export const ChatConversationScalarFieldEnum = {
+  id: 'id',
+  firstUserId: 'firstUserId',
+  secondUserId: 'secondUserId',
+  lastSequence: 'lastSequence',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChatConversationScalarFieldEnum = (typeof ChatConversationScalarFieldEnum)[keyof typeof ChatConversationScalarFieldEnum]
+
+
+export const ChatMessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  senderId: 'senderId',
+  clientMessageId: 'clientMessageId',
+  sequence: 'sequence',
+  content: 'content',
+  spoiler: 'spoiler',
+  quote: 'quote',
+  bookPreviews: 'bookPreviews',
+  bookReferences: 'bookReferences',
+  replyToId: 'replyToId',
+  createdAt: 'createdAt'
+} as const
+
+export type ChatMessageScalarFieldEnum = (typeof ChatMessageScalarFieldEnum)[keyof typeof ChatMessageScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -347,4 +425,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

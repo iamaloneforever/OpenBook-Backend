@@ -30,19 +30,36 @@ enum BookReadingStatus {
   DROPPED
 }
 
+enum ReadListVisibility {
+  PRIVATE
+  UNLISTED
+  PUBLIC
+}
+
+enum ReadListRole {
+  VIEWER
+  EDITOR
+}
+
 model User {
   id           String  @id @default(cuid())
   username     String  @unique
   password     String
   refreshToken String?
 
-  books            Book[]
-  ratings          Rating[]
-  readLists        ReadList[]
-  progress         BookProgress[]
-  readingStats     ReadingStats?
-  socialProfile    SocialProfile?
-  rssSubscriptions RssSubscription[]
+  books                 Book[]
+  ratings               Rating[]
+  readLists             ReadList[]
+  readListMemberships   ReadListCollaborator[]
+  savedReadLists        ReadListSave[]
+  readListContributions ReadListBook[]         @relation("ReadListContributor")
+  progress              BookProgress[]
+  readingStats          ReadingStats?
+  socialProfile         SocialProfile?
+  rssSubscriptions      RssSubscription[]
+  chatsAsFirst          ChatConversation[]     @relation("ChatFirstParticipant")
+  chatsAsSecond         ChatConversation[]     @relation("ChatSecondParticipant")
+  chatMessages          ChatMessage[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -112,33 +129,73 @@ model PhysicalBook {
 }
 
 model ReadList {
-  id          String  @id @default(cuid())
+  id          String             @id @default(cuid())
   title       String
   description String?
+  coverUrl    String?            @db.VarChar(2048)
+  visibility  ReadListVisibility @default(PRIVATE)
+  revision    Int                @default(0)
 
   userId String
   owner  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  items ReadListBook[]
+  items         ReadListBook[]
+  collaborators ReadListCollaborator[]
+  saves         ReadListSave[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([userId, title])
   @@index([userId])
+  @@index([visibility, updatedAt(sort: Desc), id])
 }
 
 model ReadListBook {
-  readListId String
-  bookId     String
+  id              String  @id @default(cuid())
+  readListId      String
+  bookId          String?
+  catalogProvider String? @db.VarChar(20)
+  catalogId       String? @db.VarChar(100)
+  catalogPreview  Json?
+  position        Int
+  note            String? @db.VarChar(1000)
+  addedById       String?
+  addedBy         User?   @relation("ReadListContributor", fields: [addedById], references: [id], onDelete: SetNull)
 
   readList ReadList @relation(fields: [readListId], references: [id], onDelete: Cascade)
-  book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  book     Book?    @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   addedAt DateTime @default(now())
 
-  @@id([readListId, bookId])
+  @@unique([readListId, bookId])
+  @@unique([readListId, catalogProvider, catalogId])
+  @@unique([readListId, position])
   @@index([bookId])
+  @@index([addedById])
+}
+
+model ReadListCollaborator {
+  readListId String
+  userId     String
+  role       ReadListRole @default(EDITOR)
+  readList   ReadList     @relation(fields: [readListId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime     @default(now())
+
+  @@id([readListId, userId])
+  @@index([userId])
+}
+
+model ReadListSave {
+  readListId String
+  userId     String
+  readList   ReadList @relation(fields: [readListId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@id([readListId, userId])
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model Rating {
@@ -342,4 +399,44 @@ model RssEntry {
 
   @@unique([subscriptionId, guidHash])
   @@index([subscriptionId, publishedAt(sort: Desc), id(sort: Desc)])
+}
+
+model ChatConversation {
+  id           String        @id @default(cuid())
+  firstUserId  String
+  secondUserId String
+  firstUser    User          @relation("ChatFirstParticipant", fields: [firstUserId], references: [id], onDelete: Cascade)
+  secondUser   User          @relation("ChatSecondParticipant", fields: [secondUserId], references: [id], onDelete: Cascade)
+  lastSequence Int           @default(0)
+  messages     ChatMessage[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([firstUserId, secondUserId])
+  @@index([firstUserId, id])
+  @@index([secondUserId, id])
+}
+
+model ChatMessage {
+  id              String           @id @default(cuid())
+  conversationId  String
+  senderId        String
+  clientMessageId String           @db.Uuid
+  sequence        Int
+  content         String           @db.VarChar(4000)
+  spoiler         Boolean          @default(false)
+  quote           Json?
+  bookPreviews    Json             @default("[]")
+  bookReferences  Json             @default("[]")
+  replyToId       String?
+  replyTo         ChatMessage?     @relation("ChatReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies         ChatMessage[]    @relation("ChatReplies")
+  conversation    ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender          User             @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  createdAt       DateTime         @default(now())
+
+  @@unique([conversationId, sequence])
+  @@unique([conversationId, senderId, clientMessageId])
+  @@index([senderId])
+  @@index([replyToId])
 }
